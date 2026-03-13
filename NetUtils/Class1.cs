@@ -1,6 +1,6 @@
 ﻿namespace NetUtils
 {
-    public class Class1
+    public class netUtils
     {
 
     }
