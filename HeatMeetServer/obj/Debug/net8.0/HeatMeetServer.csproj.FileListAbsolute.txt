@@ -1,0 +1,6 @@
+D:\HeatMeet-main\HeatMeetServer\obj\Debug\net8.0\HeatMeetServer.csproj.AssemblyReference.cache
+D:\HeatMeet-main\HeatMeetServer\obj\Debug\net8.0\HeatMeetServer.GeneratedMSBuildEditorConfig.editorconfig
+D:\HeatMeet-main\HeatMeetServer\obj\Debug\net8.0\HeatMeetServer.AssemblyInfoInputs.cache
+D:\HeatMeet-main\HeatMeetServer\obj\Debug\net8.0\HeatMeetServer.AssemblyInfo.cs
+D:\HeatMeet-main\HeatMeetServer\obj\Debug\net8.0\HeatMeetServer.csproj.CoreCompileInputs.cache
+D:\HeatMeet-main\HeatMeetServer\obj\Debug\net8.0\HeatMeetServer.sourcelink.json
