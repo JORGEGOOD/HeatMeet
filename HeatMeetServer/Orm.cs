@@ -1,31 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace HeatMeetServer
 {
     internal class OrmManager : DbContext
     {
-        //crear tablas
+        //create tables
+        public DbSet<Users> Users { get; set; }
+        public DbSet<Groups> Groups { get; set; }
+        public DbSet<Events> Events { get; set; }
+        public DbSet<Disponibility> Disponibility { get; set; }
+        public DbSet<Messages> Messages { get; set; }
 
-
-        //configuracion
+        //configuration
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)//config code
-        {
+        { 
             base.OnConfiguring(optionsBuilder);
             optionsBuilder.UseNpgsql(@$"Host=LocalHost;" +
                                     "Port=5432;" +
                                     "Username=alumno;" + //school pc has this default user
-                                    "Password=AlumnoIFP;" +
+                                    "Password=AlumnoFP;" +
                                     "Database=postgres;");
         }
     }
-
 
     [Table("Users")]
     public class Users
@@ -33,20 +31,20 @@ namespace HeatMeetServer
         [Key]
         int id { get; set; }
 
-        [Required,MaxLength(50)]
+        [Required, MaxLength(50)]
         string name { get; set; }
 
-        [Required,MaxLength(100)]
+        [Required, MaxLength(100)]
         string email { get; set; }
 
-        [Required,MaxLength(100)]
+        [Required, MaxLength(100)]
         string password { get; set; }
 
         List<Groups> Groups { get; set; } = new();
 
-        /*
+        /* related possible functions:
          * bool Login(string email, string passw) 
-         * void UpdateProfile(string nuevoNombre)
+         * bool UpdateProfile(string nuevoNombre)
          * List<Messages> GetNotifications()
          */
     }
@@ -57,7 +55,7 @@ namespace HeatMeetServer
         [Key]
         int id { get; set; }
 
-        [Required,MaxLength(50)]
+        [Required, MaxLength(50)]
         string name { get; set; }
 
         [Required]
@@ -66,30 +64,37 @@ namespace HeatMeetServer
         [Required]
         DateTime createDate { get; set; }
 
+        List<Users> usersId { get; set; } = new();//Should save users id's. 
 
-        List<Users>  usersId  { get; set; } = new();  //deberia guardar las id's de los usuarios
-        List<Events> eventsId { get; set; } = new();//deberia guardar cada id de evento
-        //el grupo deberia tener una lista de mensajes? y esos mensajes contienen eventos? deberia ir eventos dentro de mensajes?
+        List<Events> eventsId { get; set; } = new();//Should save events id's.
         
-        /*
-         * string GenerarEnlac
+        //the group should have a list of messages? the messages should be able to be events? or should the events be put separated?
+
+        /* related possible functions:
+         * string GenerateInviteLink()
+         * bool AddMember(int userId)
+         * bool BanUser(int userId)
          */
     }
 
-
     [Table("Events")]
-    public class Events
+    public class Events //an event is a message that opens a menu where multiple people can vote where and when to meet, voting place, and date
     {
         [Key]
         int id { get; set; }
 
-        [Required,MaxLength(50)]
+        [Required, MaxLength(50)]
         string title { get; set; }
 
-        string ubicacion { get; set; }//separar longitud y latitud?
+        string ubicacion { get; set; }//separate longitude and latitude?
 
         List<Disponibility> disponibility { get; set; } = new();
 
+        /* related possible functions:
+         * bool CalculateHeatMap() //the app will show the votes as a heatmap on the calendar
+         * bool SetPlace(string direction)
+         * List<Messages> GetChat() 
+         */
     }
 
     [Table("Disponibility")]
@@ -105,11 +110,14 @@ namespace HeatMeetServer
         TimeSpan hourStart { get; set; }
 
         [Required]
-        TimeSpan hourEnd {  get; set; }
+        TimeSpan hourEnd { get; set; }
 
         [Required]
-        int userid { get; set; }//linkearlo a usuarios? Users userid {get;set;}?
+        int userid { get; set; }//link it to users? Users userid {get;set;}?
 
+        /* related possible functions:
+         * bool RegisterVote(DateTime date, 
+         */
     }
 
     [Table("Messages")]
@@ -119,16 +127,19 @@ namespace HeatMeetServer
         int id { get; set; }
 
         [Required]
-        string content { get; set; } //texto simple sin mas, quizas en un futuro ponemos un code personalizado como <img> y q la app lo detecte como imagen serializada
+        int userId { get; set; }
 
-        //string UrlArchivo???? no hace falta, en el content podemos poner codigos personalizados? no lo tengo claro
-        
         [Required]
         DateTime createDate { get; set; }
 
-        
+        [Required]
+        string content { get; set; } //simple text no more, maybe in future we could put custom codes like <imgs> for the app to render it as an image                                  
+
+        //string UrlFile? unnecesary? in the content we could put custom codes and the serialized img, i dont know
+
+        /* related possible functions:
+         * bool SendMessage
+         * string UploadMedia(byte[] file)
+         */
     }
-
-
-
 }
