@@ -51,6 +51,15 @@ namespace NetUtils
             return host.AddressList[index].ToString();
 
         }
+
+        public static void CloseSocket(Socket s)
+        {
+            if (s.Connected)
+                s.Shutdown(SocketShutdown.Both);
+
+            s.Close();
+        }
+
     }
 }
 
