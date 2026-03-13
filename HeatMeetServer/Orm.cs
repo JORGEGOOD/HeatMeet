@@ -10,7 +10,7 @@ namespace HeatMeetServer
         public DbSet<Users> Users { get; set; }
         public DbSet<Groups> Groups { get; set; }
         public DbSet<Events> Events { get; set; }
-        public DbSet<Disponibility> Disponibility { get; set; }
+        public DbSet<Votes> Votes { get; set; }
         public DbSet<Messages> Messages { get; set; }
 
         //configuration
@@ -86,9 +86,9 @@ namespace HeatMeetServer
         [Required, MaxLength(50)]
         string title { get; set; }
 
-        string ubicacion { get; set; }//separate longitude and latitude?
+        string ubication { get; set; }
 
-        List<Disponibility> disponibility { get; set; } = new();
+        List<Votes> votes { get; set; } = new();
 
         /* related possible functions:
          * bool CalculateHeatMap() //the app will show the votes as a heatmap on the calendar
@@ -97,8 +97,8 @@ namespace HeatMeetServer
          */
     }
 
-    [Table("Disponibility")]
-    public class Disponibility
+    [Table("Votes")]
+    public class Votes
     {
         [Key]
         int id { get; set; }
@@ -109,7 +109,7 @@ namespace HeatMeetServer
         [Required]
         TimeSpan hourStart { get; set; }
 
-        [Required]
+        
         TimeSpan hourEnd { get; set; }
 
         [Required]

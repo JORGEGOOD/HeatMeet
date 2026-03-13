@@ -5643,11 +5643,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Alumno\\Documents\\GitHub\\HeatMeet\\HeatMeetServer\\HeatMeetServer.csproj",
+      "projectUniqueName": "D:\\cuak cuak\\HeatMeet\\Server\\HeatMeetServer\\HeatMeetServer\\HeatMeetServer.csproj",
       "projectName": "HeatMeetServer",
-      "projectPath": "C:\\Users\\Alumno\\Documents\\GitHub\\HeatMeet\\HeatMeetServer\\HeatMeetServer.csproj",
+      "projectPath": "D:\\cuak cuak\\HeatMeet\\Server\\HeatMeetServer\\HeatMeetServer\\HeatMeetServer.csproj",
       "packagesPath": "C:\\Users\\Alumno\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Alumno\\Documents\\GitHub\\HeatMeet\\HeatMeetServer\\obj\\",
+      "outputPath": "D:\\cuak cuak\\HeatMeet\\Server\\HeatMeetServer\\HeatMeetServer\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -5723,13 +5723,5 @@
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
       }
     }
-  },
-  "logs": [
-    {
-      "code": "Undefined",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "Problema al leer el archivo de caché C:\\Users\\Alumno\\Documents\\GitHub\\HeatMeet\\HeatMeetServer\\obj\\project.nuget.cache : Invalid property identifier character: <. Path 'version', line 3, position 0."
-    }
-  ]
+  }
 }

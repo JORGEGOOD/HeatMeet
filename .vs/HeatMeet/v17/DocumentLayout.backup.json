@@ -7,12 +7,12 @@
       "RelativeMoniker": "D:0:0:{3C78B55D-D535-4871-B1FC-421F1032B7DB}|NetUtils\\NetUtils.csproj|solutionrelative:netutils\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Alumno\\Documents\\GitHub\\HeatMeet\\HeatMeetServer\\Program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:HeatMeetServer\\Program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B2370A0A-3A76-4075-B02E-2F79BAA5B2AD}|HeatMeetServer\\HeatMeetServer.csproj|c:\\users\\alumno\\documents\\github\\heatmeet\\heatmeetserver\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B2370A0A-3A76-4075-B02E-2F79BAA5B2AD}|HeatMeetServer\\HeatMeetServer.csproj|solutionrelative:heatmeetserver\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Alumno\\Documents\\GitHub\\HeatMeet\\HeatMeetServer\\HeatMeetServer.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:HeatMeetServer\\HeatMeetServer.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+      "AbsoluteMoniker": "D:0:0:{B2370A0A-3A76-4075-B02E-2F79BAA5B2AD}|HeatMeetServer\\HeatMeetServer.csproj|c:\\users\\alumno\\documents\\github\\heatmeet\\heatmeetserver\\heatmeetserver.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{B2370A0A-3A76-4075-B02E-2F79BAA5B2AD}|HeatMeetServer\\HeatMeetServer.csproj|solutionrelative:heatmeetserver\\heatmeetserver.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
     }
   ],
   "DocumentGroupContainers": [
@@ -32,7 +32,7 @@
               "RelativeDocumentMoniker": "NetUtils\\Class1.cs",
               "ToolTip": "C:\\Users\\Alumno\\Documents\\GitHub\\HeatMeet\\NetUtils\\Class1.cs",
               "RelativeToolTip": "NetUtils\\Class1.cs",
-              "ViewState": "AgIAAB0AAAAAAAAAAAAwwDYAAAAeAAAAAAAAAA==",
+              "ViewState": "AgIAABUAAAAAAAAAAAAswDoAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-13T07:52:24.385Z",
               "IsPinned": true,
@@ -48,7 +48,7 @@
               "RelativeToolTip": "HeatMeetServer\\Program.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-13T09:09:28.061Z"
+              "WhenOpened": "2026-03-13T07:41:54.553Z"
             },
             {
               "$type": "Document",
@@ -60,7 +60,7 @@
               "RelativeToolTip": "HeatMeetServer\\HeatMeetServer.csproj",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2026-03-13T09:09:28.063Z"
+              "WhenOpened": "2026-03-13T07:41:57.979Z"
             }
           ]
         }

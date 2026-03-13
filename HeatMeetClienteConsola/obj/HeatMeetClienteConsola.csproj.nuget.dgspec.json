@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\cuak cuak\\HeatMeet\\Server\\HeatMeetServer\\HeatMeetServer\\HeatMeetServer.csproj": {}
+    "D:\\cuak cuak\\HeatMeet\\Server\\HeatMeetServer\\HeatMeetClienteConsola\\HeatMeetClienteConsola.csproj": {}
   },
   "projects": {
-    "D:\\cuak cuak\\HeatMeet\\Server\\HeatMeetServer\\HeatMeetServer\\HeatMeetServer.csproj": {
+    "D:\\cuak cuak\\HeatMeet\\Server\\HeatMeetServer\\HeatMeetClienteConsola\\HeatMeetClienteConsola.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\cuak cuak\\HeatMeet\\Server\\HeatMeetServer\\HeatMeetServer\\HeatMeetServer.csproj",
-        "projectName": "HeatMeetServer",
-        "projectPath": "D:\\cuak cuak\\HeatMeet\\Server\\HeatMeetServer\\HeatMeetServer\\HeatMeetServer.csproj",
+        "projectUniqueName": "D:\\cuak cuak\\HeatMeet\\Server\\HeatMeetServer\\HeatMeetClienteConsola\\HeatMeetClienteConsola.csproj",
+        "projectName": "HeatMeetClienteConsola",
+        "projectPath": "D:\\cuak cuak\\HeatMeet\\Server\\HeatMeetServer\\HeatMeetClienteConsola\\HeatMeetClienteConsola.csproj",
         "packagesPath": "C:\\Users\\Alumno\\.nuget\\packages\\",
-        "outputPath": "D:\\cuak cuak\\HeatMeet\\Server\\HeatMeetServer\\HeatMeetServer\\obj\\",
+        "outputPath": "D:\\cuak cuak\\HeatMeet\\Server\\HeatMeetServer\\HeatMeetClienteConsola\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -51,21 +51,9 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
-            "Microsoft.EntityFrameworkCore": {
-              "target": "Package",
-              "version": "[8.0.0, )"
-            },
             "Npgsql": {
               "target": "Package",
               "version": "[10.0.2, )"
-            },
-            "Npgsql.EntityFrameworkCore.PostgreSQL": {
-              "target": "Package",
-              "version": "[8.0.0, )"
-            },
-            "ORM": {
-              "target": "Package",
-              "version": "[0.0.1, )"
             }
           },
           "imports": [
