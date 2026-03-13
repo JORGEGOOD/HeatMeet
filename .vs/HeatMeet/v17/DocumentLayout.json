@@ -39,8 +39,7 @@
               "ViewState": "AgIAABUAAAAAAAAAAAAswDoAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-13T07:52:24.385Z",
-              "IsPinned": true,
-              "EditorCaption": ""
+              "IsPinned": true
             },
             {
               "$type": "Document",
@@ -50,7 +49,7 @@
               "RelativeDocumentMoniker": "HeatMeetServer\\Orm.cs",
               "ToolTip": "D:\\cuak cuak\\HeatMeet\\Server\\HeatMeetServer\\HeatMeetServer\\Orm.cs",
               "RelativeToolTip": "HeatMeetServer\\Orm.cs",
-              "ViewState": "AgIAAGkAAAAAAAAAAAAawG8AAAAIAAAAAAAAAA==",
+              "ViewState": "AgIAACwAAAAAAAAAAAAkwEsAAAAZAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-13T09:53:59.443Z",
               "EditorCaption": ""
@@ -65,8 +64,7 @@
               "RelativeToolTip": "HeatMeetServer\\Program.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-13T07:41:54.553Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-13T07:41:54.553Z"
             },
             {
               "$type": "Document",
@@ -78,8 +76,7 @@
               "RelativeToolTip": "HeatMeetServer\\HeatMeetServer.csproj",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2026-03-13T07:41:57.979Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-13T07:41:57.979Z"
             }
           ]
         }

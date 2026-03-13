@@ -25,121 +25,89 @@ namespace HeatMeetServer
         }
     }
 
-    [Table("Users")]
     public class Users
     {
         [Key]
-        int id { get; set; }
+        public int Id { get; set; } // Propiedades siempre PUBLIC
 
         [Required, MaxLength(50)]
-        string name { get; set; }
+        public string Name { get; set; }
 
         [Required, MaxLength(100)]
-        string email { get; set; }
+        public string Email { get; set; }
 
-        [Required, MaxLength(100)]
-        string password { get; set; }
+        [Required]
+        public string Password { get; set; }
 
-        List<Groups> Groups { get; set; } = new();
-
-        /* related possible functions:
-         * bool Login(string email, string passw) 
-         * bool UpdateProfile(string nuevoNombre)
-         * List<Messages> GetNotifications()
-         */
+        // Relación Muchos a Muchos con Groups
+        public List<Groups> Groups { get; set; } = new();
     }
 
-    [Table("Groups")]
     public class Groups
     {
         [Key]
-        int id { get; set; }
+        public int Id { get; set; }
 
         [Required, MaxLength(50)]
-        string name { get; set; }
+        public string Name { get; set; }
 
-        [Required]
-        string inviteCode { get; set; }
+        public string InviteCode { get; set; }
+        public DateTime CreateDate { get; set; }
 
-        [Required]
-        DateTime createDate { get; set; }
-
-        List<Users> usersId { get; set; } = new();//Should save users id's. 
-
-        List<Events> eventsId { get; set; } = new();//Should save events id's.
-        
-        //the group should have a list of messages? the messages should be able to be events? or should the events be put separated?
-
-        /* related possible functions:
-         * string GenerateInviteLink()
-         * bool AddMember(int userId)
-         * bool BanUser(int userId)
-         */
+        // EF Core gestiona las listas automáticamente
+        public List<Users> Users { get; set; } = new();
+        public List<Events> Events { get; set; } = new();
+        public List<Messages> Messages { get; set; } = new(); // Añadido para el chat de grupo
     }
 
-    [Table("Events")]
-    public class Events //an event is a message that opens a menu where multiple people can vote where and when to meet, voting place, and date
+    public class Events
     {
         [Key]
-        int id { get; set; }
+        public int Id { get; set; }
 
         [Required, MaxLength(50)]
-        string title { get; set; }
+        public string Title { get; set; }
+        public string? Ubicacion { get; set; }
 
-        string ubication { get; set; }
+        // Relación con el grupo al que pertenece
+        public int GroupId { get; set; }
+        public Groups Group { get; set; }
 
-        List<Votes> votes { get; set; } = new();
-
-        /* related possible functions:
-         * bool CalculateHeatMap() //the app will show the votes as a heatmap on the calendar
-         * bool SetPlace(string direction)
-         * List<Messages> GetChat() 
-         */
+        public List<Disponibility> Disponibilities { get; set; } = new();
     }
 
-    [Table("Votes")]
-    public class Votes
+    public class Disponibility
     {
         [Key]
-        int id { get; set; }
+        public int Id { get; set; }
 
         [Required]
-        DateTime date { get; set; }
+        public DateTime Date { get; set; }
+        public TimeSpan HourStart { get; set; }
+        public TimeSpan HourEnd { get; set; }
 
-        [Required]
-        TimeSpan hourStart { get; set; }
+        // FK hacia Usuario
+        public int UserId { get; set; }
+        public Users User { get; set; } // Propiedad de navegación
 
-        
-        TimeSpan hourEnd { get; set; }
-
-        [Required]
-        int userid { get; set; }//link it to users? Users userid {get;set;}?
-
-        /* related possible functions:
-         * bool RegisterVote(DateTime date, 
-         */
+        // FK hacia Evento
+        public int EventId { get; set; }
+        public Events Event { get; set; }
     }
 
-    [Table("Messages")]
     public class Messages
     {
         [Key]
-        int id { get; set; }
+        public int Id { get; set; }
 
-        [Required]
-        int userId { get; set; }
+        public string Content { get; set; }
+        public DateTime CreateDate { get; set; }
+        public string? UrlFile { get; set; } // Mejor tenerlo por si acaso para fotos
 
-        [Required]
-        DateTime createDate { get; set; }
+        public int UserId { get; set; }
+        public Users User { get; set; }
 
-        [Required]
-        string content { get; set; } //simple text no more, maybe in future we could put custom codes like <imgs> for the app to render it as an image                                  
-
-        //string UrlFile? unnecesary? in the content we could put custom codes and the serialized img, i dont know
-
-        /* related possible functions:
-         * bool SendMessage
-         * string UploadMedia(byte[] file)
-         */
+        public int GroupId { get; set; }
+        public Groups Group { get; set; }
     }
 }
