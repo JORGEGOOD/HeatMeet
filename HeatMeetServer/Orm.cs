@@ -21,14 +21,14 @@ namespace HeatMeetServer
                                     "Port=5432;" +
                                     "Username=alumno;" + //school pc has this default user
                                     "Password=AlumnoFP;" +
-                                    "Database=postgres;");
+                                    "Database=HeatMeet;");
         }
     }
 
     public class Users
     {
         [Key]
-        public int Id { get; set; } // Propiedades siempre PUBLIC
+        public int Id { get; set; }
 
         [Required, MaxLength(50)]
         public string Name { get; set; }
@@ -39,7 +39,7 @@ namespace HeatMeetServer
         [Required]
         public string Password { get; set; }
 
-        // Relación Muchos a Muchos con Groups
+        //N:M
         public List<Groups> Groups { get; set; } = new();
     }
 
@@ -54,10 +54,10 @@ namespace HeatMeetServer
         public string InviteCode { get; set; }
         public DateTime CreateDate { get; set; }
 
-        // EF Core gestiona las listas automáticamente
+
         public List<Users> Users { get; set; } = new();
-        public List<Events> Events { get; set; } = new();
-        public List<Messages> Messages { get; set; } = new(); // Añadido para el chat de grupo
+        public List<Events> Events { get; set; } = new();//messages and events are separated
+        public List<Messages> Messages { get; set; } = new(); //individual messages
     }
 
     public class Events
@@ -69,14 +69,13 @@ namespace HeatMeetServer
         public string Title { get; set; }
         public string? Ubicacion { get; set; }
 
-        // Relación con el grupo al que pertenece
         public int GroupId { get; set; }
         public Groups Group { get; set; }
 
-        public List<Disponibility> Disponibilities { get; set; } = new();
+        public List<Votes> Votes { get; set; } = new();
     }
 
-    public class Disponibility
+    public class Votes
     {
         [Key]
         public int Id { get; set; }
@@ -85,12 +84,11 @@ namespace HeatMeetServer
         public DateTime Date { get; set; }
         public TimeSpan HourStart { get; set; }
         public TimeSpan HourEnd { get; set; }
-
-        // FK hacia Usuario
+        
+        //foreign key to user
         public int UserId { get; set; }
-        public Users User { get; set; } // Propiedad de navegación
-
-        // FK hacia Evento
+        public Users User { get; set; }
+        //foreign key to event
         public int EventId { get; set; }
         public Events Event { get; set; }
     }
@@ -102,11 +100,10 @@ namespace HeatMeetServer
 
         public string Content { get; set; }
         public DateTime CreateDate { get; set; }
-        public string? UrlFile { get; set; } // Mejor tenerlo por si acaso para fotos
 
+        //foreign keys
         public int UserId { get; set; }
         public Users User { get; set; }
-
         public int GroupId { get; set; }
         public Groups Group { get; set; }
     }
