@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("HeatMeetClienteConsola")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0ec7002afcbd181e1750af434d9e10ab3f582132")]
 [assembly: System.Reflection.AssemblyProductAttribute("HeatMeetClienteConsola")]
 [assembly: System.Reflection.AssemblyTitleAttribute("HeatMeetClienteConsola")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

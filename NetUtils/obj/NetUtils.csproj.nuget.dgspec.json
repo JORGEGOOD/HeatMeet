@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\cuak cuak\\HeatMeet\\Server\\HeatMeetServer\\NetUtils\\NetUtils.csproj": {}
+    "C:\\Users\\Alumno\\Documents\\GitHub\\HeatMeet\\NetUtils\\NetUtils.csproj": {}
   },
   "projects": {
-    "D:\\cuak cuak\\HeatMeet\\Server\\HeatMeetServer\\NetUtils\\NetUtils.csproj": {
+    "C:\\Users\\Alumno\\Documents\\GitHub\\HeatMeet\\NetUtils\\NetUtils.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\cuak cuak\\HeatMeet\\Server\\HeatMeetServer\\NetUtils\\NetUtils.csproj",
+        "projectUniqueName": "C:\\Users\\Alumno\\Documents\\GitHub\\HeatMeet\\NetUtils\\NetUtils.csproj",
         "projectName": "NetUtils",
-        "projectPath": "D:\\cuak cuak\\HeatMeet\\Server\\HeatMeetServer\\NetUtils\\NetUtils.csproj",
+        "projectPath": "C:\\Users\\Alumno\\Documents\\GitHub\\HeatMeet\\NetUtils\\NetUtils.csproj",
         "packagesPath": "C:\\Users\\Alumno\\.nuget\\packages\\",
-        "outputPath": "D:\\cuak cuak\\HeatMeet\\Server\\HeatMeetServer\\NetUtils\\obj\\",
+        "outputPath": "C:\\Users\\Alumno\\Documents\\GitHub\\HeatMeet\\NetUtils\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -50,6 +50,12 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
+          "dependencies": {
+            "Npgsql": {
+              "target": "Package",
+              "version": "[10.0.2, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
