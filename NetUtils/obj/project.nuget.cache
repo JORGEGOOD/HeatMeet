@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "rcAHoi2GQmw=",
+  "dgSpecHash": "HL690Op0R74=",
   "success": true,
-  "projectFilePath": "D:\\HeatMeet-main\\NetUtils\\NetUtils.csproj",
+  "projectFilePath": "D:\\cuak cuak\\HeatMeet\\Server\\HeatMeetServer\\NetUtils\\NetUtils.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Alumno\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\8.0.0\\microsoft.extensions.dependencyinjection.abstractions.8.0.0.nupkg.sha512",
     "C:\\Users\\Alumno\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\8.0.0\\microsoft.extensions.logging.abstractions.8.0.0.nupkg.sha512",

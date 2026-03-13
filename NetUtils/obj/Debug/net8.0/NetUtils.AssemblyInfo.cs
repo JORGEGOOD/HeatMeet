@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("NetUtils")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a3f96e00b874ca71d114cbf4326f205519d74f65")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+88a51848708a4a6536f66ff47c953794bdd74ef5")]
 [assembly: System.Reflection.AssemblyProductAttribute("NetUtils")]
 [assembly: System.Reflection.AssemblyTitleAttribute("NetUtils")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

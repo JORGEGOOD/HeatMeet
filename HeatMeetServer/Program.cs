@@ -47,6 +47,12 @@ namespace HeatMeetServer
 
         static void Main(string[] args)
         {
+
+            OrmManager ormManager = new OrmManager();
+            ormManager.Database.EnsureCreated();
+
+
+
             try
             {
                 Console.WriteLine("=== HEATMEET TCP SERVER ===");
@@ -78,6 +84,9 @@ namespace HeatMeetServer
             {
                 Console.WriteLine($"\n❌ Error: {ex.Message}");
             }
+
+
+
         }
 
         static void HandleClient(object? obj)

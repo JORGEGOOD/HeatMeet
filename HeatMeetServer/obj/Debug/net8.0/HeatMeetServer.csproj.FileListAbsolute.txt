@@ -4,3 +4,40 @@ D:\HeatMeet-main\HeatMeetServer\obj\Debug\net8.0\HeatMeetServer.AssemblyInfoInpu
 D:\HeatMeet-main\HeatMeetServer\obj\Debug\net8.0\HeatMeetServer.AssemblyInfo.cs
 D:\HeatMeet-main\HeatMeetServer\obj\Debug\net8.0\HeatMeetServer.csproj.CoreCompileInputs.cache
 D:\HeatMeet-main\HeatMeetServer\obj\Debug\net8.0\HeatMeetServer.sourcelink.json
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\bin\Debug\net8.0\HeatMeetServer.exe
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\bin\Debug\net8.0\HeatMeetServer.deps.json
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\bin\Debug\net8.0\HeatMeetServer.runtimeconfig.json
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\bin\Debug\net8.0\HeatMeetServer.dll
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\bin\Debug\net8.0\HeatMeetServer.pdb
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\bin\Debug\net8.0\Dapper.dll
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.dll
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Relational.dll
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\bin\Debug\net8.0\Microsoft.Extensions.Caching.Abstractions.dll
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\bin\Debug\net8.0\Microsoft.Extensions.Caching.Memory.dll
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\bin\Debug\net8.0\Microsoft.Extensions.Configuration.Abstractions.dll
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.dll
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\bin\Debug\net8.0\Microsoft.Extensions.Logging.dll
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\bin\Debug\net8.0\Microsoft.Extensions.Logging.Abstractions.dll
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\bin\Debug\net8.0\Microsoft.Extensions.Options.dll
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\bin\Debug\net8.0\Microsoft.Extensions.Primitives.dll
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\bin\Debug\net8.0\Npgsql.dll
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\bin\Debug\net8.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\bin\Debug\net8.0\Bara.dll
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\bin\Debug\net8.0\runtimes\win7-x64\native\sni.dll
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\bin\Debug\net8.0\runtimes\win7-x86\native\sni.dll
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\bin\Debug\net8.0\runtimes\unix\lib\netstandard1.3\System.Data.SqlClient.dll
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\bin\Debug\net8.0\runtimes\win\lib\netstandard1.3\System.Data.SqlClient.dll
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\obj\Debug\net8.0\HeatMeetServer.csproj.AssemblyReference.cache
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\obj\Debug\net8.0\HeatMeetServer.GeneratedMSBuildEditorConfig.editorconfig
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\obj\Debug\net8.0\HeatMeetServer.AssemblyInfoInputs.cache
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\obj\Debug\net8.0\HeatMeetServer.AssemblyInfo.cs
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\obj\Debug\net8.0\HeatMeetServer.csproj.CoreCompileInputs.cache
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\obj\Debug\net8.0\HeatMeetServer.sourcelink.json
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\obj\Debug\net8.0\HeatMeet.83442B49.Up2Date
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\obj\Debug\net8.0\HeatMeetServer.dll
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\obj\Debug\net8.0\refint\HeatMeetServer.dll
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\obj\Debug\net8.0\HeatMeetServer.pdb
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\obj\Debug\net8.0\HeatMeetServer.genruntimeconfig.cache
+D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeetServer\obj\Debug\net8.0\ref\HeatMeetServer.dll

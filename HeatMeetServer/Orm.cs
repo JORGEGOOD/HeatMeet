@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HeatMeetServer
 {
-    internal class OrmManager : DbContext
+    public class OrmManager : DbContext
     {
         //create tables
         public DbSet<Users> Users { get; set; }
@@ -17,10 +17,10 @@ namespace HeatMeetServer
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)//config code
         { 
             base.OnConfiguring(optionsBuilder);
-            optionsBuilder.UseNpgsql(@$"Host=LocalHost;" +
+            optionsBuilder.UseNpgsql(@$"Host=127.0.0.1;" +
                                     "Port=5432;" +
-                                    "Username=alumno;" + //school pc has this default user
-                                    "Password=AlumnoFP;" +
+                                    "Username=Alumno;" + //school pc has this default user
+                                    "Password=AlumnoIFP;" +
                                     "Database=HeatMeet;");
         }
     }

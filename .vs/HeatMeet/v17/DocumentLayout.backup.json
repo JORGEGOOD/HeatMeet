@@ -1,26 +1,14 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\HeatMeet-main\\",
+  "WorkspaceRootPath": "D:\\cuak cuak\\HeatMeet\\Server\\HeatMeetServer\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{B2370A0A-3A76-4075-B02E-2F79BAA5B2AD}|HeatMeetServer\\HeatMeetServer.csproj|d:\\heatmeet-main\\heatmeetserver\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{B2370A0A-3A76-4075-B02E-2F79BAA5B2AD}|HeatMeetServer\\HeatMeetServer.csproj|solutionrelative:heatmeetserver\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{B2370A0A-3A76-4075-B02E-2F79BAA5B2AD}|HeatMeetServer\\HeatMeetServer.csproj|d:\\heatmeet-main\\heatmeetserver\\orm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{B2370A0A-3A76-4075-B02E-2F79BAA5B2AD}|HeatMeetServer\\HeatMeetServer.csproj|d:\\cuak cuak\\heatmeet\\server\\heatmeetserver\\heatmeetserver\\orm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{B2370A0A-3A76-4075-B02E-2F79BAA5B2AD}|HeatMeetServer\\HeatMeetServer.csproj|solutionrelative:heatmeetserver\\orm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{36AE656C-80EE-4E70-AC21-ED29AFE1FCC8}|HeatMeetClienteConsola\\HeatMeetClienteConsola.csproj|d:\\heatmeet-main\\heatmeetclienteconsola\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{36AE656C-80EE-4E70-AC21-ED29AFE1FCC8}|HeatMeetClienteConsola\\HeatMeetClienteConsola.csproj|solutionrelative:heatmeetclienteconsola\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{3C78B55D-D535-4871-B1FC-421F1032B7DB}|NetUtils\\NetUtils.csproj|d:\\heatmeet-main\\netutils\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{3C78B55D-D535-4871-B1FC-421F1032B7DB}|NetUtils\\NetUtils.csproj|solutionrelative:netutils\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{B2370A0A-3A76-4075-B02E-2F79BAA5B2AD}|HeatMeetServer\\HeatMeetServer.csproj|d:\\heatmeet-main\\heatmeetserver\\heatmeetserver.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
-      "RelativeMoniker": "D:0:0:{B2370A0A-3A76-4075-B02E-2F79BAA5B2AD}|HeatMeetServer\\HeatMeetServer.csproj|solutionrelative:heatmeetserver\\heatmeetserver.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+      "AbsoluteMoniker": "D:0:0:{B2370A0A-3A76-4075-B02E-2F79BAA5B2AD}|HeatMeetServer\\HeatMeetServer.csproj|d:\\cuak cuak\\heatmeet\\server\\heatmeetserver\\heatmeetserver\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B2370A0A-3A76-4075-B02E-2F79BAA5B2AD}|HeatMeetServer\\HeatMeetServer.csproj|solutionrelative:heatmeetserver\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -30,72 +18,33 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "Class1.cs",
-              "DocumentMoniker": "D:\\HeatMeet-main\\NetUtils\\Class1.cs",
-              "RelativeDocumentMoniker": "NetUtils\\Class1.cs",
-              "ToolTip": "D:\\HeatMeet-main\\NetUtils\\Class1.cs",
-              "RelativeToolTip": "NetUtils\\Class1.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAADoAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-13T07:52:24.385Z",
-              "IsPinned": true,
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Program.cs",
-              "DocumentMoniker": "D:\\HeatMeet-main\\HeatMeetClienteConsola\\Program.cs",
-              "RelativeDocumentMoniker": "HeatMeetClienteConsola\\Program.cs",
-              "ToolTip": "D:\\HeatMeet-main\\HeatMeetClienteConsola\\Program.cs",
-              "RelativeToolTip": "HeatMeetClienteConsola\\Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsBAAANAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-13T10:40:04.93Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "Orm.cs",
-              "DocumentMoniker": "D:\\HeatMeet-main\\HeatMeetServer\\Orm.cs",
+              "DocumentMoniker": "D:\\cuak cuak\\HeatMeet\\Server\\HeatMeetServer\\HeatMeetServer\\Orm.cs",
               "RelativeDocumentMoniker": "HeatMeetServer\\Orm.cs",
-              "ToolTip": "D:\\HeatMeet-main\\HeatMeetServer\\Orm.cs",
+              "ToolTip": "D:\\cuak cuak\\HeatMeet\\Server\\HeatMeetServer\\HeatMeetServer\\Orm.cs",
               "RelativeToolTip": "HeatMeetServer\\Orm.cs",
-              "ViewState": "AgIAABAAAAAAAAAAAAAWwCEAAAAWAAAAAAAAAA==",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAABsAAAAWAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-13T09:53:59.443Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "Program.cs",
-              "DocumentMoniker": "D:\\HeatMeet-main\\HeatMeetServer\\Program.cs",
+              "DocumentMoniker": "D:\\cuak cuak\\HeatMeet\\Server\\HeatMeetServer\\HeatMeetServer\\Program.cs",
               "RelativeDocumentMoniker": "HeatMeetServer\\Program.cs",
-              "ToolTip": "D:\\HeatMeet-main\\HeatMeetServer\\Program.cs",
+              "ToolTip": "D:\\cuak cuak\\HeatMeet\\Server\\HeatMeetServer\\HeatMeetServer\\Program.cs",
               "RelativeToolTip": "HeatMeetServer\\Program.cs",
-              "ViewState": "AgIAACUBAAAAAAAAAAAEwEQBAAABAAAAAAAAAA==",
+              "ViewState": "AgIAABQAAAAAAAAAAAAuwDwAAAAgAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-13T07:41:54.553Z",
               "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "HeatMeetServer.csproj",
-              "DocumentMoniker": "D:\\HeatMeet-main\\HeatMeetServer\\HeatMeetServer.csproj",
-              "RelativeDocumentMoniker": "HeatMeetServer\\HeatMeetServer.csproj",
-              "ToolTip": "D:\\HeatMeet-main\\HeatMeetServer\\HeatMeetServer.csproj",
-              "RelativeToolTip": "HeatMeetServer\\HeatMeetServer.csproj",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2026-03-13T07:41:57.979Z"
             }
           ]
         }
