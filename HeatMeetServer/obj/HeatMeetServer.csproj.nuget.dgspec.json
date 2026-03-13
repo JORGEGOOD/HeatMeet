@@ -51,11 +51,6 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
-<<<<<<< HEAD
-            "Npgsql": {
-              "target": "Package",
-              "version": "[10.0.2, )"
-=======
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
               "version": "[8.0.0, )"
@@ -71,7 +66,6 @@
             "ORM": {
               "target": "Package",
               "version": "[0.0.1, )"
->>>>>>> f84013b8f4382cb05932f4fd8122df74d3cbea8f
             }
           },
           "imports": [
