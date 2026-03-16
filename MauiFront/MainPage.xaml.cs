@@ -8,18 +8,16 @@
         {
             InitializeComponent();
         }
-
-        private void OnCounterClicked(object sender, EventArgs e)
+        private async void BotonEntrar(object sender, EventArgs e)
         {
-            count++;
-
-            if (count == 1)
-                CounterBtn.Text = $"Clicked {count} time";
+            if (!string.IsNullOrWhiteSpace(userEntry.Text) && !string.IsNullOrWhiteSpace(userEntry.Text)  )
+            {
+                await Shell.Current.GoToAsync("login");
+            }
             else
-                CounterBtn.Text = $"Clicked {count} times";
-
-            SemanticScreenReader.Announce(CounterBtn.Text);
+            {
+                DisplayAlert("Error","Pon usuario y contraseña!","Ok");
+            }
         }
     }
-
 }
