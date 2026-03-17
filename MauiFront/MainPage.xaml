@@ -3,11 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MauiFront.MainPage">
 
-    <!-- Fondo degradado -->
+    <!-- Fondo degradado animado -->
     <ContentPage.Background>
-        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-            <GradientStop Color="#6A0DAD" Offset="0.0"/>
-            <GradientStop Color="#9C27B0" Offset="1.0"/>
+        <LinearGradientBrush x:Name="bgGradient" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop x:Name="bgGrad1" Color="#6A0DAD" Offset="0.0"/>
+            <GradientStop x:Name="bgGrad2" Color="#9C27B0" Offset="1.0"/>
         </LinearGradientBrush>
     </ContentPage.Background>
 
@@ -17,7 +17,7 @@
             HorizontalOptions="Center"
             Padding="30">
 
-            <!-- Card principal -->
+            <!-- Card -->
             <Frame
                 CornerRadius="25"
                 BackgroundColor="White"
@@ -56,31 +56,42 @@
                                PlaceholderColor="Gray"/>
                     </Frame>
 
-                    <!-- Botón PRO -->
-                    <Button Text="Entrar"
-                            Clicked="BotonEntrar"
-                            HeightRequest="50"
-                            CornerRadius="12"
-                            TextColor="White"
-                            FontAttributes="Bold"
-                            BackgroundColor="#6A0DAD">
-                        <Button.Shadow>
-                            <Shadow Brush="#40000000"
-                                    Offset="0,4"
-                                    Radius="10" />
-                        </Button.Shadow>
-                    </Button>
+                    <!-- Botón con gradiente animado -->
+                    <Grid>
+                        <Button x:Name="loginButton"
+                                Text="Entrar"
+                                Clicked="BotonEntrar"
+                                HeightRequest="50"
+                                CornerRadius="12"
+                                TextColor="White"
+                                FontAttributes="Bold">
+                            <Button.Background>
+                                <LinearGradientBrush x:Name="btnGradient" StartPoint="0,0" EndPoint="1,0">
+                                    <GradientStop x:Name="btnGrad1" Color="#9C27B0" Offset="0.0"/>
+                                    <GradientStop x:Name="btnGrad2" Color="#6A0DAD" Offset="1.0"/>
+                                </LinearGradientBrush>
+                            </Button.Background>
+                            <Button.Shadow>
+                                <Shadow Brush="#40000000" Offset="0,4" Radius="10"/>
+                            </Button.Shadow>
+                        </Button>
+
+                        <!-- Loader encima -->
+                        <ActivityIndicator x:Name="loader"
+                                           IsVisible="False"
+                                           IsRunning="False"
+                                           Color="White"
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="Center"/>
+                    </Grid>
 
                     <!-- Extra -->
                     <Label Text="¿Olvidaste tu contraseña?"
                            FontSize="12"
                            TextColor="#6A0DAD"
                            HorizontalOptions="Center"/>
-
                 </VerticalStackLayout>
             </Frame>
-
         </VerticalStackLayout>
     </ScrollView>
-
 </ContentPage>
