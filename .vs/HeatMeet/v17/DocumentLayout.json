@@ -1,25 +1,33 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\HeatMeet\\HeatMeet\\",
+  "WorkspaceRootPath": "D:\\Proyecto_SH\\HeatMeet\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{8D84833D-45AD-43BB-936F-754F7AA8844A}|MauiFront\\MauiFront.csproj|d:\\heatmeet\\heatmeet\\mauifront\\groupspage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "AbsoluteMoniker": "D:0:0:{8D84833D-45AD-43BB-936F-754F7AA8844A}|MauiFront\\MauiFront.csproj|d:\\proyecto_sh\\heatmeet\\mauifront\\newgroup.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8D84833D-45AD-43BB-936F-754F7AA8844A}|MauiFront\\MauiFront.csproj|solutionrelative:mauifront\\newgroup.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8D84833D-45AD-43BB-936F-754F7AA8844A}|MauiFront\\MauiFront.csproj|d:\\proyecto_sh\\heatmeet\\mauifront\\newgroup.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{8D84833D-45AD-43BB-936F-754F7AA8844A}|MauiFront\\MauiFront.csproj|solutionrelative:mauifront\\newgroup.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8D84833D-45AD-43BB-936F-754F7AA8844A}|MauiFront\\MauiFront.csproj|d:\\proyecto_sh\\heatmeet\\mauifront\\groupspage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
       "RelativeMoniker": "D:0:0:{8D84833D-45AD-43BB-936F-754F7AA8844A}|MauiFront\\MauiFront.csproj|solutionrelative:mauifront\\groupspage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{8D84833D-45AD-43BB-936F-754F7AA8844A}|MauiFront\\MauiFront.csproj|d:\\heatmeet\\heatmeet\\mauifront\\groupspage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{8D84833D-45AD-43BB-936F-754F7AA8844A}|MauiFront\\MauiFront.csproj|d:\\proyecto_sh\\heatmeet\\mauifront\\groupspage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{8D84833D-45AD-43BB-936F-754F7AA8844A}|MauiFront\\MauiFront.csproj|solutionrelative:mauifront\\groupspage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{8D84833D-45AD-43BB-936F-754F7AA8844A}|MauiFront\\MauiFront.csproj|d:\\heatmeet\\heatmeet\\mauifront\\mainpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{8D84833D-45AD-43BB-936F-754F7AA8844A}|MauiFront\\MauiFront.csproj|d:\\proyecto_sh\\heatmeet\\mauifront\\mainpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{8D84833D-45AD-43BB-936F-754F7AA8844A}|MauiFront\\MauiFront.csproj|solutionrelative:mauifront\\mainpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{8D84833D-45AD-43BB-936F-754F7AA8844A}|MauiFront\\MauiFront.csproj|d:\\heatmeet\\heatmeet\\mauifront\\mainpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "AbsoluteMoniker": "D:0:0:{8D84833D-45AD-43BB-936F-754F7AA8844A}|MauiFront\\MauiFront.csproj|d:\\proyecto_sh\\heatmeet\\mauifront\\mainpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
       "RelativeMoniker": "D:0:0:{8D84833D-45AD-43BB-936F-754F7AA8844A}|MauiFront\\MauiFront.csproj|solutionrelative:mauifront\\mainpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{8D84833D-45AD-43BB-936F-754F7AA8844A}|MauiFront\\MauiFront.csproj|d:\\heatmeet\\heatmeet\\mauifront\\appshell.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{8D84833D-45AD-43BB-936F-754F7AA8844A}|MauiFront\\MauiFront.csproj|d:\\proyecto_sh\\heatmeet\\mauifront\\appshell.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{8D84833D-45AD-43BB-936F-754F7AA8844A}|MauiFront\\MauiFront.csproj|solutionrelative:mauifront\\appshell.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
@@ -30,41 +38,65 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "AppShell.xaml.cs",
-              "DocumentMoniker": "D:\\HeatMeet\\HeatMeet\\MauiFront\\AppShell.xaml.cs",
-              "RelativeDocumentMoniker": "MauiFront\\AppShell.xaml.cs",
-              "ToolTip": "D:\\HeatMeet\\HeatMeet\\MauiFront\\AppShell.xaml.cs",
-              "RelativeToolTip": "MauiFront\\AppShell.xaml.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAA==",
+              "DocumentIndex": 0,
+              "Title": "Newgroup.xaml.cs",
+              "DocumentMoniker": "D:\\Proyecto_SH\\HeatMeet\\MauiFront\\Newgroup.xaml.cs",
+              "RelativeDocumentMoniker": "MauiFront\\Newgroup.xaml.cs",
+              "ToolTip": "D:\\Proyecto_SH\\HeatMeet\\MauiFront\\Newgroup.xaml.cs",
+              "RelativeToolTip": "MauiFront\\Newgroup.xaml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-17T07:41:18.671Z",
+              "WhenOpened": "2026-03-17T08:21:41.906Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "GroupsPage.xaml.cs",
-              "DocumentMoniker": "D:\\HeatMeet\\HeatMeet\\MauiFront\\GroupsPage.xaml.cs",
-              "RelativeDocumentMoniker": "MauiFront\\GroupsPage.xaml.cs",
-              "ToolTip": "D:\\HeatMeet\\HeatMeet\\MauiFront\\GroupsPage.xaml.cs",
-              "RelativeToolTip": "MauiFront\\GroupsPage.xaml.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAYAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-17T07:27:16.278Z",
+              "Title": "Newgroup.xaml",
+              "DocumentMoniker": "D:\\Proyecto_SH\\HeatMeet\\MauiFront\\Newgroup.xaml",
+              "RelativeDocumentMoniker": "MauiFront\\Newgroup.xaml",
+              "ToolTip": "D:\\Proyecto_SH\\HeatMeet\\MauiFront\\Newgroup.xaml",
+              "RelativeToolTip": "MauiFront\\Newgroup.xaml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-03-17T08:21:40.163Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 6,
+              "Title": "AppShell.xaml.cs",
+              "DocumentMoniker": "D:\\Proyecto_SH\\HeatMeet\\MauiFront\\AppShell.xaml.cs",
+              "RelativeDocumentMoniker": "MauiFront\\AppShell.xaml.cs",
+              "ToolTip": "D:\\Proyecto_SH\\HeatMeet\\MauiFront\\AppShell.xaml.cs",
+              "RelativeToolTip": "MauiFront\\AppShell.xaml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-17T07:41:18.671Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "GroupsPage.xaml.cs",
+              "DocumentMoniker": "D:\\Proyecto_SH\\HeatMeet\\MauiFront\\GroupsPage.xaml.cs",
+              "RelativeDocumentMoniker": "MauiFront\\GroupsPage.xaml.cs",
+              "ToolTip": "D:\\Proyecto_SH\\HeatMeet\\MauiFront\\GroupsPage.xaml.cs",
+              "RelativeToolTip": "MauiFront\\GroupsPage.xaml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAYAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-17T07:27:16.278Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "GroupsPage.xaml",
-              "DocumentMoniker": "D:\\HeatMeet\\HeatMeet\\MauiFront\\GroupsPage.xaml",
+              "DocumentMoniker": "D:\\Proyecto_SH\\HeatMeet\\MauiFront\\GroupsPage.xaml",
               "RelativeDocumentMoniker": "MauiFront\\GroupsPage.xaml",
-              "ToolTip": "D:\\HeatMeet\\HeatMeet\\MauiFront\\GroupsPage.xaml",
+              "ToolTip": "D:\\Proyecto_SH\\HeatMeet\\MauiFront\\GroupsPage.xaml",
               "RelativeToolTip": "MauiFront\\GroupsPage.xaml",
               "ViewState": "AgIAABIAAAAAAAAAAAAAACQAAAALAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
@@ -73,29 +105,27 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 4,
               "Title": "MainPage.xaml.cs",
-              "DocumentMoniker": "D:\\HeatMeet\\HeatMeet\\MauiFront\\MainPage.xaml.cs",
+              "DocumentMoniker": "D:\\Proyecto_SH\\HeatMeet\\MauiFront\\MainPage.xaml.cs",
               "RelativeDocumentMoniker": "MauiFront\\MainPage.xaml.cs",
-              "ToolTip": "D:\\HeatMeet\\HeatMeet\\MauiFront\\MainPage.xaml.cs",
+              "ToolTip": "D:\\Proyecto_SH\\HeatMeet\\MauiFront\\MainPage.xaml.cs",
               "RelativeToolTip": "MauiFront\\MainPage.xaml.cs",
               "ViewState": "AgIAAAcAAAAAAAAAAAAgwBcAAAAIAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-16T12:30:01.507Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-16T12:30:01.507Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 5,
               "Title": "MainPage.xaml",
-              "DocumentMoniker": "D:\\HeatMeet\\HeatMeet\\MauiFront\\MainPage.xaml",
+              "DocumentMoniker": "D:\\Proyecto_SH\\HeatMeet\\MauiFront\\MainPage.xaml",
               "RelativeDocumentMoniker": "MauiFront\\MainPage.xaml",
-              "ToolTip": "D:\\HeatMeet\\HeatMeet\\MauiFront\\MainPage.xaml",
+              "ToolTip": "D:\\Proyecto_SH\\HeatMeet\\MauiFront\\MainPage.xaml",
               "RelativeToolTip": "MauiFront\\MainPage.xaml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAMAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-03-16T12:29:22.4Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-16T12:29:22.4Z"
             }
           ]
         }

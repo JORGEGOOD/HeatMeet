@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("HeatMeetServer")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0e353b65e73de8020ae83f357103983ce03775b5")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+af183de353b22d7075b809cd279f0943a9c9036a")]
 [assembly: System.Reflection.AssemblyProductAttribute("HeatMeetServer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("HeatMeetServer")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
