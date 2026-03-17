@@ -75,7 +75,8 @@ namespace HeatMeetServer
 
             OrmManager ormManager = new OrmManager();
             ormManager.Database.EnsureCreated();
-            // Crear usuario inicial automáticamente
+            
+            //Crear usuarios
             using (var db = new OrmManager())
             {
                 var existing = db.Users.FirstOrDefault(u => u.Email == "jorge1@gmail.com");
@@ -91,8 +92,17 @@ namespace HeatMeetServer
 
                     db.Users.Add(newUser);
                     db.SaveChanges();
+                    
+                    var newUser2 = new Users
+                    {
+                        Name = "admin",
+                        Email = "admin",
+                        Password = "admin"
+                    };
 
-                    Console.WriteLine("Usuario inicial creado: JORGE (jorge1@gmail.com)");
+                    db.Users.Add(newUser2);
+                    db.SaveChanges();
+                    Console.WriteLine("Usuarios default añadidos.");
                 }
                 else
                 {
@@ -101,13 +111,13 @@ namespace HeatMeetServer
             }
 
 
-
+            //bucle de aceptar clientes
             try
             {
                 Console.WriteLine("=== HEATMEET TCP SERVER ===");
 
-                IPAddress address = IPAddress.Any;
-                int port = 8888;
+                IPAddress address = IPAddress.Any;//<--Aqui podemos poner una funcion de cojer la ip buena 
+                int port = 8888;                  
 
                 Console.WriteLine("Local IPs available:");
                 ShowLocalIPs();
@@ -115,7 +125,7 @@ namespace HeatMeetServer
                 TcpListener server = new TcpListener(address, port);
                 server.Start();
 
-                Console.WriteLine($"\n✅ Server listening on port {port}");
+                Console.WriteLine($"\n✅ Server listening on ip {address} on port {port}");//por alguna razon esto da 0.0.0.0, eso esta bien?
                 Console.WriteLine(new string('-', 60));
 
                 while (true) // Main loop to accept multiple clients
