@@ -33167,11 +33167,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\cuak cuak\\HeatMeet\\Server\\HeatMeetServer\\HeatMeet\\MauiFront\\MauiFront.csproj",
+      "projectUniqueName": "D:\\HeatMeet\\HeatMeet\\MauiFront\\MauiFront.csproj",
       "projectName": "MauiFront",
-      "projectPath": "D:\\cuak cuak\\HeatMeet\\Server\\HeatMeetServer\\HeatMeet\\MauiFront\\MauiFront.csproj",
+      "projectPath": "D:\\HeatMeet\\HeatMeet\\MauiFront\\MauiFront.csproj",
       "packagesPath": "C:\\Users\\Alumno\\.nuget\\packages\\",
-      "outputPath": "D:\\cuak cuak\\HeatMeet\\Server\\HeatMeetServer\\HeatMeet\\MauiFront\\obj\\",
+      "outputPath": "D:\\HeatMeet\\HeatMeet\\MauiFront\\obj\\",
       "projectStyle": "PackageReference",
       "crossTargeting": true,
       "fallbackFolders": [

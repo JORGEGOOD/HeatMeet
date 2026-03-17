@@ -13,6 +13,13 @@
             <Entry x:Name="userEntry"  Placeholder="Usuario" />
             <Entry x:Name="passwordEntry" Placeholder="Contraseña" IsPassword="True" />
             <Button Text="Entrar" BackgroundColor="Blue" Clicked="BotonEntrar" />
+            
+            
+            <Button Text="Crear Nuevo grupo" BackgroundColor="Blue" Clicked="CrearNuevoGrupo" />
+            
+            
+            
+            
         </VerticalStackLayout>
     </ScrollView>
 

@@ -7,7 +7,7 @@
             InitializeComponent();
 
             //registrar "LoginPage" como "login"
-            Routing.RegisterRoute("login", typeof(LoginPage));
+            Routing.RegisterRoute("groups", typeof(GroupsPage));
         }
     }
 }

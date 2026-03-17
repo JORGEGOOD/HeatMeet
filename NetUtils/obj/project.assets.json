@@ -237,11 +237,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\cuak cuak\\HeatMeet\\Server\\HeatMeetServer\\HeatMeet\\NetUtils\\NetUtils.csproj",
+      "projectUniqueName": "D:\\HeatMeet\\HeatMeet\\NetUtils\\NetUtils.csproj",
       "projectName": "NetUtils",
-      "projectPath": "D:\\cuak cuak\\HeatMeet\\Server\\HeatMeetServer\\HeatMeet\\NetUtils\\NetUtils.csproj",
+      "projectPath": "D:\\HeatMeet\\HeatMeet\\NetUtils\\NetUtils.csproj",
       "packagesPath": "C:\\Users\\Alumno\\.nuget\\packages\\",
-      "outputPath": "D:\\cuak cuak\\HeatMeet\\Server\\HeatMeetServer\\HeatMeet\\NetUtils\\obj\\",
+      "outputPath": "D:\\HeatMeet\\HeatMeet\\NetUtils\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

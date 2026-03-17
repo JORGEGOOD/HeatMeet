@@ -12,43 +12,43 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = MauiFront
-build_property.ProjectDir = D:\cuak cuak\HeatMeet\Server\HeatMeetServer\HeatMeet\MauiFront\
+build_property.ProjectDir = D:\HeatMeet\HeatMeet\MauiFront\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.EffectiveAnalysisLevelStyle = 8.0
 build_property.EnableCodeStyleSeverity = 
 
-[D:/cuak cuak/HeatMeet/Server/HeatMeetServer/HeatMeet/MauiFront/App.xaml]
+[D:/HeatMeet/HeatMeet/MauiFront/App.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
 build_metadata.AdditionalFiles.ManifestResourceName = MauiFront.App.xaml
 build_metadata.AdditionalFiles.TargetPath = App.xaml
 build_metadata.AdditionalFiles.RelativePath = App.xaml
 
-[D:/cuak cuak/HeatMeet/Server/HeatMeetServer/HeatMeet/MauiFront/AppShell.xaml]
+[D:/HeatMeet/HeatMeet/MauiFront/AppShell.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
 build_metadata.AdditionalFiles.ManifestResourceName = MauiFront.AppShell.xaml
 build_metadata.AdditionalFiles.TargetPath = AppShell.xaml
 build_metadata.AdditionalFiles.RelativePath = AppShell.xaml
 
-[D:/cuak cuak/HeatMeet/Server/HeatMeetServer/HeatMeet/MauiFront/LoginPage.xaml]
+[D:/HeatMeet/HeatMeet/MauiFront/GroupsPage.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
-build_metadata.AdditionalFiles.ManifestResourceName = MauiFront.LoginPage.xaml
-build_metadata.AdditionalFiles.TargetPath = LoginPage.xaml
-build_metadata.AdditionalFiles.RelativePath = LoginPage.xaml
+build_metadata.AdditionalFiles.ManifestResourceName = MauiFront.GroupsPage.xaml
+build_metadata.AdditionalFiles.TargetPath = GroupsPage.xaml
+build_metadata.AdditionalFiles.RelativePath = GroupsPage.xaml
 
-[D:/cuak cuak/HeatMeet/Server/HeatMeetServer/HeatMeet/MauiFront/MainPage.xaml]
+[D:/HeatMeet/HeatMeet/MauiFront/MainPage.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
 build_metadata.AdditionalFiles.ManifestResourceName = MauiFront.MainPage.xaml
 build_metadata.AdditionalFiles.TargetPath = MainPage.xaml
 build_metadata.AdditionalFiles.RelativePath = MainPage.xaml
 
-[D:/cuak cuak/HeatMeet/Server/HeatMeetServer/HeatMeet/MauiFront/Resources/Styles/Colors.xaml]
+[D:/HeatMeet/HeatMeet/MauiFront/Resources/Styles/Colors.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
 build_metadata.AdditionalFiles.ManifestResourceName = MauiFront.Resources.Styles.Colors.xaml
 build_metadata.AdditionalFiles.TargetPath = Resources\Styles\Colors.xaml
 build_metadata.AdditionalFiles.RelativePath = Resources\Styles\Colors.xaml
 
-[D:/cuak cuak/HeatMeet/Server/HeatMeetServer/HeatMeet/MauiFront/Resources/Styles/Styles.xaml]
+[D:/HeatMeet/HeatMeet/MauiFront/Resources/Styles/Styles.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
 build_metadata.AdditionalFiles.ManifestResourceName = MauiFront.Resources.Styles.Styles.xaml
 build_metadata.AdditionalFiles.TargetPath = Resources\Styles\Styles.xaml

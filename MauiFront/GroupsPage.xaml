@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MauiFront.GroupsPage"
+             Title="Contenido">
+
+    <ScrollView>
+        <VerticalStackLayout
+            Padding="30,0"
+            Spacing="25">
+            <Image
+                Source="dotnet_bot.png"
+                HeightRequest="185"
+                Aspect="AspectFit"
+                SemanticProperties.Description="dot net bot in a race car number eight" 
+            />
+
+            <Label
+                Text="Hello, World!"
+                Style="{StaticResource Headline}"
+                SemanticProperties.HeadingLevel="Level1" 
+            />
+
+            <Label
+                Text="Welcome 67 67 67 67  to &#10;.NET Multi-platform App UI"
+                Style="{StaticResource SubHeadline}"
+                SemanticProperties.HeadingLevel="Level2"
+                SemanticProperties.Description="Welcome  to dot net Multi platform App U I" 
+            />
+
+            <Entry 
+                 x:Name="NombreEntry" 
+                 Placeholder="Escribe tu nombre aquí" 
+            />
+
+            <Button Text="Saludar"
+                    BackgroundColor="Purple"
+                    TextColor="White" 
+            />
+
+
+        </VerticalStackLayout>
+    </ScrollView>
+    
+    
+    
+</ContentPage>
