@@ -15,7 +15,7 @@
             <Button Text="Entrar" BackgroundColor="Blue" Clicked="BotonEntrar" />
             
             
-            <Button Text="Crear Nuevo grupo" BackgroundColor="Blue" Clicked="CrearNuevoGrupo" />
+            
             
             
             

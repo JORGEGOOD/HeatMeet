@@ -38,6 +38,9 @@
                     TextColor="White" 
             />
 
+            <Button Text="Crear Nuevo grupo" BackgroundColor="Blue" Clicked="CrearNuevoGrupo" />h
+
+
 
         </VerticalStackLayout>
     </ScrollView>

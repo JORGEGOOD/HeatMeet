@@ -8,6 +8,8 @@
 
             //registrar "LoginPage" como "login"
             Routing.RegisterRoute("groups", typeof(GroupsPage));
+            
+            
         }
     }
 }
