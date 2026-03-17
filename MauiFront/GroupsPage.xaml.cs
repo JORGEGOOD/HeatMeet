@@ -7,6 +7,8 @@ namespace MauiFront
         public string Nombre { get; set; }
         public string ImagenUrl { get; set; }
     }
+
+
     public partial class GroupsPage : ContentPage
     {
         public GroupsPage()
