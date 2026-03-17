@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\HeatMeet\\HeatMeet\\HeatMeetServer\\HeatMeetServer.csproj": {}
+    "D:\\Proyecto_SH\\HeatMeet\\HeatMeetServer\\HeatMeetServer.csproj": {}
   },
   "projects": {
-    "D:\\HeatMeet\\HeatMeet\\HeatMeetServer\\HeatMeetServer.csproj": {
+    "D:\\Proyecto_SH\\HeatMeet\\HeatMeetServer\\HeatMeetServer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\HeatMeet\\HeatMeet\\HeatMeetServer\\HeatMeetServer.csproj",
+        "projectUniqueName": "D:\\Proyecto_SH\\HeatMeet\\HeatMeetServer\\HeatMeetServer.csproj",
         "projectName": "HeatMeetServer",
-        "projectPath": "D:\\HeatMeet\\HeatMeet\\HeatMeetServer\\HeatMeetServer.csproj",
+        "projectPath": "D:\\Proyecto_SH\\HeatMeet\\HeatMeetServer\\HeatMeetServer.csproj",
         "packagesPath": "C:\\Users\\Alumno\\.nuget\\packages\\",
-        "outputPath": "D:\\HeatMeet\\HeatMeet\\HeatMeetServer\\obj\\",
+        "outputPath": "D:\\Proyecto_SH\\HeatMeet\\HeatMeetServer\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

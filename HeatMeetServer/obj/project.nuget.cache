@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "H1HjVYiHtno=",
+  "dgSpecHash": "rd63mGQQmT8=",
   "success": true,
-  "projectFilePath": "D:\\HeatMeet\\HeatMeet\\HeatMeetServer\\HeatMeetServer.csproj",
+  "projectFilePath": "D:\\Proyecto_SH\\HeatMeet\\HeatMeetServer\\HeatMeetServer.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Alumno\\.nuget\\packages\\dapper\\1.50.2\\dapper.1.50.2.nupkg.sha512",
     "C:\\Users\\Alumno\\.nuget\\packages\\microsoft.entityframeworkcore\\8.0.0\\microsoft.entityframeworkcore.8.0.0.nupkg.sha512",

@@ -52,12 +52,18 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Newgroup.xaml.cs">
+	    <DependentUpon>Newgroup.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="GroupsPage.xaml.cs">
 	    <DependentUpon>GroupsPage.xaml</DependentUpon>
 	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="Newgroup.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="GroupsPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

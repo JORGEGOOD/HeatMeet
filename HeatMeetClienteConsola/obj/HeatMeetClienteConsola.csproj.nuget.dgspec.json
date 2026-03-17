@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\HeatMeet\\HeatMeet\\HeatMeetClienteConsola\\HeatMeetClienteConsola.csproj": {}
+    "D:\\Proyecto_SH\\HeatMeet\\HeatMeetClienteConsola\\HeatMeetClienteConsola.csproj": {}
   },
   "projects": {
-    "D:\\HeatMeet\\HeatMeet\\HeatMeetClienteConsola\\HeatMeetClienteConsola.csproj": {
+    "D:\\Proyecto_SH\\HeatMeet\\HeatMeetClienteConsola\\HeatMeetClienteConsola.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\HeatMeet\\HeatMeet\\HeatMeetClienteConsola\\HeatMeetClienteConsola.csproj",
+        "projectUniqueName": "D:\\Proyecto_SH\\HeatMeet\\HeatMeetClienteConsola\\HeatMeetClienteConsola.csproj",
         "projectName": "HeatMeetClienteConsola",
-        "projectPath": "D:\\HeatMeet\\HeatMeet\\HeatMeetClienteConsola\\HeatMeetClienteConsola.csproj",
+        "projectPath": "D:\\Proyecto_SH\\HeatMeet\\HeatMeetClienteConsola\\HeatMeetClienteConsola.csproj",
         "packagesPath": "C:\\Users\\Alumno\\.nuget\\packages\\",
-        "outputPath": "D:\\HeatMeet\\HeatMeet\\HeatMeetClienteConsola\\obj\\",
+        "outputPath": "D:\\Proyecto_SH\\HeatMeet\\HeatMeetClienteConsola\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
