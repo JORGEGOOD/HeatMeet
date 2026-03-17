@@ -1,11 +1,18 @@
 ﻿namespace MauiFront
 {
-    public partial class Newgroup : ContentPage
+    public partial class NewGroupPage : ContentPage
     {
-        public Newgroup()
+        public NewGroupPage()
         {
             InitializeComponent();
+
+
         }
+
+
+
+
+
     }
 
 }

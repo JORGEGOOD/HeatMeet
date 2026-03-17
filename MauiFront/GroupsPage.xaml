@@ -2,49 +2,43 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MauiFront.GroupsPage"
-             Title="Contenido">
+             Title="Grupos">
 
-    <ScrollView>
-        <VerticalStackLayout
-            Padding="30,0"
-            Spacing="25">
-            <Image
-                Source="dotnet_bot.png"
-                HeightRequest="185"
-                Aspect="AspectFit"
-                SemanticProperties.Description="dot net bot in a race car number eight" 
-            />
+    <Grid RowDefinitions="*" ColumnDefinitions="*">
 
-            <Label
-                Text="Hello, World!"
-                Style="{StaticResource Headline}"
-                SemanticProperties.HeadingLevel="Level1" 
-            />
+        <CollectionView x:Name="GroupsCollection" Grid.Row="0" Margin="10">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Margin="0,5" Padding="10" CornerRadius="10" HasShadow="True">
+                        <HorizontalStackLayout Spacing="15">
+                            <Image Source="{Binding ImagenUrl}" 
+                                   HeightRequest="60" 
+                                   WidthRequest="60"
+                                   Aspect="AspectFill" />
 
-            <Label
-                Text="Welcome 67 67 67 67  to &#10;.NET Multi-platform App UI"
-                Style="{StaticResource SubHeadline}"
-                SemanticProperties.HeadingLevel="Level2"
-                SemanticProperties.Description="Welcome  to dot net Multi platform App U I" 
-            />
+                            <Label Text="{Binding Nombre}" 
+                                   VerticalOptions="Center" 
+                                   FontSize="18" 
+                                   FontAttributes="Bold" />
+                        </HorizontalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
 
-            <Entry 
-                 x:Name="NombreEntry" 
-                 Placeholder="Escribe tu nombre aquí" 
-            />
-
-            <Button Text="Saludar"
-                    BackgroundColor="Purple"
-                    TextColor="White" 
-            />
-
-            <Button Text="Crear Nuevo grupo" BackgroundColor="Blue" Clicked="CrearNuevoGrupo" />h
-
+        <Button Text="+"
+                FontSize="30"
+                BackgroundColor="Purple"
+                TextColor="White"
+                HeightRequest="60"
+                WidthRequest="60"
+                CornerRadius="30"
+                HorizontalOptions="End"
+                VerticalOptions="End"
+                Margin="20"
+                Clicked="CrearNuevoGrupo" />
+    </Grid>
 
 
-        </VerticalStackLayout>
-    </ScrollView>
-    
-    
-    
+
 </ContentPage>
