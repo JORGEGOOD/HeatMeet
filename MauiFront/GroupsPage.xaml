@@ -11,15 +11,14 @@
                 <DataTemplate>
                     <Frame Margin="0,5" Padding="10" CornerRadius="10" HasShadow="True">
                         <HorizontalStackLayout Spacing="15">
-                            <Image Source="{Binding ImagenUrl}" 
-                                   HeightRequest="60" 
-                                   WidthRequest="60"
-                                   Aspect="AspectFill" />
-
-                            <Label Text="{Binding Nombre}" 
-                                   VerticalOptions="Center" 
-                                   FontSize="18" 
-                                   FontAttributes="Bold" />
+                            <Label Text="{Binding Name}" 
+                               VerticalOptions="Center" 
+                               FontSize="18" 
+                               FontAttributes="Bold" />
+                            <Image Source="{Binding DisplayImage}" 
+                               HeightRequest="60" 
+                               WidthRequest="60"
+                               Aspect="AspectFill" />
                         </HorizontalStackLayout>
                     </Frame>
                 </DataTemplate>

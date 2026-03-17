@@ -1,42 +1,60 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Collections.Generic;
 
 namespace MauiFront
 {
-    public class Grupo
+    // He cambiado 'Grupo' a 'Group' para que coincida con tu lógica de abajo
+    public class Group
     {
-        public string Nombre { get; set; }
-        public string ImagenUrl { get; set; }
-    }
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string InviteCode { get; set; }
+        public DateTime CreateDate { get; set; }
 
+        public List<object> Users { get; set; } = new();
+        public List<object> Events { get; set; } = new();
+        public List<object> Messages { get; set; } = new();
+
+        public string DisplayImage => "dotnet_bot.png";
+    }
 
     public partial class GroupsPage : ContentPage
     {
         public GroupsPage()
         {
             InitializeComponent();
-
-
-            // Creamos datos inventados
-            var misGrupos = new List<Grupo>
-            {
-                new Grupo { Nombre = "Equipo de Desarrollo", ImagenUrl = "dotnet_bot.png" },
-                new Grupo { Nombre = "Fútbol Viernes", ImagenUrl = "dotnet_bot.png" },
-                new Grupo { Nombre = "Amigos HeatMeet", ImagenUrl = "dotnet_bot.png" }
-            };
-
-            // Le pasamos los datos a la lista del XAML
-            GroupsCollection.ItemsSource = misGrupos;
-
         }
 
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+
+            // Corregido: Ahora usamos 'Group' y arreglamos las llaves
+            var gruposDesdeServer = new List<Group>
+            {
+                new Group
+                {
+                    Id = 1,
+                    Name = "Desarrolladores .NET",
+                    InviteCode = "HTM-123",
+                    CreateDate = DateTime.Now
+                },
+                new Group
+                {
+                    Id = 2,
+                    Name = "Equipo HeatMeet",
+                    InviteCode = "ABC-999",
+                    CreateDate = DateTime.Now.AddDays(-10)
+                }
+            }; // Aquí estaba el error de la llave extra
+
+            GroupsCollection.ItemsSource = gruposDesdeServer;
+        }
 
         private async void CrearNuevoGrupo(object sender, EventArgs e)
         {
+            // Asegúrate de que "newGroup" esté registrado en AppShell.xaml.cs
             await Shell.Current.GoToAsync("newGroup");
         }
-
-
-
     }
-
 }
