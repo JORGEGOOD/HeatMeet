@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MauiFront
 {
-    // He cambiado 'Grupo' a 'Group' para que coincida con tu lógica de abajo
+    //grupo compatible con el orm
     public class Group
     {
         public int Id { get; set; }
@@ -46,7 +46,7 @@ namespace MauiFront
                     InviteCode = "ABC-999",
                     CreateDate = DateTime.Now.AddDays(-10)
                 }
-            }; // Aquí estaba el error de la llave extra
+            };
 
             GroupsCollection.ItemsSource = gruposDesdeServer;
         }
