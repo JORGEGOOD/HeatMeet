@@ -1,34 +1,26 @@
-﻿using System.Net;
-using System.Net.Sockets;
-using System.Text;
+﻿using System.Net.Sockets;
+using System.Net;
 using System.Text.Json;
+using System.Text;
 
 namespace NetUtils
 {
-    public class netUtils
+    public static class NetUtils
     {
-        // 
-        public void SendJson(Socket s, string data)
+        public static void SendJson(Socket s, object data)
         {
             string json = JsonSerializer.Serialize(data);
-            byte[] line = Encoding.UTF8.GetBytes(json + "\n");
+            byte[] line = Encoding.UTF8.GetBytes(json);
             s.Send(line);
         }
-        // 
-        public T ReceiveJson<T>(Socket s)
+
+        public static T ReceiveJson<T>(Socket s)
         {
-            byte[] buffer = new byte[2048];
+            byte[] buffer = new byte[4096];
             int len = s.Receive(buffer);
 
-            return JsonSerializer.Deserialize<T>(Encoding.UTF8.GetString(buffer));
-        }
-
-        public void ConnectToServer()
-        {
-            Socket client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-
-            client.Connect("localhost", 5555);
-            Console.WriteLine("Conectado al servidor!");
+            string json = Encoding.UTF8.GetString(buffer, 0, len);
+            return JsonSerializer.Deserialize<T>(json)!;
         }
 
         public static Socket CreateClientSocket(string addressText, int port)
@@ -37,19 +29,9 @@ namespace NetUtils
             IPEndPoint endpoint = new IPEndPoint(address, port);
 
             Socket clientSocket = new Socket(address.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-
             clientSocket.Connect(endpoint);
 
             return clientSocket;
-        }
-        public static string AutodetectIpAddress()
-        {
-            string hostName = Dns.GetHostName();
-            IPHostEntry host = Dns.GetHostEntry(hostName);
-            int index = host.AddressList.ToList().FindIndex((e) => e.AddressFamily == AddressFamily.InterNetwork);
-
-            return host.AddressList[index].ToString();
-
         }
 
         public static void CloseSocket(Socket s)
@@ -59,9 +41,5 @@ namespace NetUtils
 
             s.Close();
         }
-
     }
 }
-
-
-

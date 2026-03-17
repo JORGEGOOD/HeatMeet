@@ -1,15 +1,16 @@
 ﻿using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
+using SharedModels;
 
 namespace HeatMeetClient
 {
     // ---------- Network Message Structure (mirrors server) ----------
-    public class NetworkMessage
-    {
-        public string Command { get; set; } = string.Empty;
-        public object? Data { get; set; }
-    }
+    //public class NetworkMessage
+    //{
+    //    public string Command { get; set; } = string.Empty;
+    //    public object? Data { get; set; }
+    //}
 
     // Simple session storage for the client
     public static class ClientSession

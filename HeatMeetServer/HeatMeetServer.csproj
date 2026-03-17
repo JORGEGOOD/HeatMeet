@@ -14,5 +14,9 @@
     <PackageReference Include="ORM" Version="0.0.1" />
 </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SharedModels\SharedModels.csproj" />
+  </ItemGroup>
+
 
 </Project>

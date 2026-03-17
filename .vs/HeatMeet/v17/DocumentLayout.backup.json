@@ -1,0 +1,207 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\Alumno\\Documents\\GitHub\\HeatMeet\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{B2370A0A-3A76-4075-B02E-2F79BAA5B2AD}|HeatMeetServer\\HeatMeetServer.csproj|c:\\users\\alumno\\documents\\github\\heatmeet\\heatmeetserver\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B2370A0A-3A76-4075-B02E-2F79BAA5B2AD}|HeatMeetServer\\HeatMeetServer.csproj|solutionrelative:heatmeetserver\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8D84833D-45AD-43BB-936F-754F7AA8844A}|MauiFront\\MauiFront.csproj|c:\\users\\alumno\\documents\\github\\heatmeet\\mauifront\\mainpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8D84833D-45AD-43BB-936F-754F7AA8844A}|MauiFront\\MauiFront.csproj|solutionrelative:mauifront\\mainpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8D84833D-45AD-43BB-936F-754F7AA8844A}|MauiFront\\MauiFront.csproj|c:\\users\\alumno\\documents\\github\\heatmeet\\mauifront\\mainpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{8D84833D-45AD-43BB-936F-754F7AA8844A}|MauiFront\\MauiFront.csproj|solutionrelative:mauifront\\mainpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8D84833D-45AD-43BB-936F-754F7AA8844A}|MauiFront\\MauiFront.csproj|c:\\users\\alumno\\documents\\github\\heatmeet\\mauifront\\appshell.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8D84833D-45AD-43BB-936F-754F7AA8844A}|MauiFront\\MauiFront.csproj|solutionrelative:mauifront\\appshell.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8D84833D-45AD-43BB-936F-754F7AA8844A}|MauiFront\\MauiFront.csproj|c:\\users\\alumno\\documents\\github\\heatmeet\\mauifront\\appshell.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{8D84833D-45AD-43BB-936F-754F7AA8844A}|MauiFront\\MauiFront.csproj|solutionrelative:mauifront\\appshell.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{36AE656C-80EE-4E70-AC21-ED29AFE1FCC8}|HeatMeetClienteConsola\\HeatMeetClienteConsola.csproj|c:\\users\\alumno\\documents\\github\\heatmeet\\heatmeetclienteconsola\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{36AE656C-80EE-4E70-AC21-ED29AFE1FCC8}|HeatMeetClienteConsola\\HeatMeetClienteConsola.csproj|solutionrelative:heatmeetclienteconsola\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B2370A0A-3A76-4075-B02E-2F79BAA5B2AD}|HeatMeetServer\\HeatMeetServer.csproj|c:\\users\\alumno\\documents\\github\\heatmeet\\heatmeetserver\\orm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B2370A0A-3A76-4075-B02E-2F79BAA5B2AD}|HeatMeetServer\\HeatMeetServer.csproj|solutionrelative:heatmeetserver\\orm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3C78B55D-D535-4871-B1FC-421F1032B7DB}|NetUtils\\NetUtils.csproj|c:\\users\\alumno\\documents\\github\\heatmeet\\netutils\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3C78B55D-D535-4871-B1FC-421F1032B7DB}|NetUtils\\NetUtils.csproj|solutionrelative:netutils\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{61948ABE-4186-4D22-AC42-A1A0858795A3}|SharedModels\\SharedModels.csproj|c:\\users\\alumno\\documents\\github\\heatmeet\\sharedmodels\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{61948ABE-4186-4D22-AC42-A1A0858795A3}|SharedModels\\SharedModels.csproj|solutionrelative:sharedmodels\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3C78B55D-D535-4871-B1FC-421F1032B7DB}|NetUtils\\NetUtils.csproj|c:\\users\\alumno\\documents\\github\\heatmeet\\netutils\\netutils.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{3C78B55D-D535-4871-B1FC-421F1032B7DB}|NetUtils\\NetUtils.csproj|solutionrelative:netutils\\netutils.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8D84833D-45AD-43BB-936F-754F7AA8844A}|MauiFront\\MauiFront.csproj|c:\\users\\alumno\\documents\\github\\heatmeet\\mauifront\\mauifront.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{8D84833D-45AD-43BB-936F-754F7AA8844A}|MauiFront\\MauiFront.csproj|solutionrelative:mauifront\\mauifront.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "AppShell.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\Alumno\\Documents\\GitHub\\HeatMeet\\MauiFront\\AppShell.xaml.cs",
+              "RelativeDocumentMoniker": "MauiFront\\AppShell.xaml.cs",
+              "ToolTip": "C:\\Users\\Alumno\\Documents\\GitHub\\HeatMeet\\MauiFront\\AppShell.xaml.cs",
+              "RelativeToolTip": "MauiFront\\AppShell.xaml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAzAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-17T10:27:33.979Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "AppShell.xaml",
+              "DocumentMoniker": "C:\\Users\\Alumno\\Documents\\GitHub\\HeatMeet\\MauiFront\\AppShell.xaml",
+              "RelativeDocumentMoniker": "MauiFront\\AppShell.xaml",
+              "ToolTip": "C:\\Users\\Alumno\\Documents\\GitHub\\HeatMeet\\MauiFront\\AppShell.xaml",
+              "RelativeToolTip": "MauiFront\\AppShell.xaml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-03-17T10:27:31.825Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\Alumno\\Documents\\GitHub\\HeatMeet\\HeatMeetServer\\Program.cs",
+              "RelativeDocumentMoniker": "HeatMeetServer\\Program.cs",
+              "ToolTip": "C:\\Users\\Alumno\\Documents\\GitHub\\HeatMeet\\HeatMeetServer\\Program.cs",
+              "RelativeToolTip": "HeatMeetServer\\Program.cs",
+              "ViewState": "AgIAABYBAAAAAAAAAAAiwCwBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-17T09:46:45.387Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\Alumno\\Documents\\GitHub\\HeatMeet\\HeatMeetClienteConsola\\Program.cs",
+              "RelativeDocumentMoniker": "HeatMeetClienteConsola\\Program.cs",
+              "ToolTip": "C:\\Users\\Alumno\\Documents\\GitHub\\HeatMeet\\HeatMeetClienteConsola\\Program.cs",
+              "RelativeToolTip": "HeatMeetClienteConsola\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAAaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-17T09:45:39.472Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Orm.cs",
+              "DocumentMoniker": "C:\\Users\\Alumno\\Documents\\GitHub\\HeatMeet\\HeatMeetServer\\Orm.cs",
+              "RelativeDocumentMoniker": "HeatMeetServer\\Orm.cs",
+              "ToolTip": "C:\\Users\\Alumno\\Documents\\GitHub\\HeatMeet\\HeatMeetServer\\Orm.cs",
+              "RelativeToolTip": "HeatMeetServer\\Orm.cs",
+              "ViewState": "AgIAAFMAAAAAAAAAAAAiwG0AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-17T09:47:54.578Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "MainPage.xaml",
+              "DocumentMoniker": "C:\\Users\\Alumno\\Documents\\GitHub\\HeatMeet\\MauiFront\\MainPage.xaml",
+              "RelativeDocumentMoniker": "MauiFront\\MainPage.xaml",
+              "ToolTip": "C:\\Users\\Alumno\\Documents\\GitHub\\HeatMeet\\MauiFront\\MainPage.xaml",
+              "RelativeToolTip": "MauiFront\\MainPage.xaml",
+              "ViewState": "AgIAAC8AAAAAAAAAAAAwwFUAAAAOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-03-17T09:48:22.052Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "MainPage.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\Alumno\\Documents\\GitHub\\HeatMeet\\MauiFront\\MainPage.xaml.cs",
+              "RelativeDocumentMoniker": "MauiFront\\MainPage.xaml.cs",
+              "ToolTip": "C:\\Users\\Alumno\\Documents\\GitHub\\HeatMeet\\MauiFront\\MainPage.xaml.cs",
+              "RelativeToolTip": "MauiFront\\MainPage.xaml.cs",
+              "ViewState": "AgIAAB4AAAAAAAAAAADwvzUAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-17T09:48:23.473Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Class1.cs",
+              "DocumentMoniker": "C:\\Users\\Alumno\\Documents\\GitHub\\HeatMeet\\NetUtils\\Class1.cs",
+              "RelativeDocumentMoniker": "NetUtils\\Class1.cs",
+              "ToolTip": "C:\\Users\\Alumno\\Documents\\GitHub\\HeatMeet\\NetUtils\\Class1.cs",
+              "RelativeToolTip": "NetUtils\\Class1.cs",
+              "ViewState": "AgIAAAoAAAAAAAAAAAAYwC0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-17T09:52:33.566Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "MauiFront",
+              "DocumentMoniker": "C:\\Users\\Alumno\\Documents\\GitHub\\HeatMeet\\MauiFront\\MauiFront.csproj",
+              "RelativeDocumentMoniker": "MauiFront\\MauiFront.csproj",
+              "ToolTip": "C:\\Users\\Alumno\\Documents\\GitHub\\HeatMeet\\MauiFront\\MauiFront.csproj",
+              "RelativeToolTip": "MauiFront\\MauiFront.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-03-17T09:46:25.252Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Class1.cs",
+              "DocumentMoniker": "C:\\Users\\Alumno\\Documents\\GitHub\\HeatMeet\\SharedModels\\Class1.cs",
+              "RelativeDocumentMoniker": "SharedModels\\Class1.cs",
+              "ToolTip": "C:\\Users\\Alumno\\Documents\\GitHub\\HeatMeet\\SharedModels\\Class1.cs",
+              "RelativeToolTip": "SharedModels\\Class1.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-17T09:45:25.213Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "NetUtils",
+              "DocumentMoniker": "C:\\Users\\Alumno\\Documents\\GitHub\\HeatMeet\\NetUtils\\NetUtils.csproj",
+              "RelativeDocumentMoniker": "NetUtils\\NetUtils.csproj",
+              "ToolTip": "C:\\Users\\Alumno\\Documents\\GitHub\\HeatMeet\\NetUtils\\NetUtils.csproj",
+              "RelativeToolTip": "NetUtils\\NetUtils.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-03-17T09:43:29.261Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -39,6 +39,30 @@ namespace HeatMeetServer
         public string Command { get; set; } = string.Empty; // e.g., "CREATE_GROUP", "JOIN_GROUP", "MARK_AVAILABILITY", "VOTE_DAY", "GET_GROUP_INFO"
         public object? Data { get; set; }
     }
+    public static class AuthService
+    {
+        public static (bool success, string message, int userId, string userName) Login(string email, string password)
+        {
+            try
+            {
+                using var db = new OrmManager();
+
+                var user = db.Users.FirstOrDefault(u => u.Email == email);
+
+                if (user == null)
+                    return (false, "Usuario no existe", 0, "");
+
+                if (user.Password != password)
+                    return (false, "Contraseña incorrecta", 0, "");
+
+                return (true, "Login correcto", user.Id, user.Name);
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Error en servidor: {ex.Message}", 0, "");
+            }
+        }
+    }
 
     public class Program
     {
@@ -50,6 +74,30 @@ namespace HeatMeetServer
 
             OrmManager ormManager = new OrmManager();
             ormManager.Database.EnsureCreated();
+            // Crear usuario inicial automáticamente
+            using (var db = new OrmManager())
+            {
+                var existing = db.Users.FirstOrDefault(u => u.Email == "jorge1@gmail.com");
+
+                if (existing == null)
+                {
+                    var newUser = new Users
+                    {
+                        Name = "JORGE",
+                        Email = "jorge1@gmail.com",
+                        Password = "123"
+                    };
+
+                    db.Users.Add(newUser);
+                    db.SaveChanges();
+
+                    Console.WriteLine("Usuario inicial creado: JORGE (jorge1@gmail.com)");
+                }
+                else
+                {
+                    Console.WriteLine("El usuario inicial ya existe, no se crea de nuevo.");
+                }
+            }
 
 
 
@@ -240,6 +288,28 @@ namespace HeatMeetServer
                         else
                         {
                             response.Data = new { success = false, message = "Invalid data format" };
+                        }
+                        break;
+
+                    case "LOGIN":
+                        if (message.Data is JsonElement loginData)
+                        {
+                            string email = loginData.GetProperty("email").GetString() ?? "";
+                            string password = loginData.GetProperty("password").GetString() ?? "";
+
+                            var result = AuthService.Login(email, password);
+
+                            response.Data = new
+                            {
+                                success = result.success,
+                                message = result.message,
+                                userId = result.userId,
+                                userName = result.userName
+                            };
+                        }
+                        else
+                        {
+                            response.Data = new { success = false, message = "Datos inválidos" };
                         }
                         break;
 
