@@ -2,6 +2,7 @@
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
+using SharedModels;
 
 namespace HeatMeetServer
 {
@@ -34,11 +35,11 @@ namespace HeatMeetServer
     }
 
     // ---------- Network Message Structure ----------
-    public class NetworkMessage
-    {
-        public string Command { get; set; } = string.Empty; // e.g., "CREATE_GROUP", "JOIN_GROUP", "MARK_AVAILABILITY", "VOTE_DAY", "GET_GROUP_INFO"
-        public object? Data { get; set; }
-    }
+    //public class NetworkMessage
+    //{
+    //    public string Command { get; set; } = string.Empty; // e.g., "CREATE_GROUP", "JOIN_GROUP", "MARK_AVAILABILITY", "VOTE_DAY", "GET_GROUP_INFO"
+    //    public object? Data { get; set; }
+    //}
     public static class AuthService
     {
         public static (bool success, string message, int userId, string userName) Login(string email, string password)
