@@ -3,23 +3,83 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MauiFront.MainPage">
 
-    <ScrollView>
-        <VerticalStackLayout Spacing="20" Padding="30">
-            <Label Text="LOGIN" 
-               FontSize="40" 
-               HorizontalOptions="Center" 
-               TextColor="Purple" />
+    <!-- Fondo degradado -->
+    <ContentPage.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#6A0DAD" Offset="0.0"/>
+            <GradientStop Color="#9C27B0" Offset="1.0"/>
+        </LinearGradientBrush>
+    </ContentPage.Background>
 
-            <Entry x:Name="userEntry"  Placeholder="Usuario" />
-            <Entry x:Name="passwordEntry" Placeholder="Contraseña" IsPassword="True" />
-            <Button Text="Entrar" BackgroundColor="Blue" Clicked="BotonEntrar" />
-            
-            
-            
-            
-            
-            
-            
+    <ScrollView>
+        <VerticalStackLayout 
+            VerticalOptions="Center" 
+            HorizontalOptions="Center"
+            Padding="30">
+
+            <!-- Card principal -->
+            <Frame
+                CornerRadius="25"
+                BackgroundColor="White"
+                Padding="25"
+                HasShadow="True"
+                WidthRequest="320">
+
+                <VerticalStackLayout Spacing="20">
+
+                    <!-- Título -->
+                    <Label Text="Bienvenido"
+                           FontSize="26"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center"
+                           TextColor="#333"/>
+
+                    <Label Text="Inicia sesión"
+                           FontSize="14"
+                           HorizontalOptions="Center"
+                           TextColor="Gray"/>
+
+                    <!-- Usuario -->
+                    <Frame CornerRadius="10" BackgroundColor="#F5F5F5" Padding="10">
+                        <Entry x:Name="userEntry"
+                               Placeholder="Usuario"
+                               TextColor="Black"
+                               PlaceholderColor="Gray"/>
+                    </Frame>
+
+                    <!-- Contraseña -->
+                    <Frame CornerRadius="10" BackgroundColor="#F5F5F5" Padding="10">
+                        <Entry x:Name="passwordEntry"
+                               Placeholder="Contraseña"
+                               IsPassword="True"
+                               TextColor="Black"
+                               PlaceholderColor="Gray"/>
+                    </Frame>
+
+                    <!-- Botón PRO -->
+                    <Button Text="Entrar"
+                            Clicked="BotonEntrar"
+                            HeightRequest="50"
+                            CornerRadius="12"
+                            TextColor="White"
+                            FontAttributes="Bold"
+                            BackgroundColor="#6A0DAD">
+                        <Button.Shadow>
+                            <Shadow Brush="#40000000"
+                                    Offset="0,4"
+                                    Radius="10" />
+                        </Button.Shadow>
+                    </Button>
+
+                    <!-- Extra -->
+                    <Label Text="¿Olvidaste tu contraseña?"
+                           FontSize="12"
+                           TextColor="#6A0DAD"
+                           HorizontalOptions="Center"/>
+
+                </VerticalStackLayout>
+            </Frame>
+
         </VerticalStackLayout>
     </ScrollView>
 
