@@ -2,6 +2,7 @@
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 using SharedModels;
 
 namespace HeatMeetServer
@@ -101,22 +102,52 @@ namespace HeatMeetServer
             }
             else Console.WriteLine("Test users already exists.");
 
+
             //Test groups
             string groupName = "TestGroup";
-            Groups? existsGroups = ormManager.Groups.FirstOrDefault(u => u.Name == groupName);
-            if (existsGroups == null)
+            Groups? currentGroup = ormManager.Groups.Include(g => g.Users).FirstOrDefault(g => g.Name == groupName);
+            if (currentGroup == null)
             {
-                Groups? newGroup = new Groups
+                currentGroup = new Groups
                 {
                     Name = groupName,
                     InviteCode = "ABC123",
-                    CreateDate = DateTime.UtcNow//timestamp with timezome
+                    CreateDate = DateTime.UtcNow
                 };
-                ormManager.Groups.Add(newGroup);
+                ormManager.Groups.Add(currentGroup);
                 ormManager.SaveChanges();
-                Console.WriteLine("Test groups added.");
+                Console.WriteLine("Test group created.");
             }
-            else Console.WriteLine("Test groups already exists.");
+
+            Users? userJorge = ormManager.Users.FirstOrDefault(u => u.Name == "JORGE");
+            Users? userAdmin = ormManager.Users.FirstOrDefault(u => u.Name == "admin");
+
+            bool added = false;
+            if (userJorge != null && !currentGroup.Users.Any(u => u.Id == userJorge.Id))
+            {
+                currentGroup.Users.Add(userJorge);
+                added = true;
+            }
+
+            if (userAdmin != null && !currentGroup.Users.Any(u => u.Id == userAdmin.Id))
+            {
+                currentGroup.Users.Add(userAdmin);
+                added = true;
+            }
+
+            if (added)
+            {
+                ormManager.SaveChanges();
+                Console.WriteLine("New users linked to TestGroup.");
+            }
+            else
+            {
+                Console.WriteLine("Users were already in TestGroup.");
+            }
+
+
+
+
 
             //infinite client accept loop
             try
@@ -132,7 +163,7 @@ namespace HeatMeetServer
                 TcpListener server = new TcpListener(address, port);
                 server.Start();
 
-                Console.WriteLine($"\n✅ Server listening on ip {address} on port {port}");//for some reason this gives ip 0.0.0.0, that is a bug?
+                Console.WriteLine($"\n✅ Server listening on ip {address}(all ip's) on port {port}");//for some reason this gives ip 0.0.0.0, that is a bug?
                 Console.WriteLine(new string('-', 60));
 
                 while (true) // Main loop to accept multiple clients
