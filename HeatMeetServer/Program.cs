@@ -2,6 +2,7 @@
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 using SharedModels;
 
 namespace HeatMeetServer
@@ -24,7 +25,7 @@ namespace HeatMeetServer
 
         private static string GenerateGroupCode()
         {
-            return Guid.NewGuid().ToString().Substring(0, 8).ToUpper();
+            return Guid.NewGuid().ToString().Substring(0, 5).ToUpper();
         }
     }
 
@@ -76,48 +77,85 @@ namespace HeatMeetServer
             OrmManager ormManager = new OrmManager();
             ormManager.Database.EnsureCreated();
             
-            //Crear usuarios
-            using (var db = new OrmManager())
+            //Create test users and groups
+
+            //Test users
+            Users? existsUsers = ormManager.Users.FirstOrDefault(u => u.Email == "jorge1@gmail.com");
+            if (existsUsers == null)
             {
-                var existing = db.Users.FirstOrDefault(u => u.Email == "jorge1@gmail.com");
-
-                if (existing == null)
+                Users? newUser = new Users
                 {
-                    var newUser = new Users
-                    {
-                        Name = "JORGE",
-                        Email = "jorge1@gmail.com",
-                        Password = "123"
-                    };
-
-                    db.Users.Add(newUser);
-                    db.SaveChanges();
-                    
-                    var newUser2 = new Users
-                    {
-                        Name = "admin",
-                        Email = "admin",
-                        Password = "admin"
-                    };
-
-                    db.Users.Add(newUser2);
-                    db.SaveChanges();
-                    Console.WriteLine("Usuarios default añadidos.");
-                }
-                else
+                    Name = "JORGE",
+                    Email = "jorge1@gmail.com",
+                    Password = "123"
+                };
+                ormManager.Users.Add(newUser);   
+                Users? newUser2 = new Users
                 {
-                    Console.WriteLine("El usuario inicial ya existe, no se crea de nuevo.");
-                }
+                    Name = "admin",
+                    Email = "admin",
+                    Password = "admin"//this should not exist once the app launches
+                };
+                ormManager.Users.Add(newUser2);
+                ormManager.SaveChanges();
+                Console.WriteLine("Test users added.");
+            }
+            else Console.WriteLine("Test users already exists.");
+
+
+            //Test groups
+            string groupName = "TestGroup";
+            Groups? currentGroup = ormManager.Groups.Include(g => g.Users).FirstOrDefault(g => g.Name == groupName);
+            if (currentGroup == null)
+            {
+                currentGroup = new Groups
+                {
+                    Name = groupName,
+                    InviteCode = "ABC123",
+                    CreateDate = DateTime.UtcNow
+                };
+                ormManager.Groups.Add(currentGroup);
+                ormManager.SaveChanges();
+                Console.WriteLine("Test group created.");
+            }
+
+            Users? userJorge = ormManager.Users.FirstOrDefault(u => u.Name == "JORGE");
+            Users? userAdmin = ormManager.Users.FirstOrDefault(u => u.Name == "admin");
+
+            bool added = false;
+            if (userJorge != null && !currentGroup.Users.Any(u => u.Id == userJorge.Id))
+            {
+                currentGroup.Users.Add(userJorge);
+                added = true;
+            }
+
+            if (userAdmin != null && !currentGroup.Users.Any(u => u.Id == userAdmin.Id))
+            {
+                currentGroup.Users.Add(userAdmin);
+                added = true;
+            }
+
+            if (added)
+            {
+                ormManager.SaveChanges();
+                Console.WriteLine("New users linked to TestGroup.");
+            }
+            else
+            {
+                Console.WriteLine("Users were already in TestGroup.");
             }
 
 
-            //bucle de aceptar clientes
+
+
+
+            //infinite client accept loop
             try
             {
                 Console.WriteLine("=== HEATMEET TCP SERVER ===");
 
-                IPAddress address = IPAddress.Any;//<--Aqui podemos poner una funcion de cojer la ip buena 
-                int port = 8888;                  
+                IPAddress address = IPAddress.Any;//<--In a near future we will put a good ip selector hoster with dns and more
+                int port = 8888;
 
                 Console.WriteLine("Local IPs available:");
                 ShowLocalIPs();
@@ -125,7 +163,7 @@ namespace HeatMeetServer
                 TcpListener server = new TcpListener(address, port);
                 server.Start();
 
-                Console.WriteLine($"\n✅ Server listening on ip {address} on port {port}");//por alguna razon esto da 0.0.0.0, eso esta bien?
+                Console.WriteLine($"\n✅ Server listening on ip {address}(all ip's) on port {port}");//for some reason this gives ip 0.0.0.0, that is a bug?
                 Console.WriteLine(new string('-', 60));
 
                 while (true) // Main loop to accept multiple clients
@@ -143,10 +181,9 @@ namespace HeatMeetServer
             {
                 Console.WriteLine($"\n❌ Error: {ex.Message}");
             }
-
-
-
         }
+
+
 
         static void HandleClient(object? obj)
         {
@@ -212,7 +249,7 @@ namespace HeatMeetServer
                             Group newGroup = new Group
                             {
                                 GroupName = groupName,
-                                Admin = admin
+                                Admin     = admin
                             };
                             newGroup.Members.Add(admin);
 
@@ -220,9 +257,9 @@ namespace HeatMeetServer
 
                             response.Data = new
                             {
-                                success = true,
+                                success   = true,
                                 groupCode = newGroup.GroupCode,
-                                message = $"Group '{groupName}' created successfully. Share code: {newGroup.GroupCode}"
+                                message   = $"Group '{groupName}' created successfully. Share code: {newGroup.GroupCode}"
                             };
                         }
                         else
@@ -325,7 +362,7 @@ namespace HeatMeetServer
                         break;
 
                     case "VOTE_DAY":
-                        // Expected Data: { "groupCode": "...", "userId": "...", "date": "yyyy-MM-dd" }
+                        //Expected Data: { "groupCode": "...", "userId": "...", "date": "yyyy-MM-dd" }
                         if (message.Data is JsonElement voteData)
                         {
                             string groupCode = voteData.GetProperty("groupCode").GetString() ?? "";
