@@ -1,0 +1,203 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MauiFront.GroupsChat"
+             BackgroundColor="#F5F0E8">
+
+    <Grid RowDefinitions="70,*,70">
+
+        <!-- HEADER -->
+        <Grid Grid.Row="0"
+              BackgroundColor="White"
+              Padding="10,0"
+              ColumnDefinitions="40,50,*,40">
+
+            <Label Grid.Column="0"
+                   Text="←"
+                   FontSize="22"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Center">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnBackTapped"/>
+                </Label.GestureRecognizers>
+            </Label>
+
+            <!-- Avatar circular -->
+            <Frame Grid.Column="1"
+                   WidthRequest="40"
+                   HeightRequest="40"
+                   CornerRadius="20"
+                   BackgroundColor="#E03030"
+                   BorderColor="Transparent"
+                   Padding="0"
+                   IsClippedToBounds="True"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Center">
+                <Label Text="A"
+                       TextColor="White"
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"/>
+            </Frame>
+
+            <!-- Nombre del grupo -->
+            <Label Grid.Column="2"
+                   Text="Amigos del gym"
+                   FontSize="16"
+                   FontAttributes="Bold"
+                   VerticalOptions="Center"
+                   Margin="8,0,0,0"/>
+
+            <!-- Tres puntos -->
+            <Label Grid.Column="3"
+                   Text="⋮"
+                   FontSize="22"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Center"/>
+        </Grid>
+
+        <!-- MENSAJES -->
+        <ScrollView Grid.Row="1" Padding="15,10">
+            <VerticalStackLayout Spacing="10">
+
+                <!-- Mensaje recibido -->
+                <Frame BackgroundColor="White"
+                       BorderColor="Transparent"
+                       CornerRadius="16"
+                       Padding="12,8"
+                       HorizontalOptions="Start"
+                       MaximumWidthRequest="260">
+                    <Label Text="¿Qué tal quedamos esta tarde?"
+                           FontSize="14"
+                           TextColor="#222"/>
+                </Frame>
+
+                <!-- Mensaje enviado -->
+                <Frame BackgroundColor="#2C3E6B"
+                       BorderColor="Transparent"
+                       CornerRadius="16"
+                       Padding="12,8"
+                       HorizontalOptions="End"
+                       MaximumWidthRequest="260">
+                    <Label Text="Genial, ¿a qué hora?"
+                           FontSize="14"
+                           TextColor="White"/>
+                </Frame>
+
+                <!-- Mensaje recibido -->
+                <Frame BackgroundColor="White"
+                       BorderColor="Transparent"
+                       CornerRadius="16"
+                       Padding="12,8"
+                       HorizontalOptions="Start"
+                       MaximumWidthRequest="260">
+                    <Label Text="¿Os parece sobre las 18:00?"
+                           FontSize="14"
+                           TextColor="#222"/>
+                </Frame>
+
+                <!-- Mensaje enviado -->
+                <Frame BackgroundColor="#2C3E6B"
+                       BorderColor="Transparent"
+                       CornerRadius="16"
+                       Padding="12,8"
+                       HorizontalOptions="End"
+                       MaximumWidthRequest="260">
+                    <Label Text="Perfecto, allí nos vemos"
+                           FontSize="14"
+                           TextColor="White"/>
+                </Frame>
+
+                <!-- Tarjeta Propuesta -->
+                <Frame BackgroundColor="White"
+                       BorderColor="#E8A050"
+                       CornerRadius="12"
+                       Padding="15"
+                       HorizontalOptions="Fill"
+                       Margin="0,5">
+                    <VerticalStackLayout Spacing="10">
+
+                        <!-- Cabecera propuesta -->
+                        <HorizontalStackLayout Spacing="10">
+                            <Frame WidthRequest="38"
+                                   HeightRequest="38"
+                                   CornerRadius="8"
+                                   BackgroundColor="#F07030"
+                                   BorderColor="Transparent"
+                                   Padding="0"
+                                   IsClippedToBounds="True"
+                                   VerticalOptions="Center">
+                                <Label Text="📅"
+                                       FontSize="18"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center"/>
+                            </Frame>
+                            <VerticalStackLayout VerticalOptions="Center">
+                                <Label Text="Propuesta"
+                                       FontSize="15"
+                                       FontAttributes="Bold"
+                                       TextColor="#222"/>
+                                <Label Text="¿Queréis hacer una sesión de entrenamiento este sábado?"
+                                       FontSize="13"
+                                       TextColor="#555"/>
+                            </VerticalStackLayout>
+                        </HorizontalStackLayout>
+
+                        <!-- Botón propuesta -->
+                        <Button Text="Entrar en propuesta"
+                                BackgroundColor="#F07030"
+                                TextColor="White"
+                                CornerRadius="8"
+                                FontAttributes="Bold"
+                                FontSize="14"
+                                Clicked="OnPropuestaTapped"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- BARRA INFERIOR -->
+        <Grid Grid.Row="2"
+              BackgroundColor="White"
+              Padding="10,0"
+              ColumnDefinitions="*,45">
+
+            <Frame Grid.Column="0"
+                   BorderColor="#DDDDDD"
+                   CornerRadius="20"
+                   Padding="15,0"
+                   HeightRequest="42"
+                   VerticalOptions="Center">
+                <Entry x:Name="MessageEntry"
+                       Placeholder="Escribe un mensaje..."
+                       PlaceholderColor="#AAAAAA"
+                       FontSize="14"
+                       VerticalOptions="Center"/>
+            </Frame>
+
+            <Frame Grid.Column="1"
+                   WidthRequest="40"
+                   HeightRequest="40"
+                   CornerRadius="20"
+                   BackgroundColor="#F07030"
+                   BorderColor="Transparent"
+                   Padding="0"
+                   IsClippedToBounds="True"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Center">
+                <Label Text="➤"
+                       TextColor="White"
+                       FontSize="16"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnSendTapped"/>
+                    </Label.GestureRecognizers>
+                </Label>
+            </Frame>
+
+        </Grid>
+    </Grid>
+</ContentPage>

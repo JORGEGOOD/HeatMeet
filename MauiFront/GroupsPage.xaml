@@ -3,22 +3,23 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MauiFront.GroupsPage"
              Title="Grupos">
-
     <Grid RowDefinitions="*" ColumnDefinitions="*">
-
         <CollectionView x:Name="GroupsCollection" Grid.Row="0" Margin="10">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <Frame Margin="0,5" Padding="10" CornerRadius="10" HasShadow="True">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnGroupTapped" />
+                        </Frame.GestureRecognizers>
                         <HorizontalStackLayout Spacing="15">
-                            <Label Text="{Binding Name}" 
-                               VerticalOptions="Center" 
-                               FontSize="18" 
-                               FontAttributes="Bold" />
-                            <Image Source="{Binding DisplayImage}" 
-                               HeightRequest="60" 
-                               WidthRequest="60"
-                               Aspect="AspectFill" />
+                            <Label Text="{Binding Name}"
+                                   VerticalOptions="Center"
+                                   FontSize="18"
+                                   FontAttributes="Bold" />
+                            <Image Source="{Binding DisplayImage}"
+                                   HeightRequest="60"
+                                   WidthRequest="60"
+                                   Aspect="AspectFill" />
                         </HorizontalStackLayout>
                     </Frame>
                 </DataTemplate>
@@ -37,7 +38,4 @@
                 Margin="20"
                 Clicked="CrearNuevoGrupo" />
     </Grid>
-
-
-
 </ContentPage>

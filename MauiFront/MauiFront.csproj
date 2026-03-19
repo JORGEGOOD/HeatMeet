@@ -45,4 +45,22 @@
     <ProjectReference Include="..\SharedModels\SharedModels.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="CreateGroupPage.xaml.cs">
+      <DependentUpon>CreateGroupPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="GruopsChat.xaml.cs">
+      <DependentUpon>GruopsChat.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <MauiXaml Update="CreateGroupPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+    <MauiXaml Update="GruopsChat.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+  </ItemGroup>
+
 </Project>
