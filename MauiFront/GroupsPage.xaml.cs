@@ -22,29 +22,43 @@ namespace MauiFront
             InitializeComponent();
         }
 
-        protected override void OnAppearing()
+        protected override async void OnAppearing()
         {
             base.OnAppearing();
 
-            var gruposDesdeServer = new List<Group>
-            {
-                new Group
-                {
-                    Id = 1,
-                    Name = "Desarrolladores .NET",
-                    InviteCode = "HTM-123",
-                    CreateDate = DateTime.Now
-                },
-                new Group
-                {
-                    Id = 2,
-                    Name = "Equipo HeatMeet",
-                    InviteCode = "ABC-999",
-                    CreateDate = DateTime.Now.AddDays(-10)
-                }
-            };
+            int userId = Preferences.Get("userId", 0);
+            if (userId == 0) return;
 
-            GroupsCollection.ItemsSource = gruposDesdeServer;
+            try
+            {
+                var socket = NetUtils.NetUtils.CreateClientSocket("10.0.2.2", 8888);
+                var message = new SharedModels.NetworkMessage
+                {
+                    Command = "GET_USER_GROUPS",
+                    Data = new { userId }
+                };
+
+                NetUtils.NetUtils.SendJson(socket, message);
+                var response = NetUtils.NetUtils.ReceiveJson<SharedModels.NetworkMessage>(socket);
+                NetUtils.NetUtils.CloseSocket(socket);
+
+                if (response.Data is System.Text.Json.JsonElement data)
+                {
+                    bool ok = data.GetProperty("success").GetBoolean();
+                    if (ok)
+                    {
+                        var groupsJson = data.GetProperty("groups");
+                        var grupos = System.Text.Json.JsonSerializer
+                            .Deserialize<List<Group>>(groupsJson.GetRawText());
+                        GroupsCollection.ItemsSource = grupos;
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Error", "No se pudieron cargar los grupos: " + ex.Message, "OK");
+            }
         }
 
         // Pulsar un grupo → ir al chat

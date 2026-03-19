@@ -39,6 +39,8 @@ namespace MauiFront
                 string msg = data.GetProperty("message").GetString();
                 if (ok)
                 {
+                    int userId = data.GetProperty("userId").GetInt32();
+                    Preferences.Set("userId", userId);
                     await Shell.Current.GoToAsync("groups");
                 }
                 else

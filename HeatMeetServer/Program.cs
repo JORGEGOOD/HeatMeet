@@ -97,11 +97,12 @@ namespace HeatMeetServer
                     Password = "admin"//this should not exist once the app launches
                 };
                 ormManager.Users.Add(newUser2);
+
+               
                 ormManager.SaveChanges();
                 Console.WriteLine("Test users added.");
             }
             else Console.WriteLine("Test users already exists.");
-
 
             //Test groups
             string groupName = "TestGroup";
@@ -423,6 +424,42 @@ namespace HeatMeetServer
                             response.Data = new { success = false, message = "Invalid data format" };
                         }
                         break;
+
+                    case "GET_USER_GROUPS":
+                        if (message.Data is JsonElement userGroupsData)
+                        {
+                            int userId = userGroupsData.GetProperty("userId").GetInt32();
+
+                            using var db = new OrmManager();
+                            var user = db.Users
+                                .Include(u => u.Groups)
+                                .FirstOrDefault(u => u.Id == userId);
+
+                            if (user == null || user.Groups == null || !user.Groups.Any())
+                            {
+                                response.Data = new { success = false, message = "Sin grupos" };
+                            }
+                            else
+                            {
+                                response.Data = new
+                                {
+                                    success = true,
+                                    groups = user.Groups.Select(g => new
+                                    {
+                                        g.Id,
+                                        g.Name,
+                                        g.InviteCode,
+                                        g.CreateDate
+                                    }).ToList()
+                                };
+                            }
+                        }
+                        else
+                        {
+                            response.Data = new { success = false, message = "Datos inválidos" };
+                        }
+                        break;
+
 
                     default:
                         response.Data = new { success = false, message = "Unknown command" };
