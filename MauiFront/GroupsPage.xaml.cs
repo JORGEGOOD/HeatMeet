@@ -1,5 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using
+
+
+using System.Net.Sockets;
+using System.Text.Json;
 
 namespace MauiFront
 {
@@ -31,24 +36,25 @@ namespace MauiFront
 
             try
             {
-                var socket = NetUtils.NetUtils.CreateClientSocket("10.0.2.2", 8888);
-                var message = new SharedModels.NetworkMessage
+                Socket socket = NetUtils.NetUtils.CreateClientSocket("10.0.2.2", 8888);
+                SharedModels.NetworkMessage message = new SharedModels.NetworkMessage
                 {
                     Command = "GET_USER_GROUPS",
                     Data = new { userId }
                 };
 
                 NetUtils.NetUtils.SendJson(socket, message);
-                var response = NetUtils.NetUtils.ReceiveJson<SharedModels.NetworkMessage>(socket);
+                SharedModels.NetworkMessage response = NetUtils.NetUtils.ReceiveJson<SharedModels.NetworkMessage>(socket);
                 NetUtils.NetUtils.CloseSocket(socket);
 
-                if (response.Data is System.Text.Json.JsonElement data)
+                if (response.Data is JsonElement data)
                 {
                     bool ok = data.GetProperty("success").GetBoolean();
+
                     if (ok)
                     {
-                        var groupsJson = data.GetProperty("groups");
-                        var grupos = System.Text.Json.JsonSerializer
+                        JsonElement groupsJson = data.GetProperty("groups");
+                        var grupos = JsonSerializer
                             .Deserialize<List<Group>>(groupsJson.GetRawText());
                         GroupsCollection.ItemsSource = grupos;
                     }
