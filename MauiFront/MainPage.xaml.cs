@@ -74,14 +74,14 @@ namespace MauiFront
 
             try
             {
-                var socket = NetUtils.NetUtils.CreateClientSocket("10.0.2.2", 8888);
-                var message = new SharedModels.NetworkMessage
+                Socket socket = NetUtils.NetUtils.CreateClientSocket("10.0.2.2", 8888);
+                SharedModels.NetworkMessage message = new SharedModels.NetworkMessage
                 {
                     Command = "REGISTER",
                     Data = new { name, email, password }
                 };
                 NetUtils.NetUtils.SendJson(socket, message);
-                var response = NetUtils.NetUtils.ReceiveJson<SharedModels.NetworkMessage>(socket);
+                SharedModels.NetworkMessage response = NetUtils.NetUtils.ReceiveJson<SharedModels.NetworkMessage>(socket);
                 NetUtils.NetUtils.CloseSocket(socket);
 
                 if (response.Data is not JsonElement data)

@@ -28,7 +28,7 @@
 
         <Button Text="+"
                 FontSize="30"
-                BackgroundColor="Purple"
+                BackgroundColor="Orange"
                 TextColor="White"
                 HeightRequest="60"
                 WidthRequest="60"

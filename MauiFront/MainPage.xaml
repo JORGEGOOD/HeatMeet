@@ -1,15 +1,7 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="MauiFront.MainPage">
-
-    <!-- Fondo degradado animado -->
-    <ContentPage.Background>
-        <LinearGradientBrush x:Name="bgGradient" StartPoint="0,0" EndPoint="0,1">
-            <GradientStop x:Name="bgGrad1" Color="#6A0DAD" Offset="0.0"/>
-            <GradientStop x:Name="bgGrad2" Color="#9C27B0" Offset="1.0"/>
-        </LinearGradientBrush>
-    </ContentPage.Background>
+             x:Class="MauiFront.MainPage"
+             BackgroundColor="#F5EDE3">
 
     <ScrollView>
         <VerticalStackLayout 
@@ -17,66 +9,70 @@
             HorizontalOptions="Center"
             Padding="30">
 
-            <!-- Card -->
+            <!-- Card principal con borde azul -->
             <Frame
-                CornerRadius="25"
+                CornerRadius="28"
                 BackgroundColor="White"
-                Padding="25"
+                Padding="30"
+                WidthRequest="330"
+                BorderColor="#0A2A43"
                 HasShadow="True"
-                WidthRequest="320">
+                Shadow="{Shadow Brush='#20000000', Offset='0,6', Radius='18'}"
+                >
 
-                <VerticalStackLayout Spacing="20">
+                <VerticalStackLayout Spacing="22">
 
                     <!-- Título -->
                     <Label Text="Bienvenido"
-                           FontSize="26"
+                           FontSize="28"
                            FontAttributes="Bold"
                            HorizontalOptions="Center"
-                           TextColor="#333"/>
+                           TextColor="#072033"/>
 
                     <Label Text="Inicia sesión"
                            FontSize="14"
                            HorizontalOptions="Center"
-                           TextColor="Gray"/>
+                           TextColor="#0A2A43"
+                           Opacity="0.7"/>
 
                     <!-- Usuario -->
-                    <Frame CornerRadius="10" BackgroundColor="#F5F5F5" Padding="10">
-                        <Entry x:Name="userEntry"
-                               Placeholder="Usuario"
-                               TextColor="Black"
-                               PlaceholderColor="Gray"/>
-                    </Frame>
+                    <Entry x:Name="userEntry"
+                           Placeholder="Usuario"
+                           TextColor="#072033"
+                           PlaceholderColor="#8A8A8A"
+                           HeightRequest="48"
+                           FontSize="14"/>
 
                     <!-- Contraseña -->
-                    <Frame CornerRadius="10" BackgroundColor="#F5F5F5" Padding="10">
-                        <Entry x:Name="passwordEntry"
-                               Placeholder="Contraseña"
-                               IsPassword="True"
-                               TextColor="Black"
-                               PlaceholderColor="Gray"/>
-                    </Frame>
+                    <Entry x:Name="passwordEntry"
+                           Placeholder="Contraseña"
+                           IsPassword="True"
+                           TextColor="#072033"
+                           PlaceholderColor="#8A8A8A"
+                           HeightRequest="48"
+                           FontSize="14"/>
 
-                    <!-- Botón con gradiente animado -->
+                    <!-- Botón principal -->
                     <Grid>
                         <Button x:Name="loginButton"
                                 Text="Entrar"
                                 Clicked="BotonEntrar"
-                                HeightRequest="50"
-                                CornerRadius="12"
+                                HeightRequest="52"
+                                CornerRadius="14"
                                 TextColor="White"
-                                FontAttributes="Bold">
+                                FontAttributes="Bold"
+                                FontSize="16">
                             <Button.Background>
-                                <LinearGradientBrush x:Name="btnGradient" StartPoint="0,0" EndPoint="1,0">
-                                    <GradientStop x:Name="btnGrad1" Color="#9C27B0" Offset="0.0"/>
-                                    <GradientStop x:Name="btnGrad2" Color="#6A0DAD" Offset="1.0"/>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                    <GradientStop Color="#FF6A00" Offset="0.0"/>
+                                    <GradientStop Color="#E63900" Offset="1.0"/>
                                 </LinearGradientBrush>
                             </Button.Background>
                             <Button.Shadow>
-                                <Shadow Brush="#40000000" Offset="0,4" Radius="10"/>
+                                <Shadow Brush="#30000000" Offset="0,4" Radius="12"/>
                             </Button.Shadow>
                         </Button>
 
-                        <!-- Loader encima -->
                         <ActivityIndicator x:Name="loader"
                                            IsVisible="False"
                                            IsRunning="False"
@@ -85,19 +81,20 @@
                                            VerticalOptions="Center"/>
                     </Grid>
 
-                    <!-- Extra -->
+                    <!-- Enlaces -->
                     <Label Text="¿Olvidaste tu contraseña?"
                            FontSize="12"
-                           TextColor="#6A0DAD"
-                           HorizontalOptions="Center"/>
+                           TextColor="#0A2A43"
+                           HorizontalOptions="Center"
+                           Opacity="0.7"/>
 
-                    <!-- Botón Registrarse -->
                     <Button Text="¿No tienes cuenta? Regístrate"
                             Clicked="BotonRegistrar"
                             BackgroundColor="Transparent"
-                            TextColor="#6A0DAD"
+                            TextColor="#072033"
                             FontSize="12"
-                            BorderWidth="0"/>
+                            BorderWidth="0"
+                            Opacity="0.7"/>
 
                 </VerticalStackLayout>
             </Frame>

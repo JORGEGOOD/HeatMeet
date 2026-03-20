@@ -1,6 +1,7 @@
 ﻿using SharedModels;
 using NetUtils;
 using System.Text.Json;
+using System.Net.Sockets;
 
 namespace MauiFront;
 
@@ -28,14 +29,14 @@ public partial class CreateGroupPage : ContentPage
 
         try
         {
-            var socket = NetUtils.NetUtils.CreateClientSocket("10.0.2.2", 8888);
-            var message = new SharedModels.NetworkMessage
+            Socket socket = NetUtils.NetUtils.CreateClientSocket("10.0.2.2", 8888);
+            SharedModels.NetworkMessage message = new SharedModels.NetworkMessage
             {
                 Command = "CREATE_GROUP",
                 Data = new { groupName = GroupNameEntry.Text, userId }
             };
             NetUtils.NetUtils.SendJson(socket, message);
-            var response = NetUtils.NetUtils.ReceiveJson<SharedModels.NetworkMessage>(socket);
+            SharedModels.NetworkMessage response = NetUtils.NetUtils.ReceiveJson<SharedModels.NetworkMessage>(socket);
             NetUtils.NetUtils.CloseSocket(socket);
 
             if (response.Data is not JsonElement data)
@@ -81,14 +82,14 @@ public partial class CreateGroupPage : ContentPage
 
         try
         {
-            var socket = NetUtils.NetUtils.CreateClientSocket("10.0.2.2", 8888);
-            var message = new SharedModels.NetworkMessage
+            Socket socket = NetUtils.NetUtils.CreateClientSocket("10.0.2.2", 8888);
+            SharedModels.NetworkMessage message = new SharedModels.NetworkMessage
             {
                 Command = "JOIN_GROUP",
                 Data = new { inviteCode = GroupCodeEntry.Text.Trim().ToUpper(), userId }
             };
             NetUtils.NetUtils.SendJson(socket, message);
-            var response = NetUtils.NetUtils.ReceiveJson<SharedModels.NetworkMessage>(socket);
+            SharedModels.NetworkMessage response = NetUtils.NetUtils.ReceiveJson<SharedModels.NetworkMessage>(socket);
             NetUtils.NetUtils.CloseSocket(socket);
 
             if (response.Data is not JsonElement data)
