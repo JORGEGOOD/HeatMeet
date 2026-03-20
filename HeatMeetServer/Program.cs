@@ -186,20 +186,20 @@ namespace HeatMeetServer
             {
                 Console.WriteLine("=== HEATMEET TCP SERVER ===");
                 Socket serverSocket = NetUtils.NetUtils.CreateServerSocket("0.0.0.0", 8888);
-                Console.WriteLine($"✅ Servidor iniciado en 0.0.0.0:8888 (todas las IPs)");
+                Console.WriteLine($"Server Login correct en 0.0.0.0:8888 ");
                 Console.WriteLine(new string('-', 60));
 
                 while (serverSocket.IsBound)
                 {
                     Socket clientSocket = serverSocket.Accept();
-                    Console.WriteLine($"✅ Cliente conectado");
+                    Console.WriteLine($"Cliente connect");
                     Thread clientThread = new Thread(HandleClient);
                     clientThread.Start(clientSocket);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error: {ex.Message}");
+                Console.WriteLine(" Error: " + ex.Message);
             }
 
         }
@@ -214,21 +214,21 @@ namespace HeatMeetServer
                     var message = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(client);
                     if (message == null) break;
 
-                    Console.WriteLine($" Comando recibido: {message.Command}");
+                    Console.WriteLine($"Comando recibido: {message.Command}");
                     NetworkMessage response = ProcessCommand(message);
 
                     NetUtils.NetUtils.SendJson(client, response);
-                    Console.WriteLine($" Respuesta enviada");
+                    Console.WriteLine($"Respuesta enviada");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($" Error cliente: {ex.Message}");
+                Console.WriteLine($" Error client: {ex.Message}");
             }
             finally
             {
                 NetUtils.NetUtils.CloseSocket(client);
-                Console.WriteLine(" Cliente desconectado");
+                Console.WriteLine(" Clien desconnect");
             }
         }
 

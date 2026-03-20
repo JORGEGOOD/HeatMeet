@@ -8,8 +8,7 @@
 
             //registrar "LoginPage" como "login"
             Routing.RegisterRoute("groups", typeof(GroupsPage));
-            Routing.RegisterRoute("newGroup", typeof(NewGroupPage));
-            
+
             
         }
     }
