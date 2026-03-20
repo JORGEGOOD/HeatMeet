@@ -47,12 +47,19 @@ namespace HeatMeetServer
 
     public class Program
     {
-        // In-memory storage (simulates a database)
-        public static List<Group> ActiveGroups = new List<Group>();
+        
         public static OrmManager ormManager {  get; private set; }
+
+        private static void OnProcessExit(object? sender, EventArgs e)//to dispose the app on exit
+        {
+            Console.WriteLine("Cerrando ORM...");
+            ormManager?.Dispose();
+        }
 
         static void Main(string[] args)
         {
+
+            AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
 
             ormManager = new OrmManager();
             ormManager.Database.EnsureCreated();
@@ -374,6 +381,19 @@ namespace HeatMeetServer
                         {
                             response.Data = new { success = false, message = "Invalid data" };
                         }
+                        break;
+
+
+                    case "GET_GROUP_MESSAGES":
+
+
+
+
+
+
+
+
+
                         break;
 
                     default:
