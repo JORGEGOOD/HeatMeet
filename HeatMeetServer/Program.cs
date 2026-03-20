@@ -184,7 +184,7 @@ namespace HeatMeetServer
                     Socket clientSocket = serverSocket.Accept();
                     IPEndPoint clientEndPoint = (IPEndPoint)clientSocket.RemoteEndPoint;
 
-                    Console.WriteLine($"Client connected from: {clientEndPoint.Address}:{clientEndPoint.Port}");
+                    Console.WriteLine($"New client: {clientEndPoint.Address}:{clientEndPoint.Port}");
 
                     Thread clientThread = new Thread(new ParameterizedThreadStart(HandleClient));
                     clientThread.Start(clientSocket);
