@@ -1,5 +1,4 @@
 ﻿namespace MauiFront;
-
 public partial class GroupsChat : ContentPage
 {
     public GroupsChat()

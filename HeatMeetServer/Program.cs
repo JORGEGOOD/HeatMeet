@@ -25,6 +25,7 @@ namespace HeatMeetServer
 
         private static string GenerateGroupCode()
         {
+            //should also make a database check if it exists?
             return Guid.NewGuid().ToString().Substring(0, 5).ToUpper();
         }
     }
@@ -43,12 +44,11 @@ namespace HeatMeetServer
     //}
     public static class AuthService
     {
-        public static (bool success, string message, int userId, string userName) Login(string email, string password)
+        public static (bool success, string message, int userId, string userName) 
+                  Login(OrmManager db, string email, string password)
         {
             try
             {
-                using var db = new OrmManager();
-
                 var user = db.Users.FirstOrDefault(u => u.Email == email);
 
                 if (user == null)
@@ -70,11 +70,12 @@ namespace HeatMeetServer
     {
         // In-memory storage (simulates a database)
         public static List<Group> ActiveGroups = new List<Group>();
+        public static OrmManager ormManager {  get; private set; }
 
         static void Main(string[] args)
         {
 
-            OrmManager ormManager = new OrmManager();
+            ormManager = new OrmManager();
             ormManager.Database.EnsureCreated();
             
             //Create test users and groups
@@ -145,9 +146,6 @@ namespace HeatMeetServer
             {
                 Console.WriteLine("Users were already in TestGroup.");
             }
-
-
-
 
 
             //infinite client accept loop
@@ -346,7 +344,7 @@ namespace HeatMeetServer
                             string email = loginData.GetProperty("email").GetString() ?? "";
                             string password = loginData.GetProperty("password").GetString() ?? "";
 
-                            var result = AuthService.Login(email, password);
+                            var result = AuthService.Login(ormManager, email, password);
 
                             response.Data = new
                             {
