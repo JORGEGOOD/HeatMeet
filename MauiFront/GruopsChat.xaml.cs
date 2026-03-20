@@ -105,12 +105,12 @@ public partial class GroupsChat : ContentPage
     //Send message
     private async void OnSendTapped(object sender, EventArgs e)
     {
-        //if (string.IsNullOrWhiteSpace(MessageEntry.Text))
-        //    return;
+        if (string.IsNullOrWhiteSpace(MessageEntry.Text))
+            return;
 
-        ////message logic
-        //await DisplayAlert("Mensaje", $"Enviado: {MessageEntry.Text}", "OK");
-        //MessageEntry.Text = string.Empty;
+        //message logic
+        await DisplayAlert("Mensaje", $"EN PROGRESO", "OK");
+        MessageEntry.Text = string.Empty;
     }
 
 
