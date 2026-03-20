@@ -15,6 +15,7 @@
 </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\NetUtils\NetUtils.csproj" />
     <ProjectReference Include="..\SharedModels\SharedModels.csproj" />
   </ItemGroup>
 

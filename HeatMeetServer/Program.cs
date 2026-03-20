@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using SharedModels;
+using NetUtils;
 
 namespace HeatMeetServer
 {
@@ -125,127 +126,113 @@ namespace HeatMeetServer
                 Console.WriteLine("Users were already in TestGroup.");
             }
 
+
+            // Test messages
+            if (currentGroup != null)
+            {
+                bool hasMessages = ormManager.Messages.Any(m => m.GroupId == currentGroup.Id);
+
+                if (!hasMessages)
+                {
+                    if (userJorge != null && userAdmin != null)
+                    {
+                        var messages = new List<Messages>
+            {
+                new Messages
+                {
+                    Content = "¿Qué tal quedamos esta tarde?",
+                    CreateDate = DateTime.UtcNow.AddMinutes(-30),
+                    UserId = userJorge.Id,
+                    GroupId = currentGroup.Id
+                },
+                new Messages
+                {
+                    Content = "Genial, ¿a qué hora?",
+                    CreateDate = DateTime.UtcNow.AddMinutes(-25),
+                    UserId = userAdmin.Id,
+                    GroupId = currentGroup.Id
+                },
+                new Messages
+                {
+                    Content = "¿Os parece sobre las 18:00?",
+                    CreateDate = DateTime.UtcNow.AddMinutes(-20),
+                    UserId = userJorge.Id,
+                    GroupId = currentGroup.Id
+                },
+                new Messages
+                {
+                    Content = "Perfecto, allí nos vemos",
+                    CreateDate = DateTime.UtcNow.AddMinutes(-15),
+                    UserId = userAdmin.Id,
+                    GroupId = currentGroup.Id
+                }
+            };
+
+                        ormManager.Messages.AddRange(messages);
+                        ormManager.SaveChanges();
+
+                        Console.WriteLine("Test messages added.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Test messages already exist.");
+                }
+            }
+
+
             //infinite client accept loop
             try
             {
                 Console.WriteLine("=== HEATMEET TCP SERVER ===");
 
-                IPAddress address = IPAddress.Any;//<--In a near future we will put a good ip selector hoster with dns and more
-                int port = 8888;
-
-                Console.WriteLine("Local IPs available:");
-                ShowLocalIPs();
-
-                TcpListener server = new TcpListener(address, port);
-                server.Start();
-
-                Console.WriteLine($"\n✅ Server listening on ip {address}(all ip's) on port {port}");//for some reason this gives ip 0.0.0.0, that is a bug?
+                Socket serverSocket = NetUtils.NetUtils.CreateServerSocket("0.0.0.0", 8888);
+                Console.WriteLine($" Servidor iniciado en 0.0.0.0:8888 (todas las IPs)");
                 Console.WriteLine(new string('-', 60));
 
-                while (true) // Main loop to accept multiple clients
-                {
-                    TcpClient client = server.AcceptTcpClient();
-                    IPEndPoint? clientEndPoint = client.Client.RemoteEndPoint as IPEndPoint;
-                    Console.WriteLine($"✅ Client connected from: {clientEndPoint?.Address}:{clientEndPoint?.Port}");
-
-                    // Handle each client in a separate thread
-                    Thread clientThread = new Thread(HandleClient);
-                    clientThread.Start(client);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"\n❌ Error: {ex.Message}");
-            }
-
-
-
-            try
-            {
-                Console.WriteLine("=== HEATMEET TCP SERVER ===");
-
-                IPAddress ip = IPAddress.Any;
-                int port = 8888;
-
-                Console.WriteLine("Local IPs available:");
-                ShowLocalIPs();
-
-                IPEndPoint endPoint = new IPEndPoint(ip, port);
-                Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-
-                serverSocket.Bind(endPoint);
-                serverSocket.Listen();
-
-                Console.WriteLine($"Server listening on {ip.ToString}:{port}");
-                Console.WriteLine(new string('-', 60));
-
-                while (true)
+                while (serverSocket.IsBound)
                 {
                     Socket clientSocket = serverSocket.Accept();
-                    IPEndPoint clientEndPoint = (IPEndPoint)clientSocket.RemoteEndPoint;
-
-                    Console.WriteLine($"New client: {clientEndPoint.Address}:{clientEndPoint.Port}");
-
-                    Thread clientThread = new Thread(new ParameterizedThreadStart(HandleClient));
+                    Console.WriteLine($"Cliente connect");
+                    Thread clientThread = new Thread(HandleClient);
                     clientThread.Start(clientSocket);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error: {ex.Message}");
+                Console.WriteLine($"❌ Error: {ex.Message}");
             }
 
 
-
-
-
-
+           
         }
-
 
 
         static void HandleClient(object? obj)
         {
-            if (obj is not TcpClient client) return;
-
+            if (obj is not Socket client) return;
             try
             {
-                using (client)
-                using (NetworkStream stream = client.GetStream())
+                while (true)
                 {
-                    byte[] buffer = new byte[4096]; // Larger buffer for JSON
+                    var message = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(client);
+                    if (message == null) break;
 
-                    while (true)
-                    {
-                        // Read message
-                        int bytesRead = stream.Read(buffer, 0, buffer.Length);
-                        if (bytesRead == 0) break; // Client disconnected
+                    Console.WriteLine($" Comando recibido: {message.Command}");
+                    NetworkMessage response = ProcessCommand(message);
 
-                        string jsonString = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                        Console.WriteLine($"📩 Received: {jsonString}");
-
-                        // Deserialize message
-                        NetworkMessage? message = JsonSerializer.Deserialize<NetworkMessage>(jsonString);
-                        if (message == null) continue;
-
-                        // Process command
-                        NetworkMessage response = ProcessCommand(message);
-
-                        // Send response
-                        string responseJson = JsonSerializer.Serialize(response);
-                        byte[] responseData = Encoding.UTF8.GetBytes(responseJson);
-                        stream.Write(responseData, 0, responseData.Length);
-                        Console.WriteLine($"📤 Sent: {responseJson}");
-                    }
+                    NetUtils.NetUtils.SendJson(client, response);
+                    Console.WriteLine($" Respuesta enviada");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Client handler error: {ex.Message}");
+                Console.WriteLine($" Error cliente: {ex.Message}");
             }
             finally
             {
-                Console.WriteLine("Client disconnected");
+                NetUtils.NetUtils.CloseSocket(client);
+                Console.WriteLine(" Cliente desconectado");
             }
         }
 
@@ -263,8 +250,7 @@ namespace HeatMeetServer
                             string email = loginData.GetProperty("email").GetString() ?? "";
                             string password = loginData.GetProperty("password").GetString() ?? "";
 
-                            using var db = new OrmManager();
-                            var user = db.Users.FirstOrDefault(u => u.Email == email);
+                            var user = ormManager.Users.FirstOrDefault(u => u.Email == email);
 
                             if (user == null)
                                 response.Data = new { success = false, message = "User doesn't exists", userId = 0, userName = "" };
@@ -285,8 +271,8 @@ namespace HeatMeetServer
                         {
                             int userId = userGroupsData.GetProperty("userId").GetInt32();
 
-                            using var db = new OrmManager();
-                            var user = db.Users
+                           
+                            var user = ormManager.Users
                                 .Include(u => u.Groups)
                                 .FirstOrDefault(u => u.Id == userId);
 
@@ -323,7 +309,7 @@ namespace HeatMeetServer
             }
             catch (Exception ex)
             {
-                response.Data = new { success = false, message = $"Error: {ex.Message}" };
+                response.Data = new { success = false, message = "Error: "+ ex.Message};
             }
 
             return response;

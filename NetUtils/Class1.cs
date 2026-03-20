@@ -7,6 +7,27 @@ namespace NetUtils
 {
     public static class NetUtils
     {
+        public static Socket CreateServerSocket(string addressText, int port)
+        {
+            IPAddress address = IPAddress.Parse(addressText);
+            IPEndPoint endpoint = new IPEndPoint(address, port);
+
+            Socket serverSocket = new Socket(address.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+
+            serverSocket.Bind(endpoint);
+            serverSocket.Listen();
+
+            return serverSocket;
+        }
+        public static string AutodetectIpAddress()
+        {
+            string hostName = Dns.GetHostName();
+            IPHostEntry host = Dns.GetHostEntry(hostName);
+            int index = host.AddressList.ToList().FindIndex((e) => e.AddressFamily == AddressFamily.InterNetwork);
+
+            return host.AddressList[index].ToString();
+
+        }
         public static void SendJson(Socket s, object data)
         {
             string json = JsonSerializer.Serialize(data);
