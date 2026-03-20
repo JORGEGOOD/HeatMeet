@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "1p8yFVwqOqc=",
+  "success": true,
+  "projectFilePath": "D:\\cuak cuak\\HeatMeet\\Repository\\HeatMeet\\NetUtils\\NetUtils.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Alumno\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\8.0.0\\microsoft.extensions.dependencyinjection.abstractions.8.0.0.nupkg.sha512",
+    "C:\\Users\\Alumno\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\8.0.0\\microsoft.extensions.logging.abstractions.8.0.0.nupkg.sha512",
+    "C:\\Users\\Alumno\\.nuget\\packages\\npgsql\\8.0.3\\npgsql.8.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}
