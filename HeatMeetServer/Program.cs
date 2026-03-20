@@ -130,16 +130,16 @@ namespace HeatMeetServer
             {
                 Console.WriteLine("=== HEATMEET TCP SERVER ===");
 
-                IPAddress address = IPAddress.Any;//<--In a near future we will put a good ip selector hoster with dns and more
-                int port = 8888;
+                    IPAddress address = IPAddress.Any;//<--In a near future we will put a good ip selector hoster with dns and more
+                    int port = 8888;
 
-                Console.WriteLine("Local IPs available:");
-                ShowLocalIPs();
+                    Console.WriteLine("Local IPs available:");
+                    ShowLocalIPs();
 
-                TcpListener server = new TcpListener(address, port);
-                server.Start();
+                    TcpListener server = new TcpListener(address, port);
+                    server.Start();
 
-                Console.WriteLine($"\n✅ Server listening on ip {address}(all ip's) on port {port}");//for some reason this gives ip 0.0.0.0, that is a bug?
+                    Console.WriteLine($"\n✅ Server listening on ip {address}(all ip's) on port {port}");//for some reason this gives ip 0.0.0.0, that is a bug?
                 Console.WriteLine(new string('-', 60));
 
                 while (true) // Main loop to accept multiple clients
@@ -264,7 +264,7 @@ namespace HeatMeetServer
                             string password = loginData.GetProperty("password").GetString() ?? "";
 
                             using var db = new OrmManager();
-                            var user = db.Users.FirstOrDefault(u => u.Email == email);
+                            var user = db.Users.FirstOrDefault(u => u.Email == email || u.Name == email);
 
                             if (user == null)
                                 response.Data = new { success = false, message = "User doesn't exists", userId = 0, userName = "" };
@@ -276,6 +276,91 @@ namespace HeatMeetServer
                         else
                         {
                             response.Data = new { success = false, message = "Invalid data", userId = 0, userName = "" };
+                        }
+                        break;
+
+                    case "REGISTER":
+                        if (message.Data is JsonElement registerData)
+                        {
+                            string name = registerData.GetProperty("name").GetString() ?? "";
+                            string email = registerData.GetProperty("email").GetString() ?? "";
+                            string password = registerData.GetProperty("password").GetString() ?? "";
+
+                            using var db = new OrmManager();
+                            var exists = db.Users.FirstOrDefault(u => u.Email == email);
+
+                            if (exists != null)
+                                response.Data = new { success = false, message = "Email already registered" };
+                            else
+                            {
+                                db.Users.Add(new Users { Name = name, Email = email, Password = password });
+                                db.SaveChanges();
+                                response.Data = new { success = true, message = "User registered correctly" };
+                            }
+                        }
+                        else
+                        {
+                            response.Data = new { success = false, message = "Invalid data" };
+                        }
+                        break;
+
+                    case "CREATE_GROUP":
+                        if (message.Data is JsonElement createGroupData)
+                        {
+                            string groupName = createGroupData.GetProperty("groupName").GetString() ?? "";
+                            int adminId = createGroupData.GetProperty("userId").GetInt32();
+
+                            using var db = new OrmManager();
+                            var user = db.Users.FirstOrDefault(u => u.Id == adminId);
+
+                            if (user == null)
+                                response.Data = new { success = false, message = "User not found", inviteCode = "" };
+                            else
+                            {
+                                var newGroup = new Groups
+                                {
+                                    Name = groupName,
+                                    InviteCode = Guid.NewGuid().ToString().Substring(0, 6).ToUpper(),
+                                    CreateDate = DateTime.UtcNow
+                                };
+                                newGroup.Users.Add(user);
+                                db.Groups.Add(newGroup);
+                                db.SaveChanges();
+                                response.Data = new { success = true, message = "Group created", inviteCode = newGroup.InviteCode };
+                            }
+                        }
+                        else
+                        {
+                            response.Data = new { success = false, message = "Invalid data", inviteCode = "" };
+                        }
+                        break;
+
+                    case "JOIN_GROUP":
+                        if (message.Data is JsonElement joinGroupData)
+                        {
+                            string inviteCode = joinGroupData.GetProperty("inviteCode").GetString() ?? "";
+                            int userId = joinGroupData.GetProperty("userId").GetInt32();
+
+                            using var db = new OrmManager();
+                            var group = db.Groups.Include(g => g.Users).FirstOrDefault(g => g.InviteCode == inviteCode);
+                            var user = db.Users.FirstOrDefault(u => u.Id == userId);
+
+                            if (group == null)
+                                response.Data = new { success = false, message = "Group not found" };
+                            else if (user == null)
+                                response.Data = new { success = false, message = "User not found" };
+                            else if (group.Users.Any(u => u.Id == userId))
+                                response.Data = new { success = false, message = "Already in this group" };
+                            else
+                            {
+                                group.Users.Add(user);
+                                db.SaveChanges();
+                                response.Data = new { success = true, message = "Joined group correctly" };
+                            }
+                        }
+                        else
+                        {
+                            response.Data = new { success = false, message = "Invalid data" };
                         }
                         break;
 
@@ -291,11 +376,8 @@ namespace HeatMeetServer
                                 .FirstOrDefault(u => u.Id == userId);
 
                             if (user == null || user.Groups == null || !user.Groups.Any())
-                            {
-                                response.Data = new { success = false, message = "Sin grupos" };
-                            }
+                                response.Data = new { success = false, message = "No groups found" };
                             else
-                            {
                                 response.Data = new
                                 {
                                     success = true,
@@ -307,14 +389,12 @@ namespace HeatMeetServer
                                         g.CreateDate
                                     }).ToList()
                                 };
-                            }
                         }
                         else
                         {
-                            response.Data = new { success = false, message = "Datos inválidos" };
+                            response.Data = new { success = false, message = "Invalid data" };
                         }
                         break;
-
 
                     default:
                         response.Data = new { success = false, message = "Unknown command" };

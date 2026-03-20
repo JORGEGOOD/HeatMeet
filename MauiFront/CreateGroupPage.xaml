@@ -6,7 +6,6 @@
     <ScrollView>
         <VerticalStackLayout Padding="24,40" Spacing="16">
 
-            <!-- Título -->
             <Label Text="HeatMeet"
                    FontSize="30"
                    FontAttributes="Bold"
@@ -18,81 +17,41 @@
                    HorizontalOptions="Center"
                    Margin="0,0,0,10"/>
 
-            <!-- CARD CREAR GRUPO -->
-            <Frame BackgroundColor="White"
-                   BorderColor="Transparent"
-                   CornerRadius="14"
-                   Padding="20">
+            <Frame BackgroundColor="White" BorderColor="Transparent" CornerRadius="14" Padding="20">
                 <VerticalStackLayout Spacing="12">
-
-                    <Label Text="Crear grupo"
-                           FontSize="17"
-                           FontAttributes="Bold"
-                           TextColor="#1E2A4A"/>
-
+                    <Label Text="Crear grupo" FontSize="17" FontAttributes="Bold" TextColor="#1E2A4A"/>
                     <Frame BorderColor="#DDDDDD" Padding="10,5" CornerRadius="8">
                         <Entry x:Name="GroupNameEntry"
                                Placeholder="Nombre del grupo"
                                PlaceholderColor="#AAAAAA"
                                FontSize="14"/>
                     </Frame>
-
-                    <Frame BorderColor="#DDDDDD" Padding="10,5" CornerRadius="8">
-                        <Entry x:Name="AdminNameEntry"
-                               Placeholder="Tu nombre"
-                               PlaceholderColor="#AAAAAA"
-                               FontSize="14"/>
-                    </Frame>
-
                     <Button Text="Crear grupo"
                             BackgroundColor="#2C3E6B"
                             TextColor="White"
                             CornerRadius="8"
                             FontAttributes="Bold"
                             Clicked="OnCreateGroupClicked"/>
-
                 </VerticalStackLayout>
             </Frame>
 
-            <!-- Separador -->
-            <Label Text="— o —"
-                   HorizontalOptions="Center"
-                   TextColor="#AAAAAA"
-                   FontSize="13"/>
+            <Label Text="— o —" HorizontalOptions="Center" TextColor="#AAAAAA" FontSize="13"/>
 
-            <!-- CARD UNIRSE A GRUPO -->
-            <Frame BackgroundColor="White"
-                   BorderColor="Transparent"
-                   CornerRadius="14"
-                   Padding="20">
+            <Frame BackgroundColor="White" BorderColor="Transparent" CornerRadius="14" Padding="20">
                 <VerticalStackLayout Spacing="12">
-
-                    <Label Text="Unirse a un grupo"
-                           FontSize="17"
-                           FontAttributes="Bold"
-                           TextColor="#1E2A4A"/>
-
+                    <Label Text="Unirse a un grupo" FontSize="17" FontAttributes="Bold" TextColor="#1E2A4A"/>
                     <Frame BorderColor="#DDDDDD" Padding="10,5" CornerRadius="8">
                         <Entry x:Name="GroupCodeEntry"
                                Placeholder="Código del grupo (ej: AB12CD)"
                                PlaceholderColor="#AAAAAA"
                                FontSize="14"/>
                     </Frame>
-
-                    <Frame BorderColor="#DDDDDD" Padding="10,5" CornerRadius="8">
-                        <Entry x:Name="MemberNameEntry"
-                               Placeholder="Tu nombre"
-                               PlaceholderColor="#AAAAAA"
-                               FontSize="14"/>
-                    </Frame>
-
                     <Button Text="Unirse al grupo"
                             BackgroundColor="#F07030"
                             TextColor="White"
                             CornerRadius="8"
                             FontAttributes="Bold"
                             Clicked="OnJoinGroupClicked"/>
-
                 </VerticalStackLayout>
             </Frame>
 

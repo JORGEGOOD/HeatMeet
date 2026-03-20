@@ -90,6 +90,15 @@
                            FontSize="12"
                            TextColor="#6A0DAD"
                            HorizontalOptions="Center"/>
+
+                    <!-- Botón Registrarse -->
+                    <Button Text="¿No tienes cuenta? Regístrate"
+                            Clicked="BotonRegistrar"
+                            BackgroundColor="Transparent"
+                            TextColor="#6A0DAD"
+                            FontSize="12"
+                            BorderWidth="0"/>
+
                 </VerticalStackLayout>
             </Frame>
         </VerticalStackLayout>
