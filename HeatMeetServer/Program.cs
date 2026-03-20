@@ -185,23 +185,14 @@ namespace HeatMeetServer
             try
             {
                 Console.WriteLine("=== HEATMEET TCP SERVER ===");
-
-                    IPAddress address = IPAddress.Any;//<--In a near future we will put a good ip selector hoster with dns and more
-                    int port = 8888;
-
-                    Console.WriteLine("Local IPs available:");
-                    ShowLocalIPs();
-
-                    TcpListener server = new TcpListener(address, port);
-                    server.Start();
-
-                    Console.WriteLine($"\n✅ Server listening on ip {address}(all ip's) on port {port}");//for some reason this gives ip 0.0.0.0, that is a bug?
+                Socket serverSocket = NetUtils.NetUtils.CreateServerSocket("0.0.0.0", 8888);
+                Console.WriteLine($"✅ Servidor iniciado en 0.0.0.0:8888 (todas las IPs)");
                 Console.WriteLine(new string('-', 60));
 
                 while (serverSocket.IsBound)
                 {
                     Socket clientSocket = serverSocket.Accept();
-                    Console.WriteLine($"Cliente connect");
+                    Console.WriteLine($"✅ Cliente conectado");
                     Thread clientThread = new Thread(HandleClient);
                     clientThread.Start(clientSocket);
                 }
@@ -211,10 +202,7 @@ namespace HeatMeetServer
                 Console.WriteLine($"❌ Error: {ex.Message}");
             }
 
-
-           
         }
-
 
         static void HandleClient(object? obj)
         {
@@ -257,9 +245,8 @@ namespace HeatMeetServer
                         {
                             string email = loginData.GetProperty("email").GetString() ?? "";
                             string password = loginData.GetProperty("password").GetString() ?? "";
-
-                            using var db = new OrmManager();
-                            var user = db.Users.FirstOrDefault(u => u.Email == email || u.Name == email);
+                            
+                            var user = ormManager.Users.FirstOrDefault(u => u.Email == email || u.Name == email);
 
                             if (user == null)
                                 response.Data = new { success = false, message = "User doesn't exists", userId = 0, userName = "" };
@@ -281,15 +268,15 @@ namespace HeatMeetServer
                             string email = registerData.GetProperty("email").GetString() ?? "";
                             string password = registerData.GetProperty("password").GetString() ?? "";
 
-                            using var db = new OrmManager();
-                            var exists = db.Users.FirstOrDefault(u => u.Email == email);
+                            
+                            var exists = ormManager.Users.FirstOrDefault(u => u.Email == email);
 
                             if (exists != null)
                                 response.Data = new { success = false, message = "Email already registered" };
                             else
                             {
-                                db.Users.Add(new Users { Name = name, Email = email, Password = password });
-                                db.SaveChanges();
+                                ormManager.Users.Add(new Users { Name = name, Email = email, Password = password });
+                                ormManager.SaveChanges();
                                 response.Data = new { success = true, message = "User registered correctly" };
                             }
                         }
@@ -305,8 +292,8 @@ namespace HeatMeetServer
                             string groupName = createGroupData.GetProperty("groupName").GetString() ?? "";
                             int adminId = createGroupData.GetProperty("userId").GetInt32();
 
-                            using var db = new OrmManager();
-                            var user = db.Users.FirstOrDefault(u => u.Id == adminId);
+                            using var ormManager = new OrmManager();
+                            var user = ormManager.Users.FirstOrDefault(u => u.Id == adminId);
 
                             if (user == null)
                                 response.Data = new { success = false, message = "User not found", inviteCode = "" };
@@ -319,8 +306,8 @@ namespace HeatMeetServer
                                     CreateDate = DateTime.UtcNow
                                 };
                                 newGroup.Users.Add(user);
-                                db.Groups.Add(newGroup);
-                                db.SaveChanges();
+                                ormManager.Groups.Add(newGroup);
+                                ormManager.SaveChanges();
                                 response.Data = new { success = true, message = "Group created", inviteCode = newGroup.InviteCode };
                             }
                         }
@@ -336,9 +323,9 @@ namespace HeatMeetServer
                             string inviteCode = joinGroupData.GetProperty("inviteCode").GetString() ?? "";
                             int userId = joinGroupData.GetProperty("userId").GetInt32();
 
-                            using var db = new OrmManager();
-                            var group = db.Groups.Include(g => g.Users).FirstOrDefault(g => g.InviteCode == inviteCode);
-                            var user = db.Users.FirstOrDefault(u => u.Id == userId);
+                            
+                            var group = ormManager.Groups.Include(g => g.Users).FirstOrDefault(g => g.InviteCode == inviteCode);
+                            var user = ormManager.Users.FirstOrDefault(u => u.Id == userId);
 
                             if (group == null)
                                 response.Data = new { success = false, message = "Group not found" };
@@ -349,7 +336,7 @@ namespace HeatMeetServer
                             else
                             {
                                 group.Users.Add(user);
-                                db.SaveChanges();
+                                ormManager.SaveChanges();
                                 response.Data = new { success = true, message = "Joined group correctly" };
                             }
                         }
@@ -364,8 +351,6 @@ namespace HeatMeetServer
                         if (message.Data is JsonElement userGroupsData)
                         {
                             int userId = userGroupsData.GetProperty("userId").GetInt32();
-
-                           
                             var user = ormManager.Users
                                 .Include(u => u.Groups)
                                 .FirstOrDefault(u => u.Id == userId);
@@ -404,16 +389,6 @@ namespace HeatMeetServer
             return response;
         }
 
-        static void ShowLocalIPs()
-        {
-            var host = Dns.GetHostEntry(Dns.GetHostName());
-            foreach (var ip in host.AddressList)
-            {
-                if (ip.AddressFamily == AddressFamily.InterNetwork)
-                {
-                    Console.WriteLine($"   • {ip}");
-                }
-            }
-        }
+        
     }
 }
