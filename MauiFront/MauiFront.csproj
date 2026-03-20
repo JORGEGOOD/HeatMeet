@@ -42,7 +42,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\HeatMeetServer\HeatMeetServer.csproj" />
     <ProjectReference Include="..\NetUtils\NetUtils.csproj" />
     <ProjectReference Include="..\SharedModels\SharedModels.csproj" />
   </ItemGroup>
