@@ -44,24 +44,23 @@ namespace HeatMeetServer
     //    public object? Data { get; set; }
     //}
 
-
     public class Program
     {
         
-        public static OrmManager ormManager {  get; private set; }
+        public static OrmManager ormManager {  get; private set; } = new OrmManager();
 
         private static void OnProcessExit(object? sender, EventArgs e)//to dispose the app on exit
         {
             Console.WriteLine("Cerrando ORM...");
             ormManager?.Dispose();
         }
-
+        
         static void Main(string[] args)
         {
 
             AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
 
-            ormManager = new OrmManager();
+            
             ormManager.Database.EnsureCreated();
             
             //Create test users and groups
@@ -187,28 +186,26 @@ namespace HeatMeetServer
                 }
             }
 
-
             //infinite client accept loop
             try
             {
                 Console.WriteLine("=== HEATMEET TCP SERVER ===");
                 Socket serverSocket = NetUtils.NetUtils.CreateServerSocket("0.0.0.0", 8888);
-                Console.WriteLine($"✅ Servidor iniciado en 0.0.0.0:8888 (todas las IPs)");
+                Console.WriteLine($"Server initiated in 0.0.0.0:8888 (all ip's)");
                 Console.WriteLine(new string('-', 60));
 
                 while (serverSocket.IsBound)
                 {
                     Socket clientSocket = serverSocket.Accept();
-                    Console.WriteLine($"✅ Cliente conectado");
+                    Console.WriteLine($"Client connected!");
                     Thread clientThread = new Thread(HandleClient);
                     clientThread.Start(clientSocket);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error: {ex.Message}");
+                Console.WriteLine($"Error: {ex.Message}");
             }
-
         }
 
         static void HandleClient(object? obj)
@@ -221,28 +218,27 @@ namespace HeatMeetServer
                     var message = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(client);
                     if (message == null) break;
 
-                    Console.WriteLine($" Comando recibido: {message.Command}");
+                    Console.WriteLine($" Command received: {message.Command}");
                     NetworkMessage response = ProcessCommand(message);
 
                     NetUtils.NetUtils.SendJson(client, response);
-                    Console.WriteLine($" Respuesta enviada");
+                    Console.WriteLine($" Answer sent");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($" Error cliente: {ex.Message}");
+                Console.WriteLine($" Error client: {ex.Message}");
             }
             finally
             {
                 NetUtils.NetUtils.CloseSocket(client);
-                Console.WriteLine(" Cliente desconectado");
+                Console.WriteLine(" Client disconnected");
             }
         }
 
         static NetworkMessage ProcessCommand(NetworkMessage message)
         {
             NetworkMessage response = new NetworkMessage { Command = message.Command };
-
             try
             {
                 switch (message.Command)
@@ -262,10 +258,8 @@ namespace HeatMeetServer
                             else
                                 response.Data = new { success = true, message = "Login correct", userId = user.Id, userName = user.Name };
                         }
-                        else
-                        {
-                            response.Data = new { success = false, message = "Invalid data", userId = 0, userName = "" };
-                        }
+                        else response.Data = new { success = false, message = "Invalid data", userId = 0, userName = "" };
+                        
                         break;
 
                     case "REGISTER":
@@ -287,10 +281,8 @@ namespace HeatMeetServer
                                 response.Data = new { success = true, message = "User registered correctly" };
                             }
                         }
-                        else
-                        {
-                            response.Data = new { success = false, message = "Invalid data" };
-                        }
+                        else response.Data = new { success = false, message = "Invalid data" };
+                        
                         break;
 
                     case "CREATE_GROUP":
@@ -318,12 +310,8 @@ namespace HeatMeetServer
                                 response.Data = new { success = true, message = "Group created", inviteCode = newGroup.InviteCode };
                             }
                         }
-                        else
-                        {
-                            response.Data = new { success = false, message = "Invalid data", inviteCode = "" };
-                        }
+                        else response.Data = new { success = false, message = "Invalid data", inviteCode = "" };
                         break;
-
                     case "JOIN_GROUP":
                         if (message.Data is JsonElement joinGroupData)
                         {
@@ -347,18 +335,14 @@ namespace HeatMeetServer
                                 response.Data = new { success = true, message = "Joined group correctly" };
                             }
                         }
-                        else
-                        {
-                            response.Data = new { success = false, message = "Invalid data" };
-                        }
+                        else response.Data = new { success = false, message = "Invalid data" };
+                        
                         break;
-
-
                     case "GET_USER_GROUPS":
                         if (message.Data is JsonElement userGroupsData)
                         {
                             int userId = userGroupsData.GetProperty("userId").GetInt32();
-                            var user = ormManager.Users
+                            Users? user = ormManager.Users
                                 .Include(u => u.Groups)
                                 .FirstOrDefault(u => u.Id == userId);
 
@@ -377,24 +361,37 @@ namespace HeatMeetServer
                                     }).ToList()
                                 };
                         }
-                        else
-                        {
-                            response.Data = new { success = false, message = "Invalid data" };
-                        }
+                        else response.Data = new { success = false, message = "Invalid data" };
+                        
                         break;
-
-
                     case "GET_GROUP_MESSAGES":
 
+                        if (message.Data is JsonElement groupMessages)
+                        {
+                            //CLIENT SENDS THIS:
+                            //NetworkMessage message = new NetworkMessage
+                            //{
+                            //    Command = "GET_GROUP_MESSAGES",
+                            //    Data = new { groupId }
+                            //};
 
+                            int groupId = groupMessages.GetProperty("groupId").GetInt32();
 
-
-
-
-
-
-
-                        break;
+                            //now we do select to the database and retreat the messages, put in into a json and send back
+                            var messages = ormManager.Messages.Where(m => m.GroupId == groupId).Select(m => new { m.Content,m.CreateDate,m.UserId,UserName = m.User.Name}).ToList();
+                            if( messages == null || messages.Count == 0) response.Data = new { success = false, message = "No messages found" };
+                            else
+                            {
+                                //send all messages
+                                response.Data = new
+                                {
+                                    sucess = true,
+                                    message = messages
+                                };
+                            }
+                        }
+                        else response.Data = new { sucess = false, message = "Invalid data" };
+                            break;
 
                     default:
                         response.Data = new { success = false, message = "Unknown command" };
