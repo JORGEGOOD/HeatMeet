@@ -42,29 +42,7 @@ namespace HeatMeetServer
     //    public string Command { get; set; } = string.Empty; // e.g., "CREATE_GROUP", "JOIN_GROUP", "MARK_AVAILABILITY", "VOTE_DAY", "GET_GROUP_INFO"
     //    public object? Data { get; set; }
     //}
-    public static class AuthService
-    {
-        public static (bool success, string message, int userId, string userName) 
-                  Login(OrmManager db, string email, string password)
-        {
-            try
-            {
-                var user = db.Users.FirstOrDefault(u => u.Email == email);
 
-                if (user == null)
-                    return (false, "Usuario no existe", 0, "");
-
-                if (user.Password != password)
-                    return (false, "Contraseña incorrecta", 0, "");
-
-                return (true, "Login correcto", user.Id, user.Name);
-            }
-            catch (Exception ex)
-            {
-                return (false, $"Error en servidor: {ex.Message}", 0, "");
-            }
-        }
-    }
 
     public class Program
     {
@@ -147,7 +125,6 @@ namespace HeatMeetServer
                 Console.WriteLine("Users were already in TestGroup.");
             }
 
-
             //infinite client accept loop
             try
             {
@@ -180,6 +157,49 @@ namespace HeatMeetServer
             {
                 Console.WriteLine($"\n❌ Error: {ex.Message}");
             }
+
+
+
+            try
+            {
+                Console.WriteLine("=== HEATMEET TCP SERVER ===");
+
+                IPAddress ip = IPAddress.Any;
+                int port = 8888;
+
+                Console.WriteLine("Local IPs available:");
+                ShowLocalIPs();
+
+                IPEndPoint endPoint = new IPEndPoint(ip, port);
+                Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
+                serverSocket.Bind(endPoint);
+                serverSocket.Listen();
+
+                Console.WriteLine($"Server listening on {ip.ToString}:{port}");
+                Console.WriteLine(new string('-', 60));
+
+                while (true)
+                {
+                    Socket clientSocket = serverSocket.Accept();
+                    IPEndPoint clientEndPoint = (IPEndPoint)clientSocket.RemoteEndPoint;
+
+                    Console.WriteLine($"Client connected from: {clientEndPoint.Address}:{clientEndPoint.Port}");
+
+                    Thread clientThread = new Thread(new ParameterizedThreadStart(HandleClient));
+                    clientThread.Start(clientSocket);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+
+
+
+
+
+
         }
 
 
@@ -221,11 +241,11 @@ namespace HeatMeetServer
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Client handler error: {ex.Message}");
+                Console.WriteLine($"Client handler error: {ex.Message}");
             }
             finally
             {
-                Console.WriteLine("🔌 Client disconnected");
+                Console.WriteLine("Client disconnected");
             }
         }
 
@@ -237,191 +257,28 @@ namespace HeatMeetServer
             {
                 switch (message.Command)
                 {
-                    case "CREATE_GROUP":
-                        // Expected Data: JsonElement with { "userName": "...", "groupName": "..." }
-                        if (message.Data is JsonElement createData)
-                        {
-                            string userName = createData.GetProperty("userName").GetString() ?? "Anonymous";
-                            string groupName = createData.GetProperty("groupName").GetString() ?? "New Group";
-
-                            User admin = new User { Name = userName };
-                            Group newGroup = new Group
-                            {
-                                GroupName = groupName,
-                                Admin     = admin
-                            };
-                            newGroup.Members.Add(admin);
-
-                            ActiveGroups.Add(newGroup);
-
-                            response.Data = new
-                            {
-                                success   = true,
-                                groupCode = newGroup.GroupCode,
-                                message   = $"Group '{groupName}' created successfully. Share code: {newGroup.GroupCode}"
-                            };
-                        }
-                        else
-                        {
-                            response.Data = new { success = false, message = "Invalid data format" };
-                        }
-                        break;
-
-                    case "JOIN_GROUP":
-                        // Expected Data: { "userName": "...", "groupCode": "..." }
-                        if (message.Data is JsonElement joinData)
-                        {
-                            string userName = joinData.GetProperty("userName").GetString() ?? "Anonymous";
-                            string groupCode = joinData.GetProperty("groupCode").GetString() ?? "";
-
-                            Group? group = ActiveGroups.FirstOrDefault(g => g.GroupCode == groupCode);
-                            if (group != null)
-                            {
-                                User newMember = new User { Name = userName };
-                                if (!group.Members.Any(m => m.Id == newMember.Id))
-                                {
-                                    group.Members.Add(newMember);
-                                }
-
-                                response.Data = new
-                                {
-                                    success = true,
-                                    groupName = group.GroupName,
-                                    members = group.Members.Select(m => m.Name).ToList(),
-                                    message = $"Joined group '{group.GroupName}' successfully"
-                                };
-                            }
-                            else
-                            {
-                                response.Data = new { success = false, message = "Group not found" };
-                            }
-                        }
-                        else
-                        {
-                            response.Data = new { success = false, message = "Invalid data format" };
-                        }
-                        break;
-
-                    case "MARK_AVAILABILITY":
-                        // Expected Data: { "groupCode": "...", "userId": "...", "date": "yyyy-MM-dd", "status": "Free/Busy/VeryBusy" }
-                        if (message.Data is JsonElement availData)
-                        {
-                            string groupCode = availData.GetProperty("groupCode").GetString() ?? "";
-                            string userId = availData.GetProperty("userId").GetString() ?? "";
-                            string date = availData.GetProperty("date").GetString() ?? "";
-                            string status = availData.GetProperty("status").GetString() ?? "Free";
-
-                            Group? group = ActiveGroups.FirstOrDefault(g => g.GroupCode == groupCode);
-                            if (group != null)
-                            {
-                                if (!group.Availability.ContainsKey(date))
-                                {
-                                    group.Availability[date] = new CalendarDay { Date = date };
-                                }
-
-                                group.Availability[date].UserStatus[userId] = status;
-
-                                response.Data = new
-                                {
-                                    success = true,
-                                    message = $"Availability for {date} updated to {status}"
-                                };
-                            }
-                            else
-                            {
-                                response.Data = new { success = false, message = "Group not found" };
-                            }
-                        }
-                        else
-                        {
-                            response.Data = new { success = false, message = "Invalid data format" };
-                        }
-                        break;
-
                     case "LOGIN":
                         if (message.Data is JsonElement loginData)
                         {
                             string email = loginData.GetProperty("email").GetString() ?? "";
                             string password = loginData.GetProperty("password").GetString() ?? "";
 
-                            var result = AuthService.Login(ormManager, email, password);
+                            using var db = new OrmManager();
+                            var user = db.Users.FirstOrDefault(u => u.Email == email);
 
-                            response.Data = new
-                            {
-                                success = result.success,
-                                message = result.message,
-                                userId = result.userId,
-                                userName = result.userName
-                            };
-                        }
-                        else
-                        {
-                            response.Data = new { success = false, message = "Datos inválidos" };
-                        }
-                        break;
-
-                    case "VOTE_DAY":
-                        //Expected Data: { "groupCode": "...", "userId": "...", "date": "yyyy-MM-dd" }
-                        if (message.Data is JsonElement voteData)
-                        {
-                            string groupCode = voteData.GetProperty("groupCode").GetString() ?? "";
-                            string userId = voteData.GetProperty("userId").GetString() ?? "";
-                            string date = voteData.GetProperty("date").GetString() ?? "";
-
-                            Group? group = ActiveGroups.FirstOrDefault(g => g.GroupCode == groupCode);
-                            if (group != null)
-                            {
-                                if (!group.Votes.ContainsKey(date))
-                                {
-                                    group.Votes[date] = 0;
-                                }
-                                group.Votes[date]++;
-
-                                response.Data = new
-                                {
-                                    success = true,
-                                    message = $"Vote for {date} recorded. Total votes: {group.Votes[date]}"
-                                };
-                            }
+                            if (user == null)
+                                response.Data = new { success = false, message = "User doesn't exists", userId = 0, userName = "" };
+                            else if (user.Password != password)
+                                response.Data = new { success = false, message = "Incorrect password", userId = 0, userName = "" };
                             else
-                            {
-                                response.Data = new { success = false, message = "Group not found" };
-                            }
+                                response.Data = new { success = true, message = "Login correct", userId = user.Id, userName = user.Name };
                         }
                         else
                         {
-                            response.Data = new { success = false, message = "Invalid data format" };
+                            response.Data = new { success = false, message = "Invalid data", userId = 0, userName = "" };
                         }
                         break;
 
-                    case "GET_GROUP_INFO":
-                        // Expected Data: { "groupCode": "..." }
-                        if (message.Data is JsonElement infoData)
-                        {
-                            string groupCode = infoData.GetProperty("groupCode").GetString() ?? "";
-                            Group? group = ActiveGroups.FirstOrDefault(g => g.GroupCode == groupCode);
-                            if (group != null)
-                            {
-                                response.Data = new
-                                {
-                                    success = true,
-                                    groupName = group.GroupName,
-                                    groupCode = group.GroupCode,
-                                    members = group.Members.Select(m => new { m.Id, m.Name }).ToList(),
-                                    availability = group.Availability,
-                                    votes = group.Votes
-                                };
-                            }
-                            else
-                            {
-                                response.Data = new { success = false, message = "Group not found" };
-                            }
-                        }
-                        else
-                        {
-                            response.Data = new { success = false, message = "Invalid data format" };
-                        }
-                        break;
 
                     case "GET_USER_GROUPS":
                         if (message.Data is JsonElement userGroupsData)
