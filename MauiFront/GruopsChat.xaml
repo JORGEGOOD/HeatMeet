@@ -33,9 +33,9 @@
                    IsClippedToBounds="True"
                    VerticalOptions="Center"
                    HorizontalOptions="Center">
-                <Label Text="A"
+                <Label Text="Gym"
                        TextColor="White"
-                       FontSize="18"
+                       FontSize="17"
                        FontAttributes="Bold"
                        HorizontalOptions="Center"
                        VerticalOptions="Center"/>
@@ -57,104 +57,14 @@
                    HorizontalOptions="Center"/>
         </Grid>
 
-        <!-- MENSAJES -->
+        <!-- Messages -->
         <ScrollView Grid.Row="1" Padding="15,10">
-            <VerticalStackLayout Spacing="10">
-
-                <!-- Mensaje recibido -->
-                <Frame BackgroundColor="White"
-                       BorderColor="Transparent"
-                       CornerRadius="16"
-                       Padding="12,8"
-                       HorizontalOptions="Start"
-                       MaximumWidthRequest="260">
-                    <Label Text="¿Qué tal quedamos esta tarde?"
-                           FontSize="14"
-                           TextColor="#222"/>
-                </Frame>
-
-                <!-- Mensaje enviado -->
-                <Frame BackgroundColor="#2C3E6B"
-                       BorderColor="Transparent"
-                       CornerRadius="16"
-                       Padding="12,8"
-                       HorizontalOptions="End"
-                       MaximumWidthRequest="260">
-                    <Label Text="Genial, ¿a qué hora?"
-                           FontSize="14"
-                           TextColor="White"/>
-                </Frame>
-
-                <!-- Mensaje recibido -->
-                <Frame BackgroundColor="White"
-                       BorderColor="Transparent"
-                       CornerRadius="16"
-                       Padding="12,8"
-                       HorizontalOptions="Start"
-                       MaximumWidthRequest="260">
-                    <Label Text="¿Os parece sobre las 18:00?"
-                           FontSize="14"
-                           TextColor="#222"/>
-                </Frame>
-
-                <!-- Mensaje enviado -->
-                <Frame BackgroundColor="#2C3E6B"
-                       BorderColor="Transparent"
-                       CornerRadius="16"
-                       Padding="12,8"
-                       HorizontalOptions="End"
-                       MaximumWidthRequest="260">
-                    <Label Text="Perfecto, allí nos vemos"
-                           FontSize="14"
-                           TextColor="White"/>
-                </Frame>
-
-                <!-- Tarjeta Propuesta -->
-                <Frame BackgroundColor="White"
-                       BorderColor="#E8A050"
-                       CornerRadius="12"
-                       Padding="15"
-                       HorizontalOptions="Fill"
-                       Margin="0,5">
-                    <VerticalStackLayout Spacing="10">
-
-                        <!-- Cabecera propuesta -->
-                        <HorizontalStackLayout Spacing="10">
-                            <Frame WidthRequest="38"
-                                   HeightRequest="38"
-                                   CornerRadius="8"
-                                   BackgroundColor="#F07030"
-                                   BorderColor="Transparent"
-                                   Padding="0"
-                                   IsClippedToBounds="True"
-                                   VerticalOptions="Center">
-                                <Label Text="📅"
-                                       FontSize="18"
-                                       HorizontalOptions="Center"
-                                       VerticalOptions="Center"/>
-                            </Frame>
-                            <VerticalStackLayout VerticalOptions="Center">
-                                <Label Text="Propuesta"
-                                       FontSize="15"
-                                       FontAttributes="Bold"
-                                       TextColor="#222"/>
-                                <Label Text="¿Queréis hacer una sesión de entrenamiento este sábado?"
-                                       FontSize="13"
-                                       TextColor="#555"/>
-                            </VerticalStackLayout>
-                        </HorizontalStackLayout>
-
-                        <!-- Botón propuesta -->
-                        <Button Text="Entrar en propuesta"
-                                BackgroundColor="#F07030"
-                                TextColor="White"
-                                CornerRadius="8"
-                                FontAttributes="Bold"
-                                FontSize="14"
-                                Clicked="OnPropuestaTapped"/>
-                    </VerticalStackLayout>
-                </Frame>
-
+            <VerticalStackLayout x:Name="MessagesContainer" Spacing="10">
+                
+                
+                <!--Its null on the start-->
+                
+                
             </VerticalStackLayout>
         </ScrollView>
 
