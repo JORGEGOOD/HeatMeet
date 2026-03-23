@@ -18,11 +18,11 @@ public partial class GroupsChat : ContentPage
 
     public class MessageDto
     {
-        public int Id { get; set; }
+        public int UserId { get; set; }
         public string Content { get; set; }
         public DateTime CreateDate { get; set; }
         public int userId { get; set; }
-        public string userName { get; set; }
+        public string UserName { get; set; }
     }
 
 
@@ -63,28 +63,27 @@ public partial class GroupsChat : ContentPage
 
         int groupId = Preferences.Get("groupId", 0);
         int userId  = Preferences.Get("user_id", 0);
-        if (groupId == 0){ await DisplayAlert("Error", "Chat couldn't be loaded ", "OK");  return; }
+        if (groupId == 0)
+        {   await DisplayAlert("Error", "Chat couldn't be loaded ", "OK");
+            await DisplayAlert("DEBUG", $"groupId leído: {groupId}", "OK");  /*return;*/
+        }
 
         try
         {
-            Socket? socket = NetUtils.NetUtils.CreateClientSocket("10.0.2.2", 8888);
-
+            Socket? socket = NetUtils.NetUtils.CreateClientSocket("10.0.2.2", 8888);//connect to server
             NetworkMessage message = new NetworkMessage
             {
                 Command = "GET_GROUP_MESSAGES",
                 Data = new { groupId }
             };
-
-            NetUtils.NetUtils.SendJson(socket, message);
-
-            NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
+            NetUtils.NetUtils.SendJson(socket, message);//send command
+            NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);//receive all messages
             
-
             //if message is sucess
             if (response.Data is JsonElement data && data.GetProperty("success").GetBoolean())
             {
                 var messagesJson = data.GetProperty("messages").GetRawText();
-
+                
                 var messages = JsonSerializer.Deserialize<List<MessageDto>>(messagesJson);
 
                 LoadMessages(messages, userId);
@@ -97,6 +96,8 @@ public partial class GroupsChat : ContentPage
                 };
                 NetUtils.NetUtils.SendJson(socket, ack);
             }
+
+
             NetUtils.NetUtils.CloseSocket(socket);
         }
         catch (Exception ex)

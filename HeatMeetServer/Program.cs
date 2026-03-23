@@ -376,7 +376,9 @@ namespace HeatMeetServer
 
                             //now we do select to the database and retreat the messages, put in into a json and send back
                             var messages = ormManager.Messages.Where(m => m.GroupId == groupId).Select(m => new { m.Content,m.CreateDate,m.UserId,UserName = m.User.Name}).ToList();
-                            if( messages == null || messages.Count == 0) response.Data = new { success = false, messages = "No messages found" };
+                            if( messages == null || messages.Count == 0) 
+                                response.Data = new { success = false, messages = new List<object>() };
+                            
                             else
                             {
                                 //send all messages
