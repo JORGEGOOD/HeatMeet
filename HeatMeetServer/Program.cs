@@ -213,17 +213,18 @@ namespace HeatMeetServer
             if (obj is not Socket client) return;
             try
             {
-                while (true)
-                {
-                    var message = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(client);
-                    if (message == null) break;
+                // while (true) //Sergio: This should NOT be a loop. each button should be a connection
+                //{
+                var message = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(client);
+                
+                if (message == null) return;
 
-                    Console.WriteLine($" Command received: {message.Command}");
-                    NetworkMessage response = ProcessCommand(message);
+                Console.WriteLine($" Command received: {message.Command}");
+                NetworkMessage response = ProcessCommand(message);
 
-                    NetUtils.NetUtils.SendJson(client, response);
-                    Console.WriteLine($" Answer sent");
-                }
+                NetUtils.NetUtils.SendJson(client, response);
+                Console.WriteLine($" Answer sent");
+                //}
             }
             catch (Exception ex)
             {
@@ -243,6 +244,9 @@ namespace HeatMeetServer
             {
                 switch (message.Command)
                 {
+                    case "ACK":
+                        //this means "Acknowleded" or Sucess, here should be nothing or a Log message.
+                    break;
                     case "LOGIN":
                         if (message.Data is JsonElement loginData)
                         {
@@ -256,20 +260,18 @@ namespace HeatMeetServer
                             else if (user.Password != password)
                                 response.Data = new { success = false, message = "Incorrect password", userId = 0, userName = "" };
                             else
-                                response.Data = new { success = true, message = "Login correct", userId = user.Id, userName = user.Name };
+                                response.Data = new { success = true,  message = "Login correct", userId = user.Id, userName = user.Name };
                         }
                         else response.Data = new { success = false, message = "Invalid data", userId = 0, userName = "" };
-                        
-                        break;
+                    break;
 
                     case "REGISTER":
                         if (message.Data is JsonElement registerData)
                         {
-                            string name = registerData.GetProperty("name").GetString() ?? "";
-                            string email = registerData.GetProperty("email").GetString() ?? "";
+                            string name     = registerData.GetProperty("name").GetString()     ?? "";
+                            string email    = registerData.GetProperty("email").GetString()    ?? "";
                             string password = registerData.GetProperty("password").GetString() ?? "";
 
-                            
                             var exists = ormManager.Users.FirstOrDefault(u => u.Email == email);
 
                             if (exists != null)
@@ -368,29 +370,22 @@ namespace HeatMeetServer
 
                         if (message.Data is JsonElement groupMessages)
                         {
-                            //CLIENT SENDS THIS:
-                            //NetworkMessage message = new NetworkMessage
-                            //{
-                            //    Command = "GET_GROUP_MESSAGES",
-                            //    Data = new { groupId }
-                            //};
-
                             int groupId = groupMessages.GetProperty("groupId").GetInt32();
 
                             //now we do select to the database and retreat the messages, put in into a json and send back
                             var messages = ormManager.Messages.Where(m => m.GroupId == groupId).Select(m => new { m.Content,m.CreateDate,m.UserId,UserName = m.User.Name}).ToList();
-                            if( messages == null || messages.Count == 0) response.Data = new { success = false, message = "No messages found" };
+                            if( messages == null || messages.Count == 0) response.Data = new { success = false, messages = "No messages found" };
                             else
                             {
                                 //send all messages
                                 response.Data = new
                                 {
-                                    sucess = true,
-                                    message = messages
+                                    success = true,
+                                    messages = messages
                                 };
                             }
                         }
-                        else response.Data = new { sucess = false, message = "Invalid data" };
+                        else response.Data = new { success = false, message = "Invalid data" };
                             break;
 
                     default:
