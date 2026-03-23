@@ -213,7 +213,7 @@ namespace HeatMeetServer
             if (obj is not Socket client) return;
             try
             {
-                // while (true) //Sergio: This should NOT be a loop. each button should be a connection
+                // while (true) //Sergio: This should NOT be a loop, each button is a new connection
                 //{
                 var message = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(client);
                 
@@ -246,7 +246,9 @@ namespace HeatMeetServer
                 {
                     case "ACK":
                         //this means "Acknowleded" or Sucess, here should be nothing or a Log message.
+                        Console.WriteLine("Anser received: ACK");
                     break;
+
                     case "LOGIN":
                         if (message.Data is JsonElement loginData)
                         {

@@ -56,7 +56,6 @@ public partial class GroupsChat : ContentPage
         }
     }
 
-
     //Get group info and messages and update the page
     protected override async void OnAppearing()
     {
@@ -79,7 +78,7 @@ public partial class GroupsChat : ContentPage
             NetUtils.NetUtils.SendJson(socket, message);
 
             NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
-            NetUtils.NetUtils.CloseSocket(socket);
+            
 
             //if message is sucess
             if (response.Data is JsonElement data && data.GetProperty("success").GetBoolean())
@@ -98,8 +97,7 @@ public partial class GroupsChat : ContentPage
                 };
                 NetUtils.NetUtils.SendJson(socket, ack);
             }
-
-
+            NetUtils.NetUtils.CloseSocket(socket);
         }
         catch (Exception ex)
         {

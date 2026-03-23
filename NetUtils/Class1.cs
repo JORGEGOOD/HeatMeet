@@ -40,30 +40,26 @@ namespace NetUtils
         }
         public static T? ReceiveJson<T>(Socket s)
         {
-            // 1. Leer longitud (4 bytes)
+            //Get total lenght
             byte[] lengthBuffer = new byte[4];
             int received = 0;
-
             while (received < 4)
             {
                 int r = s.Receive(lengthBuffer, received, 4 - received, SocketFlags.None);
                 if (r == 0) throw new Exception("Socket closed while reading length");
                 received += r;
             }
-
             int length = BitConverter.ToInt32(lengthBuffer, 0);
 
-            // 2. Leer JSON completo
+            //Get Json on multiple parts
             byte[] buffer = new byte[length];
             received = 0;
-
             while (received < length)
             {
                 int r = s.Receive(buffer, received, length - received, SocketFlags.None);
                 if (r == 0) throw new Exception("Socket closed while reading data");
                 received += r;
             }
-
             string json = Encoding.UTF8.GetString(buffer);
 
             return JsonSerializer.Deserialize<T>(json);
