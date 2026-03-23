@@ -51,7 +51,8 @@ public partial class CreateGroupPage : ContentPage
             if (ok)
             {
                 string inviteCode = data.GetProperty("inviteCode").GetString() ?? "";
-                await DisplayAlert("Grupo creado", $"Código de invitación: {inviteCode}", "OK");
+                await DisplayAlert("Grupo creado", $"Código de invitación: {inviteCode}\n\n(Código copiado al portapapeles)", "OK");
+                await Clipboard.SetTextAsync(inviteCode);
                 await Navigation.PushAsync(new GroupsChat());
             }
             else
