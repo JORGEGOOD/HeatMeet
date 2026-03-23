@@ -82,21 +82,28 @@ public partial class GroupsChat : ContentPage
             NetUtils.NetUtils.CloseSocket(socket);
 
             //if message is sucess
-            if(response.Data is JsonElement data && data.GetProperty("success").GetBoolean())
+            if (response.Data is JsonElement data && data.GetProperty("success").GetBoolean())
             {
                 var messagesJson = data.GetProperty("messages").GetRawText();
 
                 var messages = JsonSerializer.Deserialize<List<MessageDto>>(messagesJson);
 
                 LoadMessages(messages, userId);
-            }
 
+                //send ok to server
+                NetworkMessage ack = new NetworkMessage
+                {
+                    Command = "ACK",
+                    Data = new {success = true}
+                };
+                NetUtils.NetUtils.SendJson(socket, ack);
+            }
 
 
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Error", ex.Message , "OK");
+            await DisplayAlert("Error", ex.Message, "OK");
         }
     }
 

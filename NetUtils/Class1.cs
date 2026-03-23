@@ -31,17 +31,42 @@ namespace NetUtils
         public static void SendJson(Socket s, object data)
         {
             string json = JsonSerializer.Serialize(data);
-            byte[] line = Encoding.UTF8.GetBytes(json);
-            s.Send(line);
+            byte[] jsonBytes = Encoding.UTF8.GetBytes(json);
+
+            byte[] lengthBytes = BitConverter.GetBytes(jsonBytes.Length);
+
+            s.Send(lengthBytes);  // primero tamaño
+            s.Send(jsonBytes);    // luego datos
         }
-
-        public static T ReceiveJson<T>(Socket s)
+        public static T? ReceiveJson<T>(Socket s)
         {
-            byte[] buffer = new byte[4096];
-            int len = s.Receive(buffer);
+            // 1. Leer longitud (4 bytes)
+            byte[] lengthBuffer = new byte[4];
+            int received = 0;
 
-            string json = Encoding.UTF8.GetString(buffer, 0, len);
-            return JsonSerializer.Deserialize<T>(json)!;
+            while (received < 4)
+            {
+                int r = s.Receive(lengthBuffer, received, 4 - received, SocketFlags.None);
+                if (r == 0) throw new Exception("Socket closed while reading length");
+                received += r;
+            }
+
+            int length = BitConverter.ToInt32(lengthBuffer, 0);
+
+            // 2. Leer JSON completo
+            byte[] buffer = new byte[length];
+            received = 0;
+
+            while (received < length)
+            {
+                int r = s.Receive(buffer, received, length - received, SocketFlags.None);
+                if (r == 0) throw new Exception("Socket closed while reading data");
+                received += r;
+            }
+
+            string json = Encoding.UTF8.GetString(buffer);
+
+            return JsonSerializer.Deserialize<T>(json);
         }
 
         public static Socket CreateClientSocket(string addressText, int port)
