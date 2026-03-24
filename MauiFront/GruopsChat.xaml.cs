@@ -138,7 +138,7 @@ public partial class GroupsChat : ContentPage
             //get data
             string content = MessageEntry.Text;
             int groupId = Preferences.Get("groupId", 0);
-            int userId = Preferences.Get("user_id", 0);
+            int userId = Preferences.Get("userId", 0);
 
             //build json
             NetworkMessage message = new NetworkMessage
@@ -151,6 +151,8 @@ public partial class GroupsChat : ContentPage
                     userId = userId
                 }
             };
+
+            await DisplayAlert("Comprobacion",$"DEBUG: Enviando mensaje con UserId: {userId}","Ok");
 
             //send json
             NetUtils.NetUtils.SendJson(socket, message);
@@ -166,14 +168,22 @@ public partial class GroupsChat : ContentPage
                 }
                 else
                 {
-                    await DisplayAlert("ERROR", "Message could not be sent", "Ok");
+                    // ERROR LÓGICO: El servidor respondió, pero success es false
+                    // Intentamos leer el mensaje de error que envía el servidor
+                    string serverMsg = data.TryGetProperty("message", out JsonElement msgProp)
+                                       ? msgProp.GetString()
+                                       : "No error details provided";
+
+                    await DisplayAlert("ERROR SERVIDOR", serverMsg, "Ok");
                 }
 
 
             }
             else
             {
-                await DisplayAlert("ERROR", "Didn't received a message but anything else", "Ok");
+                // ERROR DE FORMATO: Lo que llegó no es un JsonElement o la respuesta es nula
+                string rawResponse = response?.Data?.ToString() ?? "null";
+                await DisplayAlert("ERROR FORMATO", $"Recibido algo inesperado: {rawResponse}", "Ok");
             }
             
         }
@@ -184,6 +194,7 @@ public partial class GroupsChat : ContentPage
         }finally
         {
             if(socket!=null) NetUtils.NetUtils.CloseSocket(socket);
+            MessageEntry.Text = "";
         }
 
 

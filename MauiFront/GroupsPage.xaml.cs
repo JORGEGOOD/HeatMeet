@@ -72,7 +72,6 @@ namespace MauiFront
             if (sender is Frame frame && frame.BindingContext is Group grupo)
             {
                 Preferences.Set("groupId", grupo.Id);
-                await Navigation.PushAsync(new GroupsChat());
 
                 Preferences.Set("groupName", grupo.Name);
                 await Navigation.PushAsync(new GroupsChat());

@@ -46,6 +46,7 @@ namespace MauiFront
 
                 if (ok)
                 {
+
                     int userId = data.GetProperty("userId").GetInt32();
                     Preferences.Set("userId", userId);
                     await Shell.Current.GoToAsync("groups");

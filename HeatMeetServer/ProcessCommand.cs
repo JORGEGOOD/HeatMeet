@@ -177,6 +177,7 @@ namespace HeatMeetServer
                                 int userId = userMessages.GetProperty("userId").GetInt32();
                                 int groupId = userMessages.GetProperty("groupId").GetInt32();
 
+
                                 //construct message
                                 Messages newMessage = new Messages
                                 {
@@ -189,13 +190,17 @@ namespace HeatMeetServer
                                 //save to orm
                                 ormManager.Messages.Add(newMessage);
                                 ormManager.SaveChanges();
-                                
+                                Console.WriteLine($@"New message saved to Orm from {userId}: {content}");
                                 //send success to client 
                                 response.Data = new { success = true,};
                             }
                             catch (Exception ex)
                             {
-                                response.Data = new {success = false, message = "Error message: " +  ex.Message};
+                                // Esto te dirá el error real (ej: "The INSERT statement conflicted with the FOREIGN KEY constraint...")
+                                var realError = ex.InnerException?.Message ?? ex.Message;
+                                Console.WriteLine($"DATABASE ERROR: {realError}");
+
+                                response.Data = new { success = false, message = "DB Error: " + realError };
                             }
                         }
                         else response.Data = new { success = false, message = "Invalid data" };
