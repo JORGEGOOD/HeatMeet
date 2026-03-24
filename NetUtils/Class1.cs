@@ -38,6 +38,7 @@ namespace NetUtils
             s.Send(lengthBytes);  // primero tamaño
             s.Send(jsonBytes);    // luego datos
         }
+
         public static T? ReceiveJson<T>(Socket s)
         {
             //Get total lenght

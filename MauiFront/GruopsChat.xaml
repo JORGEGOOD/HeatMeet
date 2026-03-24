@@ -33,7 +33,7 @@
                    IsClippedToBounds="True"
                    VerticalOptions="Center"
                    HorizontalOptions="Center">
-                <Label Text="Gym"
+                <Label Text=" "
                        TextColor="White"
                        FontSize="17"
                        FontAttributes="Bold"
@@ -43,7 +43,7 @@
 
             <!-- Nombre del grupo -->
             <Label Grid.Column="2"
-                   Text="Amigos del gym"
+                   Text="(NameGroup)"
                    FontSize="16"
                    FontAttributes="Bold"
                    VerticalOptions="Center"
