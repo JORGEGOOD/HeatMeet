@@ -166,7 +166,6 @@ namespace HeatMeetServer
                         else response.Data = new { success = false, message = "Invalid data" };
                         break;
 
-
                     case "SEND_CHAT_MESSAGE":
                         if(message.Data is JsonElement userMessages)
                         {
@@ -192,7 +191,7 @@ namespace HeatMeetServer
                                 ormManager.SaveChanges();
                                 Console.WriteLine($@"New message saved to Orm from {userId}: {content}");
                                 //send success to client 
-                                response.Data = new { success = true,};
+                                response.Data = new { success = true, newId = newMessage.Id};
                             }
                             catch (Exception ex)
                             {
@@ -206,7 +205,32 @@ namespace HeatMeetServer
                         else response.Data = new { success = false, message = "Invalid data" };
                         break;
 
+                    case "RELOAD_CHAT_MESSAGES":
+                        if (message.Data is JsonElement syncData)
+                        {
+                            int gId = syncData.GetProperty("groupId").GetInt32();
+                            int lastId = syncData.GetProperty("lastId").GetInt32();
+
+                            // Buscamos solo los mensajes que el cliente NO tiene
+                            var nuevosMensajes = ormManager.Messages
+                                .Where(m => m.GroupId == gId && m.Id > lastId)
+                                .OrderBy(m => m.CreateDate)
+                                .Select(m => new {
+                                    m.Id,
+                                    m.Content,
+                                    m.CreateDate,
+                                    m.UserId,
+                                    UserName = m.User.Name
+                                })
+                                .ToList();
+
+                            response.Data = new { success = true, messages = nuevosMensajes };
+                        }
+                        break;
+
+
                     default:
+                        Console.WriteLine(@$"Unkown command {response.Command}");
                         response.Data = new { success = false, message = "Unknown command" };
                         break;
                 }

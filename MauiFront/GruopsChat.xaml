@@ -64,7 +64,7 @@
         </Grid>
 
         <!-- Messages -->
-        <ScrollView Grid.Row="1" Padding="15,10">
+        <ScrollView x:Name="ChatScrollView" Grid.Row="1" Padding="15,10">
             <VerticalStackLayout x:Name="MessagesContainer" Spacing="10">
                 
                 

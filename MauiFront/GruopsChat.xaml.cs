@@ -5,6 +5,11 @@ using Socket = System.Net.Sockets.Socket;
 namespace MauiFront;
 public partial class GroupsChat : ContentPage
 {
+    //generals
+    private bool _isChatActive;//for the clock
+    private int _lastMessageId;
+
+
     public GroupsChat()
     {
         InitializeComponent();
@@ -18,11 +23,94 @@ public partial class GroupsChat : ContentPage
 
     public class MessageDto
     {
+        public int Id {  get; set; }
         public int UserId { get; set; }
         public string Content { get; set; }
         public DateTime CreateDate { get; set; }
         public int userId { get; set; }
         public string UserName { get; set; }
+    }
+
+    void AddMessage(MessageDto? msg, int currentUserId)
+    {
+        int senderId = msg.UserId != 0 ? msg.UserId : msg.userId;
+        bool isMine = senderId == currentUserId;
+
+        // Top row: Name | Date and time 
+        var headerGrid = new Grid
+        {
+            ColumnDefinitions =
+            {
+                new ColumnDefinition { Width = GridLength.Star },
+                new ColumnDefinition { Width = GridLength.Auto }
+            },
+            Margin = new Thickness(2, 0, 2, 3)
+        };
+
+        // Name 
+        var nameLabel = new Label //And this loads the content of the frame
+        {
+            Text = isMine ? "Tú" : (msg.UserName ?? "Usuario"),
+            FontSize = 11,
+            FontAttributes = FontAttributes.Bold,
+            TextColor = isMine ? Color.FromArgb("#8BA3D4") : Color.FromArgb("#FF6A00"),
+            HorizontalOptions = LayoutOptions.Start
+        };
+
+        // Date and time (right)
+        var dateLabel = new Label
+        {
+            Text = msg.CreateDate.ToLocalTime().ToString("dd/MM  HH:mm"),
+            FontSize = 11,
+            TextColor = isMine ? Color.FromArgb("#8BA3D4") : Color.FromArgb("#9AAABB"),
+            HorizontalOptions = LayoutOptions.End
+        };
+
+        headerGrid.Add(nameLabel, 0, 0);
+        headerGrid.Add(dateLabel, 1, 0);
+
+        // Message content
+        var contentLabel = new Label
+        {
+            Text = msg.Content,
+            FontSize = 14,
+            TextColor = isMine ? Colors.White : Color.FromArgb("#222")
+        };
+
+        // content Cheader + mensaje 
+        var bubble = new VerticalStackLayout
+        {
+            Spacing = 0,
+            Children = { headerGrid, contentLabel }
+        };
+
+        var frame = new Frame //This loads all the css from the message
+        {
+            BackgroundColor = isMine ? Color.FromArgb("#2C3E6B") : Colors.White,
+            CornerRadius = 16,
+            Padding = new Thickness(12, 8),
+            HorizontalOptions = isMine ? LayoutOptions.End : LayoutOptions.Start,
+            MaximumWidthRequest = 260,
+            Content = bubble
+        };
+
+        MessagesContainer.Children.Add(frame);
+
+        //update _lastMessageDate
+        if(msg.Id > _lastMessageId)
+        {
+            _lastMessageId = msg.Id;
+        }
+
+        ScrollToBottom();
+
+    }
+
+    private async void ScrollToBottom()
+    {
+        // Esperamos un instante a que el layout se actualice con el nuevo mensaje
+        await Task.Delay(50);
+        await ChatScrollView.ScrollToAsync(MessagesContainer, ScrollToPosition.End, false);
     }
 
 
@@ -32,75 +120,18 @@ public partial class GroupsChat : ContentPage
 
         foreach (MessageDto? msg in mensajes)
         {
-            int senderId = msg.UserId != 0 ? msg.UserId : msg.userId;
-            bool isMine = senderId == currentUserId;
-
-            // Top row: Name | Date and time 
-            var headerGrid = new Grid
-            {
-                ColumnDefinitions =
-            {
-                new ColumnDefinition { Width = GridLength.Star },
-                new ColumnDefinition { Width = GridLength.Auto }
-            },
-                Margin = new Thickness(2, 0, 2, 3)
-            };
-
-            // Name 
-            var nameLabel = new Label //And this loads the content of the frame
-            {
-                Text = isMine ? "Tú" : (msg.UserName ?? "Usuario"),
-                FontSize = 11,
-                FontAttributes = FontAttributes.Bold,
-                TextColor = isMine ? Color.FromArgb("#8BA3D4") : Color.FromArgb("#FF6A00"),
-                HorizontalOptions = LayoutOptions.Start
-            };
-
-            // Date and time (right)
-            var dateLabel = new Label
-            {
-                Text = msg.CreateDate.ToLocalTime().ToString("dd/MM  HH:mm"),
-                FontSize = 11,
-                TextColor = isMine ? Color.FromArgb("#8BA3D4") : Color.FromArgb("#9AAABB"),
-                HorizontalOptions = LayoutOptions.End
-            };
-
-            headerGrid.Add(nameLabel, 0, 0);
-            headerGrid.Add(dateLabel, 1, 0);
-
-            // Message content
-            var contentLabel = new Label
-            {
-                Text = msg.Content,
-                FontSize = 14,
-                TextColor = isMine ? Colors.White : Color.FromArgb("#222")
-            };
-
-            // content Cheader + mensaje 
-            var bubble = new VerticalStackLayout
-            {
-                Spacing = 0,
-                Children = { headerGrid, contentLabel }
-            };
-
-            var frame = new Frame //This loads all the css from the message
-            {
-                BackgroundColor = isMine ? Color.FromArgb("#2C3E6B") : Colors.White,
-                CornerRadius = 16,
-                Padding = new Thickness(12, 8),
-                HorizontalOptions = isMine ? LayoutOptions.End : LayoutOptions.Start,
-                MaximumWidthRequest = 260,
-                Content = bubble
-            };
-
-            MessagesContainer.Children.Add(frame);
+           AddMessage(msg, currentUserId);
         }
+        ScrollToBottom();
     }
 
     //Get group info and messages and update the page
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+        _isChatActive = true;
+        Task.Run(async () => await RefreshMessagesLoop());
+
 
         string groupName = Preferences.Get("groupName", "(Grupo)");
         GroupNameLabel.Text = groupName;
@@ -135,9 +166,9 @@ public partial class GroupsChat : ContentPage
             //if message is sucess
             if (response.Data is JsonElement data && data.GetProperty("success").GetBoolean())
             {
-                var messagesJson = data.GetProperty("messages").GetRawText();
+                var messagesJson = data.GetProperty("messages").GetRawText();//get messages to raw text
+                var messages = JsonSerializer.Deserialize<List<MessageDto>>(messagesJson); //convert to raw text 
 
-                var messages = JsonSerializer.Deserialize<List<MessageDto>>(messagesJson);
                 messages = messages.OrderBy(m => m.CreateDate).ToList();
 
                 LoadMessages(messages, userId);
@@ -166,13 +197,6 @@ public partial class GroupsChat : ContentPage
     {
         if (string.IsNullOrWhiteSpace(MessageEntry.Text)) return;
 
-        //----Update screen----
-
-        //put message on screen and auto generate "CreateDate = DateTime.UtcNow"
-
-
-
-        //---------------------
 
         Socket? socket = null;
         try
@@ -187,6 +211,19 @@ public partial class GroupsChat : ContentPage
             int groupId = Preferences.Get("groupId", 0);
             int userId = Preferences.Get("userId", 0);
 
+
+            MessageDto messageFront = new MessageDto
+            {
+                Id = 0, //<-- Only for the optimistic message
+                Content = content,
+                UserId = userId,
+                UserName = "Tú",
+                CreateDate = DateTime.Now
+            };
+
+            AddMessage(messageFront, userId);
+
+
             //build json
             NetworkMessage message = new NetworkMessage
             {
@@ -198,7 +235,7 @@ public partial class GroupsChat : ContentPage
                     userId = userId
                 }
             };
-
+            
             //send json
             NetUtils.NetUtils.SendJson(socket, message);
 
@@ -209,7 +246,10 @@ public partial class GroupsChat : ContentPage
                 if(data.GetProperty("success").GetBoolean())
                 {
                     //message is success
-                    //do nothing
+                    if(data.TryGetProperty("newId",out JsonElement idProp))
+                    {
+                        _lastMessageId = idProp.GetInt32();
+                    }
                 }
                 else
                 {
@@ -242,6 +282,80 @@ public partial class GroupsChat : ContentPage
 
     }
 
+    private async Task RefreshMessagesLoop()
+    {
+        while (_isChatActive)
+        {
+            try
+            {
+                await Task.Delay(1000);//delay
+
+                int groupId = Preferences.Get("groupId", 0);
+                int userId = Preferences.Get("user_id", 0);
+
+                //send the server a command with the current status
+                NetworkMessage message = new NetworkMessage
+                {
+                    Command = "RELOAD_CHAT_MESSAGES",
+                    Data = new
+                    {
+
+                        groupId = Preferences.Get("groupId", 0),
+                        lastId = _lastMessageId
+                    }
+                };
+
+                //connect to server
+                Socket? socket = NetUtils.NetUtils.CreateClientSocket("10.0.2.2", 8888);
+
+                //send command
+                NetUtils.NetUtils.SendJson(socket, message);
+
+                //receive command
+                var response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
+
+                if(response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
+                {
+                    var messagesJson = data.GetProperty("messages").GetRawText();//get messages to raw text
+                    var newMessages  = JsonSerializer.Deserialize<List<MessageDto>>(messagesJson);//convert to raw text 
+
+                    //update new messages
+                    if(newMessages != null && newMessages.Count >0)
+                    {
+                        //MainThread is for painting, nothing more
+                        MainThread.BeginInvokeOnMainThread(async () =>
+                        {
+                            foreach(var message in newMessages)
+                            {
+                                AddMessage(message, userId);
+                            }
+                        });
+                    }
+
+
+                }
+
+                socket.Close();
+
+               
+            }
+            catch (Exception ex)
+            {
+                DisplayAlert("Error",$"AutoReload Error: {ex.Message}","Ok");
+            }
+        }
+    }
+
+
+
+
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        _isChatActive = false;
+    }
+
+
 
     //remove this entirely, or do it good enough
     private async void OnProposalTapped(object sender, EventArgs e)
@@ -249,3 +363,5 @@ public partial class GroupsChat : ContentPage
         await DisplayAlert("Proposal", "Proposal clicked!", "OK");
     }
 }
+
+

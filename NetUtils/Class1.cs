@@ -28,6 +28,16 @@ namespace NetUtils
             return host.AddressList[index].ToString();
 
         }
+
+
+        public static void ConnectToSupabase()
+        {
+            Socket? socket = CreateClientSocket("10.0.2.2", 8888);
+
+        }
+
+
+
         public static void SendJson(Socket s, object data)
         {
             string json = JsonSerializer.Serialize(data);
