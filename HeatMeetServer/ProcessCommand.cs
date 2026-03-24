@@ -170,25 +170,9 @@ namespace HeatMeetServer
                     case "SEND_CHAT_MESSAGE":
                         if(message.Data is JsonElement userMessages)
                         {
-                            //messages en el sql tiene id, content, createDate, UserId, GroupId
-                            //id y create date se genera en el server
-
-                            //El cliente enviaría algo ásí
-                            //NetworkMessage messages = new NetworkMessage
-                            //{
-                            //    Command = "GET_GROUP_MESSAGES",
-                            //    Data = new
-                            //    {
-                            //        Id,
-                            //        Content,
-                            //        CreateDate,
-                            //        UserId,
-                            //        GroupId
-                            //    }
-                            //};
-
                             try
                             {
+                                //get json data
                                 string content = userMessages.GetProperty("content").GetString();
                                 int userId = userMessages.GetProperty("userId").GetInt32();
                                 int groupId = userMessages.GetProperty("groupId").GetInt32();
@@ -206,6 +190,7 @@ namespace HeatMeetServer
                                 ormManager.Messages.Add(newMessage);
                                 ormManager.SaveChanges();
                                 
+                                //send success to client and the id and createDate
                                 response.Data = new { success = true, messageId = newMessage.Id, newMessage.CreateDate };
                             }
                             catch (Exception ex)
@@ -215,8 +200,6 @@ namespace HeatMeetServer
                         }
                         else response.Data = new { success = false, message = "Invalid data" };
                         break;
-
-
 
                     default:
                         response.Data = new { success = false, message = "Unknown command" };

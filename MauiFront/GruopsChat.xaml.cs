@@ -65,7 +65,7 @@ public partial class GroupsChat : ContentPage
         int userId  = Preferences.Get("user_id", 0);
         if (groupId == 0)
         {   await DisplayAlert("Error", "Chat couldn't be loaded ", "OK");
-            await DisplayAlert("DEBUG", $"groupId leído: {groupId}", "OK");  /*return;*/
+            await DisplayAlert("DEBUG", $"groupId read: {groupId}", "OK");  /*return;*/
         }
 
         try
@@ -111,8 +111,7 @@ public partial class GroupsChat : ContentPage
     //Send message
     private async void OnSendTapped(object sender, EventArgs e)
     {
-        if (string.IsNullOrWhiteSpace(MessageEntry.Text))
-            return;
+        if (string.IsNullOrWhiteSpace(MessageEntry.Text)) return;
 
         //message logic
         await DisplayAlert("Mensaje", $"EN PROGRESO", "OK");
@@ -120,9 +119,9 @@ public partial class GroupsChat : ContentPage
     }
 
 
-    //quitar esto entero, hacerlo bien o ponerlo en ingles
-    private async void OnPropuestaTapped(object sender, EventArgs e)
+    //remove this entirely, or do it good enough
+    private async void OnProposalTapped(object sender, EventArgs e)
     {
-        //await DisplayAlert("Propuesta", "Entrado en propuesta", "OK");
+        await DisplayAlert("Proposal", "Proposal clicked!", "OK");
     }
 }
