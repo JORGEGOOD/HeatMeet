@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore.Design;
 
 namespace HeatMeetServer
 {
@@ -14,14 +15,16 @@ namespace HeatMeetServer
         public DbSet<Messages> Messages { get; set; }
 
         //configuration
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)//config code
-        { 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
             base.OnConfiguring(optionsBuilder);
-            optionsBuilder.UseNpgsql(@$"Host=127.0.0.1;" +
-                                    "Port=5432;" +
-                                    "Username=Alumno;" + //school pc has this default user
-                                    "Password=AlumnoIFP;" +
-                                    "Database=HeatMeet;");
+            optionsBuilder.UseNpgsql("Host=aws-1-eu-west-1.pooler.supabase.com;" +
+                                     "Port=5432;" +
+                                     "Username=postgres.fpepqfaeegvamahvhlrv;" +
+                                     "Password=proyectocalendario123;" +
+                                     "Database=postgres;" +
+                                     "SSL Mode=Require;" +
+                                     "Trust Server Certificate=true;");
         }
     }
 
