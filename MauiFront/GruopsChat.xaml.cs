@@ -1,7 +1,7 @@
 ﻿using System.Net.Sockets;
 using System.Text.Json;
 using SharedModels;
-
+using Socket = System.Net.Sockets.Socket;
 namespace MauiFront;
 public partial class GroupsChat : ContentPage
 {
@@ -74,15 +74,22 @@ public partial class GroupsChat : ContentPage
 
         try
         {
-            Socket? socket = NetUtils.NetUtils.CreateClientSocket("10.0.2.2", 8888);//connect to server
+            //connect to server
+            Socket? socket = NetUtils.NetUtils.CreateClientSocket("10.0.2.2", 8888);
+
+            //build json
             NetworkMessage message = new NetworkMessage
             {
                 Command = "GET_GROUP_MESSAGES",
                 Data = new { groupId }
             };
-            NetUtils.NetUtils.SendJson(socket, message);//send command
-            NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);//receive all messages
             
+            //send command
+            NetUtils.NetUtils.SendJson(socket, message);
+            
+            //receive messages
+            NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
+
             //if message is sucess
             if (response.Data is JsonElement data && data.GetProperty("success").GetBoolean())
             {
@@ -101,7 +108,6 @@ public partial class GroupsChat : ContentPage
                 NetUtils.NetUtils.SendJson(socket, ack);
             }
 
-
             NetUtils.NetUtils.CloseSocket(socket);
         }
         catch (Exception ex)
@@ -117,9 +123,74 @@ public partial class GroupsChat : ContentPage
     {
         if (string.IsNullOrWhiteSpace(MessageEntry.Text)) return;
 
-        //message logic
-        await DisplayAlert("Mensaje", $"EN PROGRESO", "OK");
-        MessageEntry.Text = string.Empty;
+        //----Update screen----
+
+        //put message on screen and auto generate "CreateDate = DateTime.UtcNow"
+
+
+
+        //---------------------
+
+        Socket? socket = null;
+        try
+        {
+            //connect to server
+            socket = NetUtils.NetUtils.CreateClientSocket("10.0.2.2", 8888);
+
+            //servermessage logic
+
+            //get data
+            string content = MessageEntry.Text;
+            int groupId = Preferences.Get("groupId", 0);
+            int userId = Preferences.Get("user_id", 0);
+
+            //build json
+            NetworkMessage message = new NetworkMessage
+            {
+                Command = "SEND_CHAT_MESSAGE",
+                Data = new
+                {
+                    content = content,
+                    groupId = groupId,
+                    userId = userId
+                }
+            };
+
+            //send json
+            NetUtils.NetUtils.SendJson(socket, message);
+
+            //receive ok
+            NetworkMessage response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
+            if (response.Data is JsonElement data)
+            {
+                if(data.GetProperty("success").GetBoolean())
+                {
+                    //message is success
+                    //do nothing
+                }
+                else
+                {
+                    await DisplayAlert("ERROR", "Message could not be sent", "Ok");
+                }
+
+
+            }
+            else
+            {
+                await DisplayAlert("ERROR", "Didn't received a message but anything else", "Ok");
+            }
+            
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Error", ex.Message, "OK");
+            //delete the message?
+        }finally
+        {
+            if(socket!=null) NetUtils.NetUtils.CloseSocket(socket);
+        }
+
+
     }
 
 
