@@ -28,6 +28,7 @@ namespace MauiFront
         protected override async void OnAppearing()
         {
             base.OnAppearing();
+            Shell.SetNavBarIsVisible(this, true);
 
             int userId = Preferences.Get("userId", 0);
             if (userId == 0) return;
@@ -72,6 +73,10 @@ namespace MauiFront
             {
                 Preferences.Set("groupId", grupo.Id);
                 await Navigation.PushAsync(new GroupsChat());
+
+                Preferences.Set("groupName", grupo.Name);
+                await Navigation.PushAsync(new GroupsChat());
+
             }
         }
 
