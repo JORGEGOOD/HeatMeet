@@ -198,8 +198,6 @@ public partial class GroupsChat : ContentPage
                 }
             };
 
-            await DisplayAlert("Comprobacion",$"DEBUG: Enviando mensaje con UserId: {userId}","Ok");
-
             //send json
             NetUtils.NetUtils.SendJson(socket, message);
 
@@ -214,20 +212,17 @@ public partial class GroupsChat : ContentPage
                 }
                 else
                 {
-                    // ERROR LÓGICO: El servidor respondió, pero success es false
-                    // Intentamos leer el mensaje de error que envía el servidor
+                    //Extended json error
                     string serverMsg = data.TryGetProperty("message", out JsonElement msgProp)
                                        ? msgProp.GetString()
                                        : "No error details provided";
 
-                    await DisplayAlert("ERROR SERVIDOR", serverMsg, "Ok");
+                    await DisplayAlert("ERROR SERVER", serverMsg, "Ok");
                 }
-
-
             }
             else
             {
-                // ERROR DE FORMATO: Lo que llegó no es un JsonElement o la respuesta es nula
+                //Extended format error
                 string rawResponse = response?.Data?.ToString() ?? "null";
                 await DisplayAlert("ERROR FORMATO", $"Recibido algo inesperado: {rawResponse}", "Ok");
             }
