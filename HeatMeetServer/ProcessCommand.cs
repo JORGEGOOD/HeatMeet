@@ -190,8 +190,8 @@ namespace HeatMeetServer
                                 ormManager.Messages.Add(newMessage);
                                 ormManager.SaveChanges();
                                 
-                                //send success to client and the id and createDate
-                                response.Data = new { success = true, messageId = newMessage.Id, newMessage.CreateDate };
+                                //send success to client 
+                                response.Data = new { success = true,};
                             }
                             catch (Exception ex)
                             {
