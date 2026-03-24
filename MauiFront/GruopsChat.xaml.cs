@@ -136,8 +136,9 @@ public partial class GroupsChat : ContentPage
             if (response.Data is JsonElement data && data.GetProperty("success").GetBoolean())
             {
                 var messagesJson = data.GetProperty("messages").GetRawText();
-                
+
                 var messages = JsonSerializer.Deserialize<List<MessageDto>>(messagesJson);
+                messages = messages.OrderBy(m => m.CreateDate).ToList();
 
                 LoadMessages(messages, userId);
 
