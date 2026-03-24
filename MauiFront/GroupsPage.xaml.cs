@@ -72,13 +72,12 @@ namespace MauiFront
             if (sender is Frame frame && frame.BindingContext is Group grupo)
             {
                 Preferences.Set("groupId", grupo.Id);
-                await Navigation.PushAsync(new GroupsChat());
-
                 Preferences.Set("groupName", grupo.Name);
-                await Navigation.PushAsync(new GroupsChat());
 
+                await Navigation.PushAsync(new GroupsChat());
             }
         }
+
 
         // Botón "+" → ir a crear/unirse a grupo
         private async void CrearNuevoGrupo(object sender, EventArgs e)

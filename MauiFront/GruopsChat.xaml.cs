@@ -32,7 +32,9 @@ public partial class GroupsChat : ContentPage
 
         foreach (MessageDto? msg in mensajes)
         {
-            bool isMine = msg.userId == currentUserId;
+            int senderId = msg.UserId != 0 ? msg.UserId : msg.userId;
+
+            bool isMine = senderId == currentUserId;
 
             var frame = new Frame //This loads all the css from the message
             {
@@ -62,7 +64,9 @@ public partial class GroupsChat : ContentPage
         base.OnAppearing();
 
         int groupId = Preferences.Get("groupId", 0);
-        int userId  = Preferences.Get("user_id", 0);
+
+        int userId = Preferences.Get("userId", 0);
+
         if (groupId == 0)
         {   await DisplayAlert("Error", "Chat couldn't be loaded ", "OK");
             await DisplayAlert("DEBUG", $"groupId read: {groupId}", "OK");  /*return;*/

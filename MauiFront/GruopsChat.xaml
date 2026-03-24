@@ -13,14 +13,18 @@
               ColumnDefinitions="40,50,*,40">
 
             <Label Grid.Column="0"
-                   Text="←"
-                   FontSize="22"
-                   VerticalOptions="Center"
-                   HorizontalOptions="Center">
+               Text="←"
+               FontSize="32"
+               FontAttributes="Bold"
+               TextColor="#222"
+               VerticalOptions="Center"
+               HorizontalOptions="Center">
+                 
                 <Label.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnBackTapped"/>
                 </Label.GestureRecognizers>
             </Label>
+
 
             <!-- Avatar circular -->
             <Frame Grid.Column="1"
@@ -42,12 +46,14 @@
             </Frame>
 
             <!-- Nombre del grupo -->
-            <Label Grid.Column="2"
-                   Text="(NameGroup)"
-                   FontSize="16"
-                   FontAttributes="Bold"
-                   VerticalOptions="Center"
-                   Margin="8,0,0,0"/>
+            <Label x:Name="GroupNameLabel"
+               Grid.Column="2"
+               FontSize="18"
+               FontAttributes="Bold"
+               VerticalOptions="Center"
+               TextColor="#222"
+               Margin="8,0,0,0"/>   
+
 
             <!-- Tres puntos -->
             <Label Grid.Column="3"
