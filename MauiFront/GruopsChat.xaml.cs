@@ -33,26 +33,65 @@ public partial class GroupsChat : ContentPage
         foreach (MessageDto? msg in mensajes)
         {
             int senderId = msg.UserId != 0 ? msg.UserId : msg.userId;
-
             bool isMine = senderId == currentUserId;
 
-            var frame = new Frame //This loads all the css from the message
+            // Top row: Name | Date and time 
+            var headerGrid = new Grid
             {
-                BackgroundColor = isMine ? Color.FromArgb("#2C3E6B") : Colors.White,
-                CornerRadius = 16,
-                Padding = new Thickness(12, 8),
-                HorizontalOptions = isMine ? LayoutOptions.End : LayoutOptions.Start,//is message is from user on the right
-                MaximumWidthRequest = 260
+                ColumnDefinitions =
+            {
+                new ColumnDefinition { Width = GridLength.Star },
+                new ColumnDefinition { Width = GridLength.Auto }
+            },
+                Margin = new Thickness(2, 0, 2, 3)
             };
 
-            Label? label = new Label//And this loads the content of the frame
+            // Name 
+            var nameLabel = new Label //And this loads the content of the frame
+            {
+                Text = isMine ? "Tú" : (msg.UserName ?? "Usuario"),
+                FontSize = 11,
+                FontAttributes = FontAttributes.Bold,
+                TextColor = isMine ? Color.FromArgb("#8BA3D4") : Color.FromArgb("#FF6A00"),
+                HorizontalOptions = LayoutOptions.Start
+            };
+
+            // Date and time (right)
+            var dateLabel = new Label
+            {
+                Text = msg.CreateDate.ToLocalTime().ToString("dd/MM  HH:mm"),
+                FontSize = 11,
+                TextColor = isMine ? Color.FromArgb("#8BA3D4") : Color.FromArgb("#9AAABB"),
+                HorizontalOptions = LayoutOptions.End
+            };
+
+            headerGrid.Add(nameLabel, 0, 0);
+            headerGrid.Add(dateLabel, 1, 0);
+
+            // Message content
+            var contentLabel = new Label
             {
                 Text = msg.Content,
                 FontSize = 14,
                 TextColor = isMine ? Colors.White : Color.FromArgb("#222")
             };
 
-            frame.Content = label;
+            // content Cheader + mensaje 
+            var bubble = new VerticalStackLayout
+            {
+                Spacing = 0,
+                Children = { headerGrid, contentLabel }
+            };
+
+            var frame = new Frame //This loads all the css from the message
+            {
+                BackgroundColor = isMine ? Color.FromArgb("#2C3E6B") : Colors.White,
+                CornerRadius = 16,
+                Padding = new Thickness(12, 8),
+                HorizontalOptions = isMine ? LayoutOptions.End : LayoutOptions.Start,
+                MaximumWidthRequest = 260,
+                Content = bubble
+            };
 
             MessagesContainer.Children.Add(frame);
         }
@@ -62,6 +101,9 @@ public partial class GroupsChat : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+
+        string groupName = Preferences.Get("groupName", "(Grupo)");
+        GroupNameLabel.Text = groupName;
 
         int groupId = Preferences.Get("groupId", 0);
 
