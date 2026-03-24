@@ -31,6 +31,16 @@ namespace HeatMeetServer
         }
     }
 
+    public class Message
+    {
+        public int Id { get; set; } 
+        public string Content { get; set; }
+        public DateTime CreateDate { get; set; } = DateTime.UtcNow;
+        public int UserId { get; set; }
+        public int GroupId { get; set; }
+    }
+
+
     public class CalendarDay
     {
         public string Date { get; set; } = string.Empty; // Format: yyyy-MM-dd
@@ -206,10 +216,6 @@ namespace HeatMeetServer
             {
                 Console.WriteLine($"Error: {ex.Message}");
             }
-        }
-
-        
-
-        
+        } 
     }
 }
