@@ -193,16 +193,20 @@ namespace HeatMeetServer
                                 int userId = userMessages.GetProperty("userId").GetInt32();
                                 int groupId = userMessages.GetProperty("groupId").GetInt32();
 
-                                Message newMessage = new Message
+                                //construct message
+                                Messages newMessage = new Messages
                                 {
-                                    Id = userId,
                                     Content = content,
                                     UserId = userId,
-                                    GroupId = groupId
+                                    GroupId = groupId,
+                                    CreateDate = DateTime.UtcNow
                                 };
 
-
-
+                                //save to orm
+                                ormManager.Messages.Add(newMessage);
+                                ormManager.SaveChanges();
+                                
+                                response.Data = new { success = true, messageId = newMessage.Id, newMessage.CreateDate };
                             }
                             catch (Exception ex)
                             {
