@@ -15,7 +15,7 @@ namespace MauiFront
         public List<object> Users { get; set; } = new();
         public List<object> Events { get; set; } = new();
         public List<object> Messages { get; set; } = new();
-        public string DisplayImage => "dotnet_bot.png";
+        public string DisplayImage => "logo.png";
     }
 
     public partial class GroupsPage : ContentPage
