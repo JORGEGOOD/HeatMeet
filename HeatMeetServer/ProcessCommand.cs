@@ -28,14 +28,18 @@ namespace HeatMeetServer
                             string email = loginData.GetProperty("email").GetString() ?? "";
                             string password = loginData.GetProperty("password").GetString() ?? "";
 
-                            var user = ormManager.Users.FirstOrDefault(u => u.Email == email || u.Name == email);
+                            lock (ormLock)
+                            {
+                                var user = ormManager.Users.FirstOrDefault(u => u.Email == email || u.Name == email);
 
-                            if (user == null)
-                                response.Data = new { success = false, message = "User doesn't exists", userId = 0, userName = "" };
-                            else if (user.Password != password)
-                                response.Data = new { success = false, message = "Incorrect password", userId = 0, userName = "" };
-                            else
-                                response.Data = new { success = true, message = "Login correct", userId = user.Id, userName = user.Name };
+
+                                if (user == null)
+                                    response.Data = new { success = false, message = "User doesn't exists", userId = 0, userName = "" };
+                                else if (user.Password != password)
+                                    response.Data = new { success = false, message = "Incorrect password", userId = 0, userName = "" };
+                                else
+                                    response.Data = new { success = true, message = "Login correct", userId = user.Id, userName = user.Name };
+                            }
                         }
                         else response.Data = new { success = false, message = "Invalid data", userId = 0, userName = "" };
                         break;
@@ -46,16 +50,18 @@ namespace HeatMeetServer
                             string name = registerData.GetProperty("name").GetString() ?? "";
                             string email = registerData.GetProperty("email").GetString() ?? "";
                             string password = registerData.GetProperty("password").GetString() ?? "";
-
-                            var exists = ormManager.Users.FirstOrDefault(u => u.Email == email);
-
-                            if (exists != null)
-                                response.Data = new { success = false, message = "Email already registered" };
-                            else
+                            lock (ormLock)
                             {
-                                ormManager.Users.Add(new Users { Name = name, Email = email, Password = password });
-                                ormManager.SaveChanges();
-                                response.Data = new { success = true, message = "User registered correctly" };
+                                var exists = ormManager.Users.FirstOrDefault(u => u.Email == email);
+
+                                if (exists != null)
+                                    response.Data = new { success = false, message = "Email already registered" };
+                                else
+                                {
+                                    ormManager.Users.Add(new Users { Name = name, Email = email, Password = password });
+                                    ormManager.SaveChanges();
+                                    response.Data = new { success = true, message = "User registered correctly" };
+                                }
                             }
                         }
                         else response.Data = new { success = false, message = "Invalid data" };
@@ -68,23 +74,25 @@ namespace HeatMeetServer
                             string groupName = createGroupData.GetProperty("groupName").GetString() ?? "";
                             int adminId = createGroupData.GetProperty("userId").GetInt32();
 
-                            using var ormManager = new OrmManager();
-                            var user = ormManager.Users.FirstOrDefault(u => u.Id == adminId);
-
-                            if (user == null)
-                                response.Data = new { success = false, message = "User not found", inviteCode = "" };
-                            else
+                            lock (ormLock)
                             {
-                                var newGroup = new Groups
+                                var user = ormManager.Users.FirstOrDefault(u => u.Id == adminId);
+
+                                if (user == null)
+                                    response.Data = new { success = false, message = "User not found", inviteCode = "" };
+                                else
                                 {
-                                    Name = groupName,
-                                    InviteCode = Guid.NewGuid().ToString().Substring(0, 6).ToUpper(),
-                                    CreateDate = DateTime.UtcNow
-                                };
-                                newGroup.Users.Add(user);
-                                ormManager.Groups.Add(newGroup);
-                                ormManager.SaveChanges();
-                                response.Data = new { success = true, message = "Group created", inviteCode = newGroup.InviteCode, groupId = newGroup.Id, groupName = newGroup.Name };
+                                    var newGroup = new Groups
+                                    {
+                                        Name = groupName,
+                                        InviteCode = Guid.NewGuid().ToString().Substring(0, 6).ToUpper(),
+                                        CreateDate = DateTime.UtcNow
+                                    };
+                                    newGroup.Users.Add(user);
+                                    ormManager.Groups.Add(newGroup);
+                                    ormManager.SaveChanges();
+                                    response.Data = new { success = true, message = "Group created", inviteCode = newGroup.InviteCode, groupId = newGroup.Id, groupName = newGroup.Name };
+                                }
                             }
                         }
                         else response.Data = new { success = false, message = "Invalid data", inviteCode = "" };
@@ -95,21 +103,23 @@ namespace HeatMeetServer
                             string inviteCode = joinGroupData.GetProperty("inviteCode").GetString() ?? "";
                             int userId = joinGroupData.GetProperty("userId").GetInt32();
 
-
-                            var group = ormManager.Groups.Include(g => g.Users).FirstOrDefault(g => g.InviteCode == inviteCode);
-                            var user = ormManager.Users.FirstOrDefault(u => u.Id == userId);
-
-                            if (group == null)
-                                response.Data = new { success = false, message = "Group not found" };
-                            else if (user == null)
-                                response.Data = new { success = false, message = "User not found" };
-                            else if (group.Users.Any(u => u.Id == userId))
-                                response.Data = new { success = false, message = "Already in this group" };
-                            else
+                            lock (ormLock)
                             {
-                                group.Users.Add(user);
-                                ormManager.SaveChanges();
-                                response.Data = new { success = true, message = "Joined group correctly", groupId = group.Id , groupName = group.Name  };
+                                var group = ormManager.Groups.Include(g => g.Users).FirstOrDefault(g => g.InviteCode == inviteCode);
+                                var user = ormManager.Users.FirstOrDefault(u => u.Id == userId);
+
+                                if (group == null)
+                                    response.Data = new { success = false, message = "Group not found" };
+                                else if (user == null)
+                                    response.Data = new { success = false, message = "User not found" };
+                                else if (group.Users.Any(u => u.Id == userId))
+                                    response.Data = new { success = false, message = "Already in this group" };
+                                else
+                                {
+                                    group.Users.Add(user);
+                                    ormManager.SaveChanges();
+                                    response.Data = new { success = true, message = "Joined group correctly", groupId = group.Id, groupName = group.Name };
+                                }
                             }
                         }
                         else response.Data = new { success = false, message = "Invalid data" };
@@ -119,24 +129,27 @@ namespace HeatMeetServer
                         if (message.Data is JsonElement userGroupsData)
                         {
                             int userId = userGroupsData.GetProperty("userId").GetInt32();
-                            Users? user = ormManager.Users
+                            lock (ormLock)
+                            {
+                                Users? user = ormManager.Users
                                 .Include(u => u.Groups)
                                 .FirstOrDefault(u => u.Id == userId);
 
-                            if (user == null || user.Groups == null || !user.Groups.Any())
-                                response.Data = new { success = false, message = "No groups found" };
-                            else
-                                response.Data = new
-                                {
-                                    success = true,
-                                    groups = user.Groups.Select(g => new
+                                if (user == null || user.Groups == null || !user.Groups.Any())
+                                    response.Data = new { success = false, message = "No groups found" };
+                                else
+                                    response.Data = new
                                     {
-                                        g.Id,
-                                        g.Name,
-                                        g.InviteCode,
-                                        g.CreateDate
-                                    }).ToList()
-                                };
+                                        success = true,
+                                        groups = user.Groups.Select(g => new
+                                        {
+                                            g.Id,
+                                            g.Name,
+                                            g.InviteCode,
+                                            g.CreateDate
+                                        }).ToList()
+                                    };
+                            }
                         }
                         else response.Data = new { success = false, message = "Invalid data" };
 
@@ -146,20 +159,22 @@ namespace HeatMeetServer
                         if (message.Data is JsonElement groupMessages)
                         {
                             int groupId = groupMessages.GetProperty("groupId").GetInt32();
-
-                            //now we do select to the database and retreat the messages, put in into a json and send back
-                            var messages = ormManager.Messages.Where(m => m.GroupId == groupId).Select(m => new { m.Content, m.CreateDate, m.UserId, UserName = m.User.Name }).ToList();
-                            if (messages == null || messages.Count == 0)
-                                response.Data = new { success = false, messages = new List<object>() };
-
-                            else
+                            lock (ormLock)
                             {
-                                //send all messages
-                                response.Data = new
+                                //now we do select to the database and retreat the messages, put in into a json and send back
+                                var messages = ormManager.Messages.Where(m => m.GroupId == groupId).Select(m => new { m.Content, m.CreateDate, m.UserId, UserName = m.User.Name }).ToList();
+                                if (messages == null || messages.Count == 0)
+                                    response.Data = new { success = false, messages = new List<object>() };
+
+                                else
                                 {
-                                    success = true,
-                                    messages = messages
-                                };
+                                    //send all messages
+                                    response.Data = new
+                                    {
+                                        success = true,
+                                        messages = messages
+                                    };
+                                }
                             }
                         }
                         else response.Data = new { success = false, message = "Invalid data" };
@@ -185,17 +200,19 @@ namespace HeatMeetServer
                                     CreateDate = DateTime.UtcNow
                                 };
 
-                                //save to orm
-                                ormManager.Messages.Add(newMessage);
-                                ormManager.SaveChanges();
-                                Console.WriteLine($@"New message saved to Orm from {userId}: {content}");
-                                //send success to client 
-                                response.Data = new { success = true, newId = newMessage.Id};
+                                lock (ormLock)
+                                {
+                                    //save to orm
+                                    ormManager.Messages.Add(newMessage);
+                                    ormManager.SaveChanges();
+                                    Console.WriteLine($@"New message saved to Orm from {userId}: {content}");
+                                    //send success to client 
+                                    response.Data = new { success = true, newId = newMessage.Id };
+                                }
                             }
                             catch (Exception ex)
                             {
-                                // Esto te dirá el error real (ej: "The INSERT statement conflicted with the FOREIGN KEY constraint...")
-                                var realError = ex.InnerException?.Message ?? ex.Message;
+                                String? realError = ex.InnerException?.Message ?? ex.Message;
                                 Console.WriteLine($"DATABASE ERROR: {realError}");
 
                                 response.Data = new { success = false, message = "DB Error: " + realError };
@@ -210,11 +227,14 @@ namespace HeatMeetServer
                             int gId = syncData.GetProperty("groupId").GetInt32();
                             int lastId = syncData.GetProperty("lastId").GetInt32();
 
-                            // Buscamos solo los mensajes que el cliente NO tiene
-                            var nuevosMensajes = ormManager.Messages
+                            lock (ormLock)
+                            {
+                                //Search messages the user DOESN'T have
+                                var nuevosMensajes = ormManager.Messages
                                 .Where(m => m.GroupId == gId && m.Id > lastId)
                                 .OrderBy(m => m.CreateDate)
-                                .Select(m => new {
+                                .Select(m => new
+                                {
                                     m.Id,
                                     m.Content,
                                     m.CreateDate,
@@ -223,7 +243,8 @@ namespace HeatMeetServer
                                 })
                                 .ToList();
 
-                            response.Data = new { success = true, messages = nuevosMensajes };
+                                response.Data = new { success = true, messages = nuevosMensajes };
+                            }
                         }
                         break;
 

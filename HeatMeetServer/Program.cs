@@ -53,15 +53,16 @@ namespace HeatMeetServer
         private static void OnProcessExit(object? sender, EventArgs e)//to dispose the app on exit
         {
             Console.WriteLine("Cerrando ORM...");
-            ormManager?.Dispose();
+            lock (ormLock)
+            {
+                ormManager?.Dispose();
+            }
         }
         
         static void Main(string[] args)
         {
-
             AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
 
-            
             ormManager.Database.EnsureCreated();
             
             //Create test users and groups
