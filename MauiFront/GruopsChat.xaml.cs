@@ -1,7 +1,7 @@
 ﻿using System.Net.Sockets;
 using System.Text.Json;
 using SharedModels;
-using Socket = System.Net.Sockets.Socket;
+using System.Net.Sockets;
 namespace MauiFront;
 public partial class GroupsChat : ContentPage
 {

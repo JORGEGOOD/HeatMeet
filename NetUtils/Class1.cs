@@ -32,13 +32,13 @@ namespace NetUtils
 
         public static Socket ConnectToServer()
         {
-            Socket socket = CreateClientSocket("10.0.2.2", 8888);
+            Socket socket = CreateClientSocket("192.168.111.33", 8888);
             return socket;
         }
 
         public static void SendJson(Socket s, object data)
         {
-            s.SendTimeout = 5000;
+            s.SendTimeout = 10000;
             //custom option to avoid possible infinite sending loop
             JsonSerializerOptions options = new JsonSerializerOptions 
             { 
@@ -59,13 +59,11 @@ namespace NetUtils
                 if (r == 0) throw new Exception("Could not sent data");
                 sent += r;
             }
-
-            s.Send(jsonBytes);    //then data
         }
 
         public static T? ReceiveJson<T>(Socket s)
         {
-            s.ReceiveTimeout = 5000;
+            s.ReceiveTimeout = 10000;
             //Get total lenght
             byte[] lengthBuffer = new byte[4];
             int received = 0;

@@ -21,8 +21,10 @@ namespace HeatMeetServer
                 NetworkMessage message = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(client);
 
                 if (message == null) return;
-
-                Console.WriteLine($" Command received: {message.Command}");
+                if (message.Command != "RELOAD_MESSAGES")
+                {
+                    Console.WriteLine($" Command received: {message.Command}");
+                }
                 NetworkMessage response = ProcessCommand(message);
 
                 NetUtils.NetUtils.SendJson(client, response);
