@@ -50,6 +50,12 @@ public partial class CreateGroupPage : ContentPage
 
             if (ok)
             {
+                int groupId = data.GetProperty("groupId").GetInt32();
+                string groupName = data.GetProperty("groupName").GetString() ?? "";
+
+                Preferences.Set("groupId", groupId);
+                Preferences.Set("groupName", groupName);
+
                 string inviteCode = data.GetProperty("inviteCode").GetString() ?? "";
                 await DisplayAlert("Grupo creado", $"Código de invitación: {inviteCode}\n\n(Código copiado al portapapeles)", "OK");
                 await Clipboard.SetTextAsync(inviteCode);
@@ -103,7 +109,16 @@ public partial class CreateGroupPage : ContentPage
             string msg = data.GetProperty("message").GetString() ?? "";
 
             if (ok)
+            {
+                int groupId      = data.GetProperty("groupId").GetInt32();
+                string groupName = data.GetProperty("groupName").GetString();
+
+                Preferences.Set("groupId", groupId);
+                Preferences.Set("groupName", groupName);
+
                 await Navigation.PushAsync(new GroupsChat());
+            }
+
             else
                 await DisplayAlert("Error", msg, "OK");
         }

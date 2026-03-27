@@ -85,7 +85,7 @@ namespace HeatMeetServer
                                 newGroup.Users.Add(user);
                                 ormManager.Groups.Add(newGroup);
                                 ormManager.SaveChanges();
-                                response.Data = new { success = true, message = "Group created", inviteCode = newGroup.InviteCode };
+                                response.Data = new { success = true, message = "Group created", inviteCode = newGroup.InviteCode, groupId = newGroup.Id, groupName = newGroup.Name };
                             }
                         }
                         else response.Data = new { success = false, message = "Invalid data", inviteCode = "" };
@@ -110,7 +110,7 @@ namespace HeatMeetServer
                             {
                                 group.Users.Add(user);
                                 ormManager.SaveChanges();
-                                response.Data = new { success = true, message = "Joined group correctly" };
+                                response.Data = new { success = true, message = "Joined group correctly", groupId = group.Id , groupName = group.Name  };
                             }
                         }
                         else response.Data = new { success = false, message = "Invalid data" };
