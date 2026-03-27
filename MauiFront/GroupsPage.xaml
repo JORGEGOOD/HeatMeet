@@ -2,40 +2,87 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MauiFront.GroupsPage"
-             Title="Grupos">
+             Title="Grupos"
+             BackgroundColor="#F5EDE3">
+
     <Grid RowDefinitions="*" ColumnDefinitions="*">
-        <CollectionView x:Name="GroupsCollection" Grid.Row="0" Margin="10">
+
+        <!-- LISTA DE GRUPOS -->
+        <CollectionView x:Name="GroupsCollection"
+                        Grid.Row="0"
+                        Margin="15"
+                        ZIndex="1">
+
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Frame Margin="0,5" Padding="10" CornerRadius="10" HasShadow="True">
+
+                    <!-- TARJETA DEL GRUPO -->
+                    <Frame Margin="0,10"
+                           Padding="15"
+                           CornerRadius="18"
+                           BackgroundColor="White"
+                           BorderColor="#0A2A43"
+                           HasShadow="True">
+
+                        <!-- 👇 TAP MOVIDO AQUÍ -->
                         <Frame.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnGroupTapped" />
                         </Frame.GestureRecognizers>
+
                         <HorizontalStackLayout Spacing="15">
-                            <Label Text="{Binding Name}"
-                                   VerticalOptions="Center"
-                                   FontSize="18"
-                                   FontAttributes="Bold" />
+
+                            <!-- IMAGEN DEL GRUPO -->
                             <Image Source="{Binding DisplayImage}"
                                    HeightRequest="60"
                                    WidthRequest="60"
-                                   Aspect="AspectFill" />
+                                   Aspect="AspectFill">
+
+                                <Image.Clip>
+                                    <RoundRectangleGeometry CornerRadius="12"
+                                                            Rect="0,0,60,60"/>
+                                </Image.Clip>
+
+                            </Image>
+
+                            <!-- NOMBRE DEL GRUPO -->
+                            <Label Text="{Binding Name}"
+                                   VerticalOptions="Center"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   TextColor="#072033"/>
                         </HorizontalStackLayout>
+
                     </Frame>
+
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
 
+        <!-- BOTÓN FLOTANTE PARA CREAR GRUPO -->
         <Button Text="+"
-                FontSize="30"
-                BackgroundColor="Orange"
+                ZIndex="10"
+                FontSize="32"
                 TextColor="White"
-                HeightRequest="60"
-                WidthRequest="60"
-                CornerRadius="30"
+                HeightRequest="65"
+                WidthRequest="65"
+                CornerRadius="33"
                 HorizontalOptions="End"
                 VerticalOptions="End"
-                Margin="20"
-                Clicked="CrearNuevoGrupo" />
+                Margin="25"
+                Clicked="CrearNuevoGrupo">
+
+            <Button.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#FF6A00" Offset="0.0"/>
+                    <GradientStop Color="#E63900" Offset="1.0"/>
+                </LinearGradientBrush>
+            </Button.Background>
+
+            <Button.Shadow>
+                <Shadow Brush="#30000000" Offset="0,4" Radius="14"/>
+            </Button.Shadow>
+
+        </Button>
+
     </Grid>
 </ContentPage>
