@@ -69,7 +69,7 @@
                 HorizontalOptions="End"
                 VerticalOptions="End"
                 Margin="25"
-                Clicked="CrearNuevoGrupo">
+                Clicked="CreateNewGroup">
 
             <Button.Background>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
