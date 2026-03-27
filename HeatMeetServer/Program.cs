@@ -47,7 +47,7 @@ namespace HeatMeetServer
 
     public partial class Program
     {
-        
+        public static readonly object ormLock = new object();
         public static OrmManager ormManager {  get; private set; } = new OrmManager();
 
         private static void OnProcessExit(object? sender, EventArgs e)//to dispose the app on exit
