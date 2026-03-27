@@ -1,0 +1,110 @@
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+
+namespace HeatMeetServer
+{
+    public class OrmManager : DbContext
+    {
+        //create tables
+        public DbSet<Users> Users { get; set; }
+        public DbSet<Groups> Groups { get; set; }
+        public DbSet<Events> Events { get; set; }
+        public DbSet<Votes> Votes { get; set; }
+        public DbSet<Messages> Messages { get; set; }
+
+        //configuration
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)//config code
+        { 
+            base.OnConfiguring(optionsBuilder);
+            optionsBuilder.UseNpgsql(@$"Host=127.0.0.0;" +
+                                    "Port=5432;" +
+                                    "Username=Alumno;" + //school pc has this default user
+                                    "Password=AlumnoIFP;" +
+                                    "Database=HeatMeet;");
+        }
+    }
+
+    public class Users
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required, MaxLength(50)]
+        public string Name { get; set; }
+
+        [Required, MaxLength(100)]
+        public string Email { get; set; }
+
+        [Required]
+        public string Password { get; set; }
+
+        //N:M
+        public List<Groups> Groups { get; set; } = new();
+    }
+
+    public class Groups
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required, MaxLength(50)]
+        public string Name { get; set; }
+
+        public string InviteCode { get; set; }
+        public DateTime CreateDate { get; set; }
+
+
+        public List<Users> Users { get; set; } = new();
+        public List<Events> Events { get; set; } = new();//messages and events are separated
+        public List<Messages> Messages { get; set; } = new(); //individual messages
+    }
+
+    public class Events
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required, MaxLength(50)]
+        public string Title { get; set; }
+        public string? Ubicacion { get; set; }
+
+        public int GroupId { get; set; }
+        public Groups Group { get; set; }
+
+        public List<Votes> Votes { get; set; } = new();
+    }
+
+    public class Votes
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        public DateTime Date { get; set; }
+        public TimeSpan HourStart { get; set; }
+        public TimeSpan HourEnd { get; set; }
+        
+        //foreign key to user
+        public int UserId { get; set; }
+        public Users User { get; set; }
+        //foreign key to event
+        public int EventId { get; set; }
+        public Events Event { get; set; }
+    }
+
+    public class Messages
+    {
+        [Key]
+        public int Id { get; set; }
+
+        public string Content { get; set; }
+        public DateTime CreateDate { get; set; }
+
+        //foreign keys
+        public int UserId { get; set; }
+        public Users User { get; set; }
+        public int GroupId { get; set; }
+        public Groups Group { get; set; }
+    }
+}
