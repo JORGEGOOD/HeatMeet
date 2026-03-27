@@ -21,6 +21,7 @@ namespace MauiFront
             }
 
             int userId = Preferences.Get("userId", 0);
+
             if (userId == 0)
             {
                 await DisplayAlert("Error", "No hay sesión activa", "OK");
