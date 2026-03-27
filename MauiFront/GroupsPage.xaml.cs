@@ -20,6 +20,7 @@ namespace MauiFront
 
     public partial class GroupsPage : ContentPage
     {
+        bool isFabOpen = false;
         public GroupsPage()
         {
             InitializeComponent();
@@ -78,11 +79,62 @@ namespace MauiFront
             }
         }
 
+        //Animation button create or join croup
+        private async void ToggleFabMenu(object sender, EventArgs e)
+        {
+            if (!isFabOpen)
+            {
+                Overlay.IsVisible = true;
 
-        // Botón "+" → ir a crear/unirse a grupo
-        private async void CrearNuevoGrupo(object sender, EventArgs e)
+                CrearLayout.IsVisible = true;
+                UnirseLayout.IsVisible = true;
+
+                await Task.WhenAll(
+                    Overlay.FadeTo(1, 200),
+
+                    CrearLayout.FadeTo(1, 200),
+                    CrearLayout.TranslateTo(0, -20, 200, Easing.SinOut),
+                    CrearLayout.ScaleTo(1, 200),
+
+                    UnirseLayout.FadeTo(1, 200),
+                    UnirseLayout.TranslateTo(0, -20, 200, Easing.SinOut),
+                    UnirseLayout.ScaleTo(1, 200),
+
+                    FabButton.RotateTo(45, 200)
+                );
+            }
+            else
+            {
+                await Task.WhenAll(
+                    Overlay.FadeTo(0, 150),
+
+                    CrearLayout.FadeTo(0, 150),
+                    CrearLayout.ScaleTo(0.8, 150),
+
+                    UnirseLayout.FadeTo(0, 150),
+                    UnirseLayout.ScaleTo(0.8, 150),
+
+                    FabButton.RotateTo(0, 200)
+                );
+
+                Overlay.IsVisible = false;
+                CrearLayout.IsVisible = false;
+                UnirseLayout.IsVisible = false;
+            }
+
+            isFabOpen = !isFabOpen;
+        }
+
+        
+        private async void IrCrearGrupo(object sender, EventArgs e)
         {
             await Navigation.PushAsync(new CreateGroupPage());
+        }
+
+       
+        private async void IrUnirseGrupo(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new JoinGroups()); 
         }
     }
 }

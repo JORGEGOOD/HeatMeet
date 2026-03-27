@@ -282,63 +282,66 @@ public partial class GroupsChat : ContentPage
 
     }
 
-    private bool _isProcessingNetwork = false;
     private async Task RefreshMessagesLoop()
     {
         while (_isChatActive)
         {
-            await Task.Delay(2000); // Un respiro entre peticiones
-
-            if (_isProcessingNetwork) continue;
-
-            Socket socket = null;
             try
             {
-                _isProcessingNetwork = true;
-                socket = NetUtils.NetUtils.ConnectToServer(); // Usa tu método estándar
+                await Task.Delay(1000);//delay
 
-                if (socket == null) continue;
+                int groupId = Preferences.Get("groupId", 0);
+                int userId = Preferences.Get("user_id", 0);
 
-                var message = new NetworkMessage
+                //send the server a command with the current status
+                NetworkMessage message = new NetworkMessage
                 {
                     Command = "RELOAD_CHAT_MESSAGES",
                     Data = new
                     {
+
                         groupId = Preferences.Get("groupId", 0),
                         lastId = _lastMessageId
                     }
                 };
 
+                //connect to server
+                Socket? socket = NetUtils.NetUtils.CreateClientSocket("10.0.2.2", 8888);
+
+                //send command
                 NetUtils.NetUtils.SendJson(socket, message);
+
+                //receive command
                 var response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
 
-                if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
+                if(response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
                 {
-                    var messagesJson = data.GetProperty("messages").GetRawText();
-                    var newMessages = JsonSerializer.Deserialize<List<MessageDto>>(messagesJson);
+                    var messagesJson = data.GetProperty("messages").GetRawText();//get messages to raw text
+                    var newMessages  = JsonSerializer.Deserialize<List<MessageDto>>(messagesJson);//convert to raw text 
 
-                    if (newMessages != null && newMessages.Count > 0)
+                    //update new messages
+                    if(newMessages != null && newMessages.Count >0)
                     {
-                        int currentUserId = Preferences.Get("userId", 0);
-                        MainThread.BeginInvokeOnMainThread(() =>
+                        //MainThread is for painting, nothing more
+                        MainThread.BeginInvokeOnMainThread(async () =>
                         {
-                            foreach (var msg in newMessages.OrderBy(m => m.Id))
+                            foreach(var message in newMessages)
                             {
-                                if (msg.Id > _lastMessageId)
-                                    AddMessage(msg, currentUserId);
+                                AddMessage(message, userId);
                             }
                         });
                     }
+
+
                 }
+
+                socket.Close();
+
+               
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Refresh Error: {ex.Message}");
-            }
-            finally
-            {
-                if (socket != null) NetUtils.NetUtils.CloseSocket(socket);
-                _isProcessingNetwork = false;
+                DisplayAlert("Error",$"AutoReload Error: {ex.Message}","Ok");
             }
         }
     }

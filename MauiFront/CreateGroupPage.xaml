@@ -35,25 +35,7 @@
                 </VerticalStackLayout>
             </Frame>
 
-            <Label Text="— o —" HorizontalOptions="Center" TextColor="#AAAAAA" FontSize="13"/>
-
-            <Frame BackgroundColor="White" BorderColor="Transparent" CornerRadius="14" Padding="20">
-                <VerticalStackLayout Spacing="12">
-                    <Label Text="Unirse a un grupo" FontSize="17" FontAttributes="Bold" TextColor="#1E2A4A"/>
-                    <Frame BorderColor="#DDDDDD" Padding="10,5" CornerRadius="8">
-                        <Entry x:Name="GroupCodeEntry"
-                               Placeholder="Código del grupo (ej: AB12CD)"
-                               PlaceholderColor="#AAAAAA"
-                               FontSize="14"/>
-                    </Frame>
-                    <Button Text="Unirse al grupo"
-                            BackgroundColor="#F07030"
-                            TextColor="White"
-                            CornerRadius="8"
-                            FontAttributes="Bold"
-                            Clicked="OnJoinGroupClicked"/>
-                </VerticalStackLayout>
-            </Frame>
+         
 
         </VerticalStackLayout>
     </ScrollView>
