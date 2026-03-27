@@ -28,21 +28,18 @@
 
             <!-- Avatar circular -->
             <Frame Grid.Column="1"
-                   WidthRequest="40"
-                   HeightRequest="40"
-                   CornerRadius="20"
-                   BackgroundColor="#E03030"
-                   BorderColor="Transparent"
-                   Padding="0"
-                   IsClippedToBounds="True"
-                   VerticalOptions="Center"
-                   HorizontalOptions="Center">
-                <Label Text=" "
-                       TextColor="White"
-                       FontSize="17"
-                       FontAttributes="Bold"
-                       HorizontalOptions="Center"
-                       VerticalOptions="Center"/>
+               WidthRequest="40"
+               HeightRequest="40"
+               CornerRadius="15"
+               Padding="0"
+               IsClippedToBounds="True"
+               HasShadow="False"
+               BackgroundColor="Transparent"
+               VerticalOptions="Center"
+               HorizontalOptions="Center">  
+
+                <Image Source="logo.png"
+                Aspect="AspectFill"/>
             </Frame>
 
             <!-- Nombre del grupo -->

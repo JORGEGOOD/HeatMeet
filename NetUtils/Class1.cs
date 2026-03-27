@@ -60,7 +60,6 @@ namespace NetUtils
                 sent += r;
             }
 
-            s.Send(jsonBytes);    //then data
         }
 
         public static T? ReceiveJson<T>(Socket s)

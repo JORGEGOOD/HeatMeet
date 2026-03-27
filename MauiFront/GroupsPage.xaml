@@ -86,7 +86,7 @@
                     CornerRadius="28"
                     Text="+"
                     TextColor="White"
-                    Clicked="IrCrearGrupo"/>
+                    Clicked="CreateNewGroup"/>
         </HorizontalStackLayout>
 
         <!-- OPCIÓN: UNIRSE -->
@@ -129,11 +129,7 @@
                 HorizontalOptions="End"
                 VerticalOptions="End"
                 Margin="25"
-<<<<<<< HEAD
                 Clicked="ToggleFabMenu">
-=======
-                Clicked="CreateNewGroup">
->>>>>>> 068fb45c6a799e7a9b3bdce0a389c16b9258e177
 
             <Button.Background>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">

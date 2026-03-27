@@ -89,8 +89,6 @@ namespace MauiFront
             if (!isFabOpen)
             {
                 Overlay.IsVisible = true;
-
-<<<<<<< HEAD
                 CrearLayout.IsVisible = true;
                 UnirseLayout.IsVisible = true;
 
@@ -131,11 +129,9 @@ namespace MauiFront
         }
 
         
-        private async void IrCrearGrupo(object sender, EventArgs e)
-=======
-        // Button "+" → go to join/create group
+       
+        
         private async void CreateNewGroup(object sender, EventArgs e)
->>>>>>> 068fb45c6a799e7a9b3bdce0a389c16b9258e177
         {
             await Navigation.PushAsync(new CreateGroupPage());
         }
