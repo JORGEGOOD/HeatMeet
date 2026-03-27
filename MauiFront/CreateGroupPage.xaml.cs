@@ -29,7 +29,8 @@ public partial class CreateGroupPage : ContentPage
 
         try
         {
-            Socket socket = NetUtils.NetUtils.CreateClientSocket("10.0.2.2", 8888);
+            Socket socket = NetUtils.NetUtils.ConnectToServer();
+
             SharedModels.NetworkMessage message = new SharedModels.NetworkMessage
             {
                 Command = "CREATE_GROUP",
@@ -89,7 +90,7 @@ public partial class CreateGroupPage : ContentPage
 
         try
         {
-            Socket socket = NetUtils.NetUtils.CreateClientSocket("10.0.2.2", 8888);
+            Socket socket = NetUtils.NetUtils.ConnectToServer();
             SharedModels.NetworkMessage message = new SharedModels.NetworkMessage
             {
                 Command = "JOIN_GROUP",

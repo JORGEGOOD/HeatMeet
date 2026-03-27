@@ -35,7 +35,7 @@ namespace MauiFront
 
             try
             {
-                Socket socket = NetUtils.NetUtils.CreateClientSocket("10.0.2.2", 8888);
+                Socket socket = NetUtils.NetUtils.ConnectToServer();
                 SharedModels.NetworkMessage message = new SharedModels.NetworkMessage
                 {
                     Command = "GET_USER_GROUPS",

@@ -148,7 +148,7 @@ public partial class GroupsChat : ContentPage
         try
         {
             //connect to server
-            Socket? socket = NetUtils.NetUtils.CreateClientSocket("10.0.2.2", 8888);
+            Socket socket = NetUtils.NetUtils.ConnectToServer();
 
             //build json
             NetworkMessage message = new NetworkMessage
@@ -202,7 +202,7 @@ public partial class GroupsChat : ContentPage
         try
         {
             //connect to server
-            socket = NetUtils.NetUtils.CreateClientSocket("10.0.2.2", 8888);
+            socket = NetUtils.NetUtils.ConnectToServer();
 
             //servermessage logic
 

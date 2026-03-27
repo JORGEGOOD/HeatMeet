@@ -30,10 +30,10 @@ namespace NetUtils
         }
 
 
-        public static void ConnectToSupabase()
+        public static Socket ConnectToServer()
         {
-            Socket? socket = CreateClientSocket("10.0.2.2", 8888);
-
+            Socket socket = CreateClientSocket("10.0.2.2", 8888);
+            return socket;
         }
 
 
