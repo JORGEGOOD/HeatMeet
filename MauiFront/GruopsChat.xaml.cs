@@ -306,7 +306,7 @@ public partial class GroupsChat : ContentPage
                 };
 
                 //connect to server
-                Socket? socket = NetUtils.NetUtils.CreateClientSocket("10.0.2.2", 8888);
+                Socket socket = NetUtils.NetUtils.ConnectToServer();
 
                 //send command
                 NetUtils.NetUtils.SendJson(socket, message);
