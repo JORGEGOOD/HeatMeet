@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-
 using System.Net.Sockets;
 using System.Text.Json;
+
 
 namespace MauiFront
 {
@@ -29,14 +29,15 @@ namespace MauiFront
         protected override async void OnAppearing()
         {
             base.OnAppearing();
+            await Task.Delay(100);//for possible bugs
             Shell.SetNavBarIsVisible(this, true);
 
             int userId = Preferences.Get("userId", 0);
             if (userId == 0) return;
-
+            Socket socket = null;
             try
             {
-                Socket socket = NetUtils.NetUtils.ConnectToServer();
+                socket = NetUtils.NetUtils.ConnectToServer();
                 SharedModels.NetworkMessage message = new SharedModels.NetworkMessage
                 {
                     Command = "GET_USER_GROUPS",
@@ -45,7 +46,7 @@ namespace MauiFront
 
                 NetUtils.NetUtils.SendJson(socket, message);
                 SharedModels.NetworkMessage response = NetUtils.NetUtils.ReceiveJson<SharedModels.NetworkMessage>(socket);
-                NetUtils.NetUtils.CloseSocket(socket);
+                
 
                 if (response.Data is JsonElement data)
                 {
@@ -59,15 +60,18 @@ namespace MauiFront
                         GroupsCollection.ItemsSource = grupos;
                     }
                 }
-
             }
             catch (Exception ex)
             {
                 await DisplayAlert("Error", "No se pudieron cargar los grupos: " + ex.Message, "OK");
             }
+            finally
+            {
+                if(socket != null) NetUtils.NetUtils.CloseSocket(socket);
+            }
         }
 
-        // Pulsar un grupo → ir al chat
+        //Clic on group → go to chat
         private async void OnGroupTapped(object sender, EventArgs e)
         {
             if (sender is Frame frame && frame.BindingContext is Group grupo)
@@ -86,6 +90,7 @@ namespace MauiFront
             {
                 Overlay.IsVisible = true;
 
+<<<<<<< HEAD
                 CrearLayout.IsVisible = true;
                 UnirseLayout.IsVisible = true;
 
@@ -127,6 +132,10 @@ namespace MauiFront
 
         
         private async void IrCrearGrupo(object sender, EventArgs e)
+=======
+        // Button "+" → go to join/create group
+        private async void CreateNewGroup(object sender, EventArgs e)
+>>>>>>> 068fb45c6a799e7a9b3bdce0a389c16b9258e177
         {
             await Navigation.PushAsync(new CreateGroupPage());
         }

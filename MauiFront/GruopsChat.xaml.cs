@@ -265,7 +265,7 @@ public partial class GroupsChat : ContentPage
             {
                 //Extended format error
                 string rawResponse = response?.Data?.ToString() ?? "null";
-                await DisplayAlert("ERROR FORMATO", $"Recibido algo inesperado: {rawResponse}", "Ok");
+                await DisplayAlert("ERROR FORMAT", $"Got somehting unexpected : {rawResponse}", "Ok");
             }
             
         }
@@ -286,9 +286,21 @@ public partial class GroupsChat : ContentPage
     {
         while (_isChatActive)
         {
+<<<<<<< HEAD
             try
             {
                 await Task.Delay(1000);//delay
+=======
+            await Task.Delay(2000);
+
+            if (_isProcessingNetwork) continue;//this is an artificial lock but ultimately does nothing, just prevents damage
+
+            Socket socket = null;
+            try
+            {
+                _isProcessingNetwork = true;
+                socket = NetUtils.NetUtils.ConnectToServer();
+>>>>>>> 068fb45c6a799e7a9b3bdce0a389c16b9258e177
 
                 int groupId = Preferences.Get("groupId", 0);
                 int userId = Preferences.Get("user_id", 0);

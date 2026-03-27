@@ -2,6 +2,7 @@
 using System.Net;
 using System.Text.Json;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace NetUtils
 {
@@ -29,28 +30,42 @@ namespace NetUtils
 
         }
 
-
         public static Socket ConnectToServer()
         {
             Socket socket = CreateClientSocket("192.168.111.33", 8888);
             return socket;
         }
 
-
-
         public static void SendJson(Socket s, object data)
         {
-            string json = JsonSerializer.Serialize(data);
-            byte[] jsonBytes = Encoding.UTF8.GetBytes(json);
+            s.SendTimeout = 5000;
+            //custom option to avoid possible infinite sending loop
+            JsonSerializerOptions options = new JsonSerializerOptions 
+            { 
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,//<-- Ignore possible Orm infinites
+                WriteIndented = false//<-- Ignore pretty printing, it should already be by default tho
+            };
 
+            string json = JsonSerializer.Serialize(data,options);
+            byte[] jsonBytes = Encoding.UTF8.GetBytes(json);
             byte[] lengthBytes = BitConverter.GetBytes(jsonBytes.Length);
 
-            s.Send(lengthBytes);  // primero tamaño
-            s.Send(jsonBytes);    // luego datos
+            s.Send(lengthBytes);  //length first
+            //send json by pieces
+            int sent = 0;
+            while(sent<jsonBytes.Length)
+            {
+                int r = s.Send(jsonBytes, sent, jsonBytes.Length - sent, SocketFlags.None);
+                if (r == 0) throw new Exception("Could not sent data");
+                sent += r;
+            }
+
+            s.Send(jsonBytes);    //then data
         }
 
         public static T? ReceiveJson<T>(Socket s)
         {
+            s.ReceiveTimeout = 5000;
             //Get total lenght
             byte[] lengthBuffer = new byte[4];
             int received = 0;
