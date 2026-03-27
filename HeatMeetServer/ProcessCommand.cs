@@ -19,8 +19,7 @@ namespace HeatMeetServer
                 switch (message.Command)
                 {
                     case "ACK":
-                        //this means "Acknowleded" or Sucess, here should be nothing or a Log message.
-                        Console.WriteLine("Anser received: ACK");
+                        //nothing here
                         break;
 
                     case "LOGIN":
