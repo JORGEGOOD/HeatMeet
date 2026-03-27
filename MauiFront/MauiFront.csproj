@@ -53,6 +53,9 @@
     <Compile Update="CreateGroupPage.xaml.cs">
       <DependentUpon>CreateGroupPage.xaml</DependentUpon>
     </Compile>
+    <Compile Update="JoinGroups.xaml.cs">
+      <DependentUpon>JoinGroups.xaml</DependentUpon>
+    </Compile>
     <Compile Update="GruopsChat.xaml.cs">
       <DependentUpon>GruopsChat.xaml</DependentUpon>
     </Compile>
@@ -60,6 +63,9 @@
 
   <ItemGroup>
     <MauiXaml Update="CreateGroupPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+    <MauiXaml Update="JoinGroups.xaml">
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
     <MauiXaml Update="GruopsChat.xaml">

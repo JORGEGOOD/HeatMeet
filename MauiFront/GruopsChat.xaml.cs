@@ -9,7 +9,6 @@ public partial class GroupsChat : ContentPage
     private bool _isChatActive;//for the clock
     private int _lastMessageId;
 
-
     public GroupsChat()
     {
         InitializeComponent();
@@ -23,7 +22,7 @@ public partial class GroupsChat : ContentPage
 
     public class MessageDto
     {
-        public int Id {  get; set; }
+        public int Id { get; set; }
         public int UserId { get; set; }
         public string Content { get; set; }
         public DateTime CreateDate { get; set; }
@@ -97,7 +96,7 @@ public partial class GroupsChat : ContentPage
         MessagesContainer.Children.Add(frame);
 
         //update _lastMessageDate
-        if(msg.Id > _lastMessageId)
+        if (msg.Id > _lastMessageId)
         {
             _lastMessageId = msg.Id;
         }
@@ -120,7 +119,7 @@ public partial class GroupsChat : ContentPage
 
         foreach (MessageDto? msg in mensajes)
         {
-           AddMessage(msg, currentUserId);
+            AddMessage(msg, currentUserId);
         }
         ScrollToBottom();
     }
@@ -141,7 +140,8 @@ public partial class GroupsChat : ContentPage
         int userId = Preferences.Get("userId", 0);
 
         if (groupId == 0)
-        {   await DisplayAlert("Error", "Chat couldn't be loaded ", "OK");
+        {
+            await DisplayAlert("Error", "Chat couldn't be loaded ", "OK");
             await DisplayAlert("DEBUG", $"groupId read: {groupId}", "OK");  /*return;*/
         }
 
@@ -156,10 +156,10 @@ public partial class GroupsChat : ContentPage
                 Command = "GET_GROUP_MESSAGES",
                 Data = new { groupId }
             };
-            
+
             //send command
             NetUtils.NetUtils.SendJson(socket, message);
-            
+
             //receive messages
             NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
 
@@ -177,7 +177,7 @@ public partial class GroupsChat : ContentPage
                 NetworkMessage ack = new NetworkMessage
                 {
                     Command = "ACK",
-                    Data = new {success = true}
+                    Data = new { success = true }
                 };
                 NetUtils.NetUtils.SendJson(socket, ack);
             }
@@ -235,7 +235,7 @@ public partial class GroupsChat : ContentPage
                     userId = userId
                 }
             };
-            
+
             //send json
             NetUtils.NetUtils.SendJson(socket, message);
 
@@ -243,10 +243,10 @@ public partial class GroupsChat : ContentPage
             NetworkMessage response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
             if (response.Data is JsonElement data)
             {
-                if(data.GetProperty("success").GetBoolean())
+                if (data.GetProperty("success").GetBoolean())
                 {
                     //message is success
-                    if(data.TryGetProperty("newId",out JsonElement idProp))
+                    if (data.TryGetProperty("newId", out JsonElement idProp))
                     {
                         _lastMessageId = idProp.GetInt32();
                     }
@@ -267,15 +267,16 @@ public partial class GroupsChat : ContentPage
                 string rawResponse = response?.Data?.ToString() ?? "null";
                 await DisplayAlert("ERROR FORMAT", $"Got somehting unexpected : {rawResponse}", "Ok");
             }
-            
+
         }
         catch (Exception ex)
         {
             await DisplayAlert("Error", ex.Message, "OK");
             //delete the message?
-        }finally
+        }
+        finally
         {
-            if(socket!=null) NetUtils.NetUtils.CloseSocket(socket);
+            if (socket != null) NetUtils.NetUtils.CloseSocket(socket);
             MessageEntry.Text = "";
         }
 
@@ -360,5 +361,4 @@ public partial class GroupsChat : ContentPage
         await DisplayAlert("Proposal", "Proposal clicked!", "OK");
     }
 }
-
 

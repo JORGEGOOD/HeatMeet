@@ -28,6 +28,8 @@ namespace HeatMeetServer
                 NetworkMessage response = ProcessCommand(message);
 
                 NetUtils.NetUtils.SendJson(client, response);
+                Console.WriteLine($" Answer sent");
+
             }
             catch (Exception ex)
             {
@@ -36,6 +38,7 @@ namespace HeatMeetServer
             finally
             {
                 NetUtils.NetUtils.CloseSocket(client);
+                Console.WriteLine(" Client disconnected");
             }
         }
     }
