@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-
 using System.Net.Sockets;
 using System.Text.Json;
+
 
 namespace MauiFront
 {
@@ -15,11 +15,12 @@ namespace MauiFront
         public List<object> Users { get; set; } = new();
         public List<object> Events { get; set; } = new();
         public List<object> Messages { get; set; } = new();
-        public string DisplayImage => "dotnet_bot.png";
+        public string DisplayImage => "logo.png";
     }
 
     public partial class GroupsPage : ContentPage
     {
+        bool isFabOpen = false;
         public GroupsPage()
         {
             InitializeComponent();
@@ -28,14 +29,15 @@ namespace MauiFront
         protected override async void OnAppearing()
         {
             base.OnAppearing();
+            await Task.Delay(100);//for possible bugs
             Shell.SetNavBarIsVisible(this, true);
 
             int userId = Preferences.Get("userId", 0);
             if (userId == 0) return;
-
+            Socket socket = null;
             try
             {
-                Socket socket = NetUtils.NetUtils.CreateClientSocket("10.0.2.2", 8888);
+                socket = NetUtils.NetUtils.ConnectToServer();
                 SharedModels.NetworkMessage message = new SharedModels.NetworkMessage
                 {
                     Command = "GET_USER_GROUPS",
@@ -44,7 +46,7 @@ namespace MauiFront
 
                 NetUtils.NetUtils.SendJson(socket, message);
                 SharedModels.NetworkMessage response = NetUtils.NetUtils.ReceiveJson<SharedModels.NetworkMessage>(socket);
-                NetUtils.NetUtils.CloseSocket(socket);
+                
 
                 if (response.Data is JsonElement data)
                 {
@@ -58,15 +60,18 @@ namespace MauiFront
                         GroupsCollection.ItemsSource = grupos;
                     }
                 }
-
             }
             catch (Exception ex)
             {
                 await DisplayAlert("Error", "No se pudieron cargar los grupos: " + ex.Message, "OK");
             }
+            finally
+            {
+                if(socket != null) NetUtils.NetUtils.CloseSocket(socket);
+            }
         }
 
-        // Pulsar un grupo → ir al chat
+        //Clic on group → go to chat
         private async void OnGroupTapped(object sender, EventArgs e)
         {
             if (sender is Frame frame && frame.BindingContext is Group grupo)
@@ -78,11 +83,63 @@ namespace MauiFront
             }
         }
 
+        //Animation button create or join croup
+        private async void ToggleFabMenu(object sender, EventArgs e)
+        {
+            if (!isFabOpen)
+            {
+                Overlay.IsVisible = true;
+                CrearLayout.IsVisible = true;
+                UnirseLayout.IsVisible = true;
 
-        // Botón "+" → ir a crear/unirse a grupo
-        private async void CrearNuevoGrupo(object sender, EventArgs e)
+                await Task.WhenAll(
+                    Overlay.FadeTo(1, 200),
+
+                    CrearLayout.FadeTo(1, 200),
+                    CrearLayout.TranslateTo(0, -20, 200, Easing.SinOut),
+                    CrearLayout.ScaleTo(1, 200),
+
+                    UnirseLayout.FadeTo(1, 200),
+                    UnirseLayout.TranslateTo(0, -20, 200, Easing.SinOut),
+                    UnirseLayout.ScaleTo(1, 200),
+
+                    FabButton.RotateTo(45, 200)
+                );
+            }
+            else
+            {
+                await Task.WhenAll(
+                    Overlay.FadeTo(0, 150),
+
+                    CrearLayout.FadeTo(0, 150),
+                    CrearLayout.ScaleTo(0.8, 150),
+
+                    UnirseLayout.FadeTo(0, 150),
+                    UnirseLayout.ScaleTo(0.8, 150),
+
+                    FabButton.RotateTo(0, 200)
+                );
+
+                Overlay.IsVisible = false;
+                CrearLayout.IsVisible = false;
+                UnirseLayout.IsVisible = false;
+            }
+
+            isFabOpen = !isFabOpen;
+        }
+
+        
+       
+        
+        private async void CreateNewGroup(object sender, EventArgs e)
         {
             await Navigation.PushAsync(new CreateGroupPage());
+        }
+
+       
+        private async void IrUnirseGrupo(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new JoinGroups()); 
         }
     }
 }
