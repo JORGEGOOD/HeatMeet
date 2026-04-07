@@ -10,6 +10,9 @@ public partial class GroupsChat : ContentPage
     private bool _isChatActive;
     private int _lastMessageId;
 
+
+
+
     public GroupsChat()
     {
         InitializeComponent();
@@ -50,7 +53,7 @@ public partial class GroupsChat : ContentPage
 
         var nameLabel = new Label
         {
-            Text = isMine ? "Tú" : (msg.UserName ?? "Usuario"),
+            Text = isMine ? "Tú " : (msg.UserName ?? "Usuario"),
             FontSize = 11,
             FontAttributes = FontAttributes.Bold,
             TextColor = isMine ? Color.FromArgb("#8BA3D4") : Color.FromArgb("#FF6A00"),
@@ -273,15 +276,20 @@ public partial class GroupsChat : ContentPage
 
                     if (newMessages != null && newMessages.Count > 0)
                     {
-                        int currentUserId = Preferences.Get("userId", 0);
-                        MainThread.BeginInvokeOnMainThread(() =>
+                        int maxIdreceived = newMessages.Max(m  => m.Id);
+                        _lastMessageId = maxIdreceived;
+                        if (maxIdreceived > _lastMessageId)
                         {
-                            foreach (var msg in newMessages.OrderBy(m => m.Id))
+                            int currentUserId = Preferences.Get("userId", 0);
+                            MainThread.BeginInvokeOnMainThread(() =>
                             {
-                                if (msg.Id > _lastMessageId)
-                                    AddMessage(msg, currentUserId);
-                            }
-                        });
+                                foreach (var msg in newMessages.OrderBy(m => m.Id))
+                                {
+                                    if (msg.Id > _lastMessageId)
+                                        AddMessage(msg, currentUserId);
+                                }
+                            });
+                        }
                     }
                 }
             }
@@ -302,6 +310,10 @@ public partial class GroupsChat : ContentPage
         base.OnDisappearing();
         _isChatActive = false;
     }
+
+
+
+
 
     // =========================================================================
     // MENÚ 3 PUNTOS

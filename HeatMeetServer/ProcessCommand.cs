@@ -206,7 +206,7 @@ namespace HeatMeetServer
                                     ormManager.Messages.Add(newMessage);
                                     ormManager.SaveChanges();
                                     Console.WriteLine($@"New message saved to Orm from {userId}: {content}");
-                                    //send success to client 
+                                    //send success to client AND message Id
                                     response.Data = new { success = true, newId = newMessage.Id };
                                 }
                             }
