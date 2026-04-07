@@ -1,12 +1,13 @@
 ﻿using System.Net.Sockets;
 using System.Text.Json;
 using SharedModels;
-using System.Net.Sockets;
+
 namespace MauiFront;
+
 public partial class GroupsChat : ContentPage
 {
-    //generals
-    private bool _isChatActive;//for the clock
+    // ─── Generales ────────────────────────────────────────────────────────────
+    private bool _isChatActive;
     private int _lastMessageId;
 
     public GroupsChat()
@@ -19,23 +20,24 @@ public partial class GroupsChat : ContentPage
         await Navigation.PopAsync();
     }
 
-
+    // ─── DTO ──────────────────────────────────────────────────────────────────
     public class MessageDto
     {
         public int Id { get; set; }
         public int UserId { get; set; }
         public string Content { get; set; }
         public DateTime CreateDate { get; set; }
-        public int userId { get; set; }
+        public int userId { get; set; }   // alias por si el servidor devuelve minúscula
         public string UserName { get; set; }
     }
 
+    // ─── Mensajes ─────────────────────────────────────────────────────────────
     void AddMessage(MessageDto? msg, int currentUserId)
     {
         int senderId = msg.UserId != 0 ? msg.UserId : msg.userId;
         bool isMine = senderId == currentUserId;
 
-        // Top row: Name | Date and time 
+        // Cabecera: Nombre | Fecha hora
         var headerGrid = new Grid
         {
             ColumnDefinitions =
@@ -46,8 +48,7 @@ public partial class GroupsChat : ContentPage
             Margin = new Thickness(2, 0, 2, 3)
         };
 
-        // Name 
-        var nameLabel = new Label //And this loads the content of the frame
+        var nameLabel = new Label
         {
             Text = isMine ? "Tú" : (msg.UserName ?? "Usuario"),
             FontSize = 11,
@@ -56,7 +57,6 @@ public partial class GroupsChat : ContentPage
             HorizontalOptions = LayoutOptions.Start
         };
 
-        // Date and time (right)
         var dateLabel = new Label
         {
             Text = msg.CreateDate.ToLocalTime().ToString("dd/MM  HH:mm"),
@@ -68,7 +68,6 @@ public partial class GroupsChat : ContentPage
         headerGrid.Add(nameLabel, 0, 0);
         headerGrid.Add(dateLabel, 1, 0);
 
-        // Message content
         var contentLabel = new Label
         {
             Text = msg.Content,
@@ -76,14 +75,13 @@ public partial class GroupsChat : ContentPage
             TextColor = isMine ? Colors.White : Color.FromArgb("#222")
         };
 
-        // content Cheader + mensaje 
         var bubble = new VerticalStackLayout
         {
             Spacing = 0,
             Children = { headerGrid, contentLabel }
         };
 
-        var frame = new Frame //This loads all the css from the message
+        var frame = new Frame
         {
             BackgroundColor = isMine ? Color.FromArgb("#2C3E6B") : Colors.White,
             CornerRadius = 16,
@@ -95,85 +93,66 @@ public partial class GroupsChat : ContentPage
 
         MessagesContainer.Children.Add(frame);
 
-        //update _lastMessageDate
         if (msg.Id > _lastMessageId)
-        {
             _lastMessageId = msg.Id;
-        }
 
         ScrollToBottom();
-
     }
 
     private async void ScrollToBottom()
     {
-        // Esperamos un instante a que el layout se actualice con el nuevo mensaje
         await Task.Delay(50);
         await ChatScrollView.ScrollToAsync(MessagesContainer, ScrollToPosition.End, false);
     }
 
-
     void LoadMessages(List<MessageDto> mensajes, int currentUserId)
     {
-        MessagesContainer.Children.Clear();//Clears residual messages from another group chat
-
+        MessagesContainer.Children.Clear();
         foreach (MessageDto? msg in mensajes)
-        {
             AddMessage(msg, currentUserId);
-        }
         ScrollToBottom();
     }
 
-    //Get group info and messages and update the page
+    // ─── OnAppearing ──────────────────────────────────────────────────────────
     protected override async void OnAppearing()
     {
         base.OnAppearing();
         _isChatActive = true;
         Task.Run(async () => await RefreshMessagesLoop());
 
-
         string groupName = Preferences.Get("groupName", "(Grupo)");
         GroupNameLabel.Text = groupName;
 
         int groupId = Preferences.Get("groupId", 0);
-
         int userId = Preferences.Get("userId", 0);
 
         if (groupId == 0)
         {
-            await DisplayAlert("Error", "Chat couldn't be loaded ", "OK");
-            await DisplayAlert("DEBUG", $"groupId read: {groupId}", "OK");  /*return;*/
+            await DisplayAlert("Error", "El chat no se pudo cargar.", "OK");
+            return;
         }
 
         try
         {
-            //connect to server
             Socket socket = NetUtils.NetUtils.ConnectToServer();
 
-            //build json
             NetworkMessage message = new NetworkMessage
             {
                 Command = "GET_GROUP_MESSAGES",
                 Data = new { groupId }
             };
 
-            //send command
             NetUtils.NetUtils.SendJson(socket, message);
-
-            //receive messages
             NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
 
-            //if message is sucess
             if (response.Data is JsonElement data && data.GetProperty("success").GetBoolean())
             {
-                var messagesJson = data.GetProperty("messages").GetRawText();//get messages to raw text
-                var messages = JsonSerializer.Deserialize<List<MessageDto>>(messagesJson); //convert to raw text 
+                var messagesJson = data.GetProperty("messages").GetRawText();
+                var messages = JsonSerializer.Deserialize<List<MessageDto>>(messagesJson);
 
                 messages = messages.OrderBy(m => m.CreateDate).ToList();
-
                 LoadMessages(messages, userId);
 
-                //send ok to server
                 NetworkMessage ack = new NetworkMessage
                 {
                     Command = "ACK",
@@ -190,114 +169,88 @@ public partial class GroupsChat : ContentPage
         }
     }
 
-
-
-    //Send message
+    // ─── Enviar mensaje ───────────────────────────────────────────────────────
     private async void OnSendTapped(object sender, EventArgs e)
     {
         if (string.IsNullOrWhiteSpace(MessageEntry.Text)) return;
 
-
         Socket? socket = null;
         try
         {
-            //connect to server
             socket = NetUtils.NetUtils.ConnectToServer();
 
-            //servermessage logic
-
-            //get data
             string content = MessageEntry.Text;
             int groupId = Preferences.Get("groupId", 0);
             int userId = Preferences.Get("userId", 0);
 
-
+            // Mensaje optimista
             MessageDto messageFront = new MessageDto
             {
-                Id = 0, //<-- Only for the optimistic message
+                Id = 0,
                 Content = content,
                 UserId = userId,
                 UserName = "Tú",
                 CreateDate = DateTime.Now
             };
-
             AddMessage(messageFront, userId);
 
-
-            //build json
             NetworkMessage message = new NetworkMessage
             {
                 Command = "SEND_CHAT_MESSAGE",
-                Data = new
-                {
-                    content = content,
-                    groupId = groupId,
-                    userId = userId
-                }
+                Data = new { content, groupId, userId }
             };
 
-            //send json
             NetUtils.NetUtils.SendJson(socket, message);
-
-            //receive ok
             NetworkMessage response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
+
             if (response.Data is JsonElement data)
             {
                 if (data.GetProperty("success").GetBoolean())
                 {
-                    //message is success
                     if (data.TryGetProperty("newId", out JsonElement idProp))
-                    {
                         _lastMessageId = idProp.GetInt32();
-                    }
                 }
                 else
                 {
-                    //Extended json error
                     string serverMsg = data.TryGetProperty("message", out JsonElement msgProp)
                                        ? msgProp.GetString()
-                                       : "No error details provided";
-
-                    await DisplayAlert("ERROR SERVER", serverMsg, "Ok");
+                                       : "Sin detalles del error";
+                    await DisplayAlert("Error del servidor", serverMsg, "OK");
                 }
             }
             else
             {
-                //Extended format error
                 string rawResponse = response?.Data?.ToString() ?? "null";
-                await DisplayAlert("ERROR FORMAT", $"Got somehting unexpected : {rawResponse}", "Ok");
+                await DisplayAlert("Error de formato", $"Respuesta inesperada: {rawResponse}", "OK");
             }
-
         }
         catch (Exception ex)
         {
             await DisplayAlert("Error", ex.Message, "OK");
-            //delete the message?
         }
         finally
         {
             if (socket != null) NetUtils.NetUtils.CloseSocket(socket);
             MessageEntry.Text = "";
         }
-
-
     }
 
+    // ─── Loop de refresco ─────────────────────────────────────────────────────
     private bool _isProcessingNetwork = false;
+
     private async Task RefreshMessagesLoop()
     {
         while (_isChatActive)
         {
             await Task.Delay(2000);
 
-            if (_isProcessingNetwork) continue;//this is an artificial lock but ultimately does nothing, just prevents damage
+            if (_isProcessingNetwork) continue;
 
             Socket socket = null;
             try
             {
                 _isProcessingNetwork = true;
                 socket = NetUtils.NetUtils.ConnectToServer();
-
                 if (socket == null) continue;
 
                 var message = new NetworkMessage
@@ -344,21 +297,207 @@ public partial class GroupsChat : ContentPage
         }
     }
 
-
-
-
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
         _isChatActive = false;
     }
 
+    // =========================================================================
+    // MENÚ 3 PUNTOS
+    // =========================================================================
 
-
-    //remove this entirely, or do it good enough
-    private async void OnProposalTapped(object sender, EventArgs e)
+    private async void OnMenuTapped(object sender, EventArgs e)
     {
-        await DisplayAlert("Proposal", "Proposal clicked!", "OK");
+        // Etiqueta del botón de silencio dinámica según preferencia actual
+        int groupId = Preferences.Get("groupId", 0);
+        bool isMuted = Preferences.Get($"muted_group_{groupId}", false);
+        string muteText = isMuted ? "🔔 Activar notificaciones" : "🔕 Silenciar notificaciones";
+
+        string action = await DisplayActionSheet(
+            "Opciones del grupo",
+            "Cancelar",
+            null,
+            "📋 Copiar código del grupo",
+            "ℹ️  Info del grupo",
+            muteText,
+            "🚪 Salir del grupo"
+        );
+
+        switch (action)
+        {
+            case "📋 Copiar código del grupo":
+                await OnCopyGroupCode();
+                break;
+            case "ℹ️  Info del grupo":
+                await OnGroupInfo();
+                break;
+            case "🔕 Silenciar notificaciones":
+            case "🔔 Activar notificaciones":
+                OnMuteToggle();
+                break;
+            case "🚪 Salir del grupo":
+                await OnLeaveGroup();
+                break;
+        }
+    }
+
+    // ─── Copiar código del grupo ──────────────────────────────────────────────
+    private async Task OnCopyGroupCode()
+    {
+        int groupId = Preferences.Get("groupId", 0);
+        Socket socket = null;
+        try
+        {
+            socket = NetUtils.NetUtils.ConnectToServer();
+
+            var message = new NetworkMessage
+            {
+                Command = "GET_GROUP_CODE",
+                Data = new { groupId }
+            };
+            NetUtils.NetUtils.SendJson(socket, message);
+
+            var response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
+
+            if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
+            {
+                string code = data.GetProperty("code").GetString();
+                await Clipboard.Default.SetTextAsync(code);
+                await DisplayAlert("✅ Código copiado",
+                    $"Código del grupo:\n\n{code}\n\nYa está en tu portapapeles.", "OK");
+            }
+            else
+            {
+                string serverMsg = response?.Data is JsonElement d2 &&
+                                   d2.TryGetProperty("message", out JsonElement mp)
+                                   ? mp.GetString() : "No se pudo obtener el código.";
+                await DisplayAlert("Error", serverMsg, "OK");
+            }
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Error", ex.Message, "OK");
+        }
+        finally
+        {
+            if (socket != null) NetUtils.NetUtils.CloseSocket(socket);
+        }
+    }
+
+    // ─── Info del grupo ───────────────────────────────────────────────────────
+    private async Task OnGroupInfo()
+    {
+        int groupId = Preferences.Get("groupId", 0);
+        string groupName = Preferences.Get("groupName", "(Grupo)");
+        Socket socket = null;
+        try
+        {
+            socket = NetUtils.NetUtils.ConnectToServer();
+
+            var message = new NetworkMessage
+            {
+                Command = "GET_GROUP_INFO",
+                Data = new { groupId }
+            };
+            NetUtils.NetUtils.SendJson(socket, message);
+
+            var response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
+
+            if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
+            {
+                int memberCount = data.GetProperty("memberCount").GetInt32();
+                string createdBy = data.GetProperty("createdBy").GetString();
+                string createdAt = data.GetProperty("createdAt").GetString();
+
+                await DisplayAlert(
+                    $"ℹ️ {groupName}",
+                    $"👥 Miembros: {memberCount}\n" +
+                    $"👤 Creado por: {createdBy}\n" +
+                    $"📅 Fecha: {createdAt}",
+                    "Cerrar");
+            }
+            else
+            {
+                // Fallback con datos locales si el servidor aún no lo implementa
+                await DisplayAlert($"ℹ️ {groupName}", $"ID del grupo: {groupId}", "Cerrar");
+            }
+        }
+        catch (Exception)
+        {
+            await DisplayAlert($"ℹ️ {groupName}", $"ID del grupo: {groupId}", "Cerrar");
+        }
+        finally
+        {
+            if (socket != null) NetUtils.NetUtils.CloseSocket(socket);
+        }
+    }
+
+    // ─── Silenciar / activar notificaciones (preferencia local) ──────────────
+    private void OnMuteToggle()
+    {
+        int groupId = Preferences.Get("groupId", 0);
+        string key = $"muted_group_{groupId}";
+        bool isMuted = Preferences.Get(key, false);
+
+        Preferences.Set(key, !isMuted);
+
+        string msg = !isMuted
+            ? "🔕 Notificaciones silenciadas para este grupo."
+            : "🔔 Notificaciones activadas para este grupo.";
+
+        MainThread.BeginInvokeOnMainThread(async () =>
+            await DisplayAlert("Notificaciones", msg, "OK"));
+    }
+
+    // ─── Salir del grupo ──────────────────────────────────────────────────────
+    private async Task OnLeaveGroup()
+    {
+        bool confirm = await DisplayAlert(
+            "🚪 Salir del grupo",
+            "¿Seguro que quieres salir? Ya no podrás leer los mensajes de este grupo.",
+            "Salir",
+            "Cancelar");
+
+        if (!confirm) return;
+
+        int groupId = Preferences.Get("groupId", 0);
+        int userId = Preferences.Get("userId", 0);
+        Socket socket = null;
+        try
+        {
+            socket = NetUtils.NetUtils.ConnectToServer();
+
+            var message = new NetworkMessage
+            {
+                Command = "LEAVE_GROUP",
+                Data = new { groupId, userId }
+            };
+            NetUtils.NetUtils.SendJson(socket, message);
+
+            var response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
+
+            if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
+            {
+                _isChatActive = false; // detiene el loop de refresco
+                await DisplayAlert("👋", "Has salido del grupo.", "OK");
+                await Navigation.PopAsync();
+            }
+            else
+            {
+                string serverMsg = response?.Data is JsonElement d2 &&
+                                   d2.TryGetProperty("message", out JsonElement mp)
+                                   ? mp.GetString() : "No se pudo salir del grupo.";
+                await DisplayAlert("Error", serverMsg, "OK");
+            }
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Error", ex.Message, "OK");
+        }
+        finally
+        {
+            if (socket != null) NetUtils.NetUtils.CloseSocket(socket);
+        }
     }
 }
-

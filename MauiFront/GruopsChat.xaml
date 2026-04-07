@@ -53,11 +53,16 @@
 
 
             <!-- Tres puntos -->
-            <Label Grid.Column="3"
-                   Text="⋮"
-                   FontSize="22"
-                   VerticalOptions="Center"
-                   HorizontalOptions="Center"/>
+            <Button Grid.Column="3"
+                    Text="⋮"
+                    FontSize="22"
+                    BackgroundColor="Transparent"
+                    TextColor="Black"
+                    HorizontalOptions="End"
+                    VerticalOptions="Center"
+                    Clicked="OnMenuTapped"
+                    Padding="8,4"
+                    Margin="0,0,20,0"/> 
         </Grid>
 
         <!-- Messages -->
