@@ -6,12 +6,8 @@ namespace MauiFront;
 
 public partial class GroupsChat : ContentPage
 {
-    // ─── Generales ────────────────────────────────────────────────────────────
     private bool _isChatActive;
     private int _lastMessageId;
-
-
-
 
     public GroupsChat()
     {
@@ -23,24 +19,21 @@ public partial class GroupsChat : ContentPage
         await Navigation.PopAsync();
     }
 
-    // ─── DTO ──────────────────────────────────────────────────────────────────
     public class MessageDto
     {
         public int Id { get; set; }
         public int UserId { get; set; }
         public string Content { get; set; }
         public DateTime CreateDate { get; set; }
-        public int userId { get; set; }   // alias por si el servidor devuelve minúscula
+        public int userId { get; set; }
         public string UserName { get; set; }
     }
 
-    // ─── Mensajes ─────────────────────────────────────────────────────────────
     void AddMessage(MessageDto? msg, int currentUserId)
     {
         int senderId = msg.UserId != 0 ? msg.UserId : msg.userId;
         bool isMine = senderId == currentUserId;
 
-        // Cabecera: Nombre | Fecha hora
         var headerGrid = new Grid
         {
             ColumnDefinitions =
@@ -115,8 +108,6 @@ public partial class GroupsChat : ContentPage
             AddMessage(msg, currentUserId);
         ScrollToBottom();
     }
-
-    // ─── OnAppearing ──────────────────────────────────────────────────────────
     protected override async void OnAppearing()
     {
         base.OnAppearing();
@@ -131,7 +122,7 @@ public partial class GroupsChat : ContentPage
 
         if (groupId == 0)
         {
-            await DisplayAlert("Error", "El chat no se pudo cargar.", "OK");
+            await DisplayAlert("Error", "Chat couldn't be loaded", "OK");
             return;
         }
 
@@ -172,7 +163,6 @@ public partial class GroupsChat : ContentPage
         }
     }
 
-    // ─── Enviar mensaje ───────────────────────────────────────────────────────
     private async void OnSendTapped(object sender, EventArgs e)
     {
         if (string.IsNullOrWhiteSpace(MessageEntry.Text)) return;
@@ -186,7 +176,7 @@ public partial class GroupsChat : ContentPage
             int groupId = Preferences.Get("groupId", 0);
             int userId = Preferences.Get("userId", 0);
 
-            // Mensaje optimista
+            //Optimism chat technology --> Creates content-only message and refill when server sends details
             MessageDto messageFront = new MessageDto
             {
                 Id = 0,
@@ -217,14 +207,14 @@ public partial class GroupsChat : ContentPage
                 {
                     string serverMsg = data.TryGetProperty("message", out JsonElement msgProp)
                                        ? msgProp.GetString()
-                                       : "Sin detalles del error";
-                    await DisplayAlert("Error del servidor", serverMsg, "OK");
+                                       : "Without error details. ";
+                    await DisplayAlert("Server error: ", serverMsg, "OK");
                 }
             }
             else
             {
                 string rawResponse = response?.Data?.ToString() ?? "null";
-                await DisplayAlert("Error de formato", $"Respuesta inesperada: {rawResponse}", "OK");
+                await DisplayAlert("Format error", $"Unexpected error: {rawResponse}", "OK");
             }
         }
         catch (Exception ex)
@@ -238,10 +228,9 @@ public partial class GroupsChat : ContentPage
         }
     }
 
-    // ─── Loop de refresco ─────────────────────────────────────────────────────
-    private bool _isProcessingNetwork = false;
 
-    private async Task RefreshMessagesLoop()
+    private bool _isProcessingNetwork = false;
+    private async Task RefreshMessagesLoop()//infinite thread of new message lookups
     {
         while (_isChatActive)
         {
@@ -316,17 +305,18 @@ public partial class GroupsChat : ContentPage
 
 
     // =========================================================================
-    // MENÚ 3 PUNTOS
+    // 3 Point menú
     // =========================================================================
 
     private async void OnMenuTapped(object sender, EventArgs e)
     {
-        // Etiqueta del botón de silencio dinámica según preferencia actual
+        //Dynamic mute button label based on current preference
         int groupId = Preferences.Get("groupId", 0);
         bool isMuted = Preferences.Get($"muted_group_{groupId}", false);
         string muteText = isMuted ? "🔔 Activar notificaciones" : "🔕 Silenciar notificaciones";
 
-        string action = await DisplayActionSheet(
+        string action = await DisplayActionSheet
+        (
             "Opciones del grupo",
             "Cancelar",
             null,
@@ -354,7 +344,7 @@ public partial class GroupsChat : ContentPage
         }
     }
 
-    // ─── Copiar código del grupo ──────────────────────────────────────────────
+    // ─── Copy code group ──────────────────────────────────────────────
     private async Task OnCopyGroupCode()
     {
         int groupId = Preferences.Get("groupId", 0);
@@ -397,7 +387,7 @@ public partial class GroupsChat : ContentPage
         }
     }
 
-    // ─── Info del grupo ───────────────────────────────────────────────────────
+    // ─── Group info ───────────────────────────────────────────────────────
     private async Task OnGroupInfo()
     {
         int groupId = Preferences.Get("groupId", 0);
@@ -431,7 +421,7 @@ public partial class GroupsChat : ContentPage
             }
             else
             {
-                // Fallback con datos locales si el servidor aún no lo implementa
+                // Fallback with local data if the server does not yet implement it
                 await DisplayAlert($"ℹ️ {groupName}", $"ID del grupo: {groupId}", "Cerrar");
             }
         }
@@ -445,7 +435,7 @@ public partial class GroupsChat : ContentPage
         }
     }
 
-    // ─── Silenciar / activar notificaciones (preferencia local) ──────────────
+    // ─── Mute / Unmute notifications (local preference) ──────────────
     private void OnMuteToggle()
     {
         int groupId = Preferences.Get("groupId", 0);
@@ -462,7 +452,7 @@ public partial class GroupsChat : ContentPage
             await DisplayAlert("Notificaciones", msg, "OK"));
     }
 
-    // ─── Salir del grupo ──────────────────────────────────────────────────────
+    // ─── Leave the group ───────────────────────────────────────────────────
     private async Task OnLeaveGroup()
     {
         bool confirm = await DisplayAlert(
@@ -491,7 +481,7 @@ public partial class GroupsChat : ContentPage
 
             if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
             {
-                _isChatActive = false; // detiene el loop de refresco
+                _isChatActive = false; //stops the refresh loop
                 await DisplayAlert("👋", "Has salido del grupo.", "OK");
                 await Navigation.PopAsync();
             }
