@@ -40,33 +40,31 @@ namespace MauiFront
 
         private async void OnSchedulerTapped(object sender, SchedulerTappedEventArgs e)
         {
-            // Verificamos que sea un día válido
-            if (e.Element == SchedulerElement.SchedulerCell && e.Date.HasValue)
+            // Si estamos en el MES, al tocar un día viajamos al DÍA
+            if (SchedulerControl.View == SchedulerView.Month)
             {
-                DateTime fechaSeleccionada = e.Date.Value;
-
-                // 1. Esto abre una ventana con teclado para escribir
-                string nombreEvento = await DisplayPromptAsync("Nuevo Evento",
-                    $"¿Qué quieres agendar para el {fechaSeleccionada:dd/MM}?",
-                    accept: "Guardar",
-                    cancel: "Cancelar",
-                    placeholder: "Ej: Reunión de estudio");
-
-                // 2. Si el usuario no canceló y escribió algo
-                if (!string.IsNullOrWhiteSpace(nombreEvento))
+                if (e.Element == SchedulerElement.SchedulerCell && e.Date.HasValue)
                 {
-                    // 3. Creamos el evento con lo que el usuario escribió
-                    var nuevoEvento = new SchedulerAppointment
+                    SchedulerControl.DisplayDate = e.Date.Value;
+                    SchedulerControl.View = SchedulerView.Day;
+                }
+            }
+            // Si ya estamos en el DÍA, entonces sí pedimos el nombre del evento
+            else if (SchedulerControl.View == SchedulerView.Day)
+            {
+                if (e.Element == SchedulerElement.SchedulerCell && e.Date.HasValue)
+                {
+                    string nombre = await DisplayPromptAsync("Nuevo Evento", "Nombre:", "OK", "Cancelar");
+                    if (!string.IsNullOrWhiteSpace(nombre))
                     {
-                        StartTime = fechaSeleccionada,
-                        EndTime = fechaSeleccionada.AddHours(1),
-                        Subject = nombreEvento, // Aquí se pone lo que escribiste
-                        Background = Color.FromArgb("#0A2A43"), // Tu azul oscuro
-                        Notes = "Evento de grupo"
-                    };
-
-                    // 4. Lo añadimos a la lista para que se vea en el calendario
-                    EventosAgendados.Add(nuevoEvento);
+                        EventosAgendados.Add(new SchedulerAppointment
+                        {
+                            StartTime = e.Date.Value,
+                            EndTime = e.Date.Value.AddHours(1),
+                            Subject = nombre,
+                            Background = Color.FromArgb("#FF6A00")
+                        });
+                    }
                 }
             }
         }
@@ -187,6 +185,13 @@ namespace MauiFront
         private async void IrUnirseGrupo(object sender, EventArgs e)
         {
             await Navigation.PushAsync(new JoinGroups()); 
+        }
+
+        
+        private void VolverAlMes_Clicked(object sender, EventArgs e)
+        {
+            
+            SchedulerControl.View = SchedulerView.Month;
         }
     }
 }
