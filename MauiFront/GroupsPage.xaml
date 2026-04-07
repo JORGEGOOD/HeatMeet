@@ -1,5 +1,7 @@
 ﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:calendar="clr-namespace:Syncfusion.Maui.Calendar;assembly=Syncfusion.Maui.Calendar"
+             xmlns:scheduler="clr-namespace:Syncfusion.Maui.Scheduler;assembly=Syncfusion.Maui.Scheduler"
              x:Class="MauiFront.GroupsPage"
              Title="Grupos"
              BackgroundColor="#F5EDE3">
@@ -9,18 +11,20 @@
         <ScrollView ZIndex="1">
             <VerticalStackLayout Spacing="0">
 
-                <Frame HeightRequest="300" 
-                       Margin="15,15,15,5"
-                       BackgroundColor="White"
-                       CornerRadius="20"
-                       BorderColor="Transparent"
-                       HasShadow="True">
-                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
-                        <Label Text="📅" FontSize="40" HorizontalOptions="Center"/>
-                        <Label Text="Espacio para Calendario General" 
-                               TextColor="Gray" 
-                               FontAttributes="Italic"/>
-                    </VerticalStackLayout>
+                <Frame HeightRequest="450" 
+                   Margin="15,15,15,5"
+                   BackgroundColor="White"
+                   CornerRadius="20"
+                   HasShadow="True"
+                   Padding="0">
+
+                    <scheduler:SfScheduler x:Name="SchedulerControl"
+                       View="Month"
+                       Tapped="OnSchedulerTapped"
+                       AppointmentsSource="{Binding EventosAgendados}"
+                       HeightRequest="450"
+                       Margin="15">
+                    </scheduler:SfScheduler>
                 </Frame>
 
                 <Label Text="Mis Grupos" 
@@ -30,7 +34,7 @@
                        Margin="20,10,0,0"/>
 
                 <CollectionView x:Name="GroupsCollection"
-                                Margin="15,0,15,100" SelectionMode="None">>
+                                Margin="15,0,15,100" SelectionMode="None">
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
                             <Frame Margin="0,10"
