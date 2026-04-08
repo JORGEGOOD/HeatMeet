@@ -364,7 +364,7 @@ public partial class GroupsChat : ContentPage
 
             if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
             {
-                string code = data.GetProperty("code").GetString();
+                string code = data.GetProperty("inviteCode").GetString();                     
                 await Clipboard.Default.SetTextAsync(code);
                 await DisplayAlert("✅ Código copiado",
                     $"Código del grupo:\n\n{code}\n\nYa está en tu portapapeles.", "OK");

@@ -34,7 +34,7 @@ namespace HeatMeetServer
 
                                 lock (ormLock)
                                 {
-                                    var user = ormManager.Users.FirstOrDefault(u => u.Email == email || u.Name == email);
+                                    Users? user = ormManager.Users.FirstOrDefault(u => u.Email == email || u.Name == email);
 
 
                                     if (user == null)
@@ -58,7 +58,7 @@ namespace HeatMeetServer
                                 string password = registerData.GetProperty("password").GetString() ?? "";
                                 lock (ormLock)
                                 {
-                                    var exists = ormManager.Users.FirstOrDefault(u => u.Email == email);
+                                    Users? exists = ormManager.Users.FirstOrDefault(u => u.Email == email);
 
                                     if (exists != null)
                                         response.Data = new { success = false, message = "Email already registered" };
@@ -83,7 +83,7 @@ namespace HeatMeetServer
 
                                 lock (ormLock)
                                 {
-                                    var user = ormManager.Users.FirstOrDefault(u => u.Id == adminId);
+                                    Users? user = ormManager.Users.FirstOrDefault(u => u.Id == adminId);
 
                                     if (user == null)
                                         response.Data = new { success = false, message = "User not found", inviteCode = "" };
@@ -114,8 +114,8 @@ namespace HeatMeetServer
 
                                 lock (ormLock)
                                 {
-                                    var group = ormManager.Groups.Include(g => g.Users).FirstOrDefault(g => g.InviteCode == inviteCode);
-                                    var user = ormManager.Users.FirstOrDefault(u => u.Id == userId);
+                                    Groups? group = ormManager.Groups.Include(g => g.Users).FirstOrDefault(g => g.InviteCode == inviteCode);
+                                    Users? user = ormManager.Users.FirstOrDefault(u => u.Id == userId);
 
                                     if (group == null)
                                         response.Data = new { success = false, message = "Group not found" };
@@ -202,7 +202,6 @@ namespace HeatMeetServer
                                     int userId = userMessages.GetProperty("userId").GetInt32();
                                     int groupId = userMessages.GetProperty("groupId").GetInt32();
 
-
                                     //construct message
                                     Messages newMessage = new Messages
                                     {
@@ -224,7 +223,7 @@ namespace HeatMeetServer
                                 }
                                 catch (Exception ex)
                                 {
-                                    String? realError = ex.InnerException?.Message ?? ex.Message;
+                                    string? realError = ex.InnerException?.Message ?? ex.Message;
                                     Console.WriteLine($"DATABASE ERROR: {realError}");
 
                                     response.Data = new { success = false, message = "DB Error: " + realError };
@@ -271,7 +270,18 @@ namespace HeatMeetServer
                             //    Data = new { groupId }
                             //};
 
-                            var groupId = 0;
+                            if(message.Data is JsonElement userGroupData)
+                            {
+                                //get groupId
+                                int? groupId = userGroupData.GetProperty("groupId").GetInt32();
+
+                                //select the group code
+                                string? inviteCode = ormManager.Groups.FirstOrDefault(m => m.Id == groupId).InviteCode;
+
+                                //return data
+                                response.Data = new {success =true, inviteCode = inviteCode};
+                            }
+                            
 
                         }
                         break;
