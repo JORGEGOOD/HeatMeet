@@ -24,7 +24,6 @@ namespace HeatMeetServer
                             //nothing here
                         }
                         break;
-
                     case "LOGIN":
                         {
                             if (message.Data is JsonElement loginData)
@@ -48,7 +47,6 @@ namespace HeatMeetServer
                             else response.Data = new { success = false, message = "Invalid data", userId = 0, userName = "" };
                         }
                         break;
-
                     case "REGISTER":
                         {
                             if (message.Data is JsonElement registerData)
@@ -73,7 +71,6 @@ namespace HeatMeetServer
                             else response.Data = new { success = false, message = "Invalid data" };
                         }
                         break;
-
                     case "CREATE_GROUP":
                         {
                             if (message.Data is JsonElement createGroupData)
@@ -190,7 +187,6 @@ namespace HeatMeetServer
                             else response.Data = new { success = false, message = "Invalid data" };
                         }
                         break;
-
                     case "SEND_CHAT_MESSAGE":
                         {
                             if (message.Data is JsonElement userMessages)
@@ -232,8 +228,7 @@ namespace HeatMeetServer
                             else response.Data = new { success = false, message = "Invalid data" };
                         }
                         break;
-
-                    case "RELOAD_CHAT_MESSAGES":
+                    case "RELOAD_CHAT_MESSAGES"://This returns the last message the server has track of
                         {
                             if (message.Data is JsonElement syncData)
                             {
@@ -255,37 +250,27 @@ namespace HeatMeetServer
                                         UserName = m.User.Name
                                     })
                                     .ToList();
-
                                     response.Data = new { success = true, messages = nuevosMensajes };
                                 }
                             }
                         }
                         break;
-
                     case "GET_GROUP_CODE":
                         {
-                            //var message = new NetworkMessage
-                            //{
-                            //    Command = "GET_GROUP_CODE",
-                            //    Data = new { groupId }
-                            //};
-
                             if(message.Data is JsonElement userGroupData)
                             {
                                 //get groupId
                                 int? groupId = userGroupData.GetProperty("groupId").GetInt32();
-
-                                //select the group code
-                                string? inviteCode = ormManager.Groups.FirstOrDefault(m => m.Id == groupId).InviteCode;
-
-                                //return data
-                                response.Data = new {success =true, inviteCode = inviteCode};
+                                lock (ormLock)
+                                {
+                                    //select the group code
+                                    string? inviteCode = ormManager.Groups.FirstOrDefault(m => m.Id == groupId).InviteCode;
+                                    //return data
+                                    response.Data = new {success =true, inviteCode = inviteCode};
+                                }
                             }
-                            
-
                         }
                         break;
-
                     case "CREATE_EVENT":
                         {
                             if (message.Data is JsonElement evtData)
@@ -337,6 +322,25 @@ namespace HeatMeetServer
                         }
                         break;
 
+                    case "GET_USER_EVENTS_AND_AVIABILITY":
+                        {
+                            if (message.Data is JsonElement evtData)
+                            {
+                                try
+                                {
+                                    //POR HACER
+                                    
+                                }
+                                catch (Exception ex)
+                                {
+                                    string? realError = ex.InnerException?.Message ?? ex.Message;
+                                    Console.WriteLine($"DATABASE ERROR GET USER EVENTS: {realError}");
+                                    response.Data = new { success = false, message = "DB Error: " + realError };
+                                }
+                            }
+                            else response.Data = new { success = false, message = "Invalid data" };
+                        }
+                        break;
 
                     default:
                         {
