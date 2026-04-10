@@ -9,7 +9,7 @@ namespace MauiFront
         public static MauiApp CreateMauiApp()
         {
             
-            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1JHaF5cWWdCekx3QXxbf1x2ZFZMZFtbQXZPMyBoS35RcEVnWXhec3BSQ2BcWER2VEFe");
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("NDMwNzcwMUAzMjMyMmUzMDJlMzBGcFZCUCtpYkY4Mmw2NlBYL25jVDVFNjZjSCtLcmFVUWl2bUNJckJ6MUVRPQ==");
 
             var builder = MauiApp.CreateBuilder();
             builder
