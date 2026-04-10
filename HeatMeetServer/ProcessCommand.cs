@@ -295,7 +295,8 @@ namespace HeatMeetServer
                                     string title = evtData.GetProperty("title").GetString() ?? "";
                                     string? ubicacion = evtData.TryGetProperty("ubicacion", out var u) ? u.GetString() : null;
                                     string? direccion = evtData.TryGetProperty("direccionUrl", out var d) ? d.GetString() : null;
-                                    DateTime fechaHora = evtData.GetProperty("fechaHora").GetDateTime();
+                                    DateTime rawDate = evtData.GetProperty("fechaHora").GetDateTime();
+                                    DateTime fechaHora = DateTime.SpecifyKind(rawDate, DateTimeKind.Utc);
                                     int groupId = evtData.GetProperty("groupId").GetInt32();
 
                                     lock (ormLock)
@@ -313,8 +314,9 @@ namespace HeatMeetServer
                                             Title = title,
                                             Location = ubicacion,
                                             AddressUrl = direccion,
-                                            Date = fechaHora,
-                                            GroupId = groupId
+                                            Date = fechaHora,   
+                                            GroupId = groupId,
+                                            IsEvent = true         
                                         };
 
                                         ormManager.Events.Add(newEvent);

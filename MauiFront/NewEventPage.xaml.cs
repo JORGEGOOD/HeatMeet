@@ -28,7 +28,11 @@ namespace MauiFront
             }
 
             // Combinar fecha y hora
-            DateTime fechaHora = FechaPicker.Date + HoraPicker.Time;
+            // En NewEventPage.xaml.cs
+            DateTime fechaHoraLocal = FechaPicker.Date + HoraPicker.Time;
+            DateTime fechaHoraUtc = fechaHoraLocal.ToUniversalTime(); // Esto le pone el Kind.Utc
+
+           
 
             Socket socket = null;
             try
@@ -43,7 +47,7 @@ namespace MauiFront
                         title = NombreEvento.Text.Trim(),
                         ubicacion = NombreLugar.Text?.Trim(),
                         direccionUrl = Direccion.Text?.Trim(),
-                        fechaHora = fechaHora,
+                        fechaHora = fechaHoraUtc,
                         groupId = groupId
                     }
                 };
