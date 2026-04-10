@@ -286,6 +286,56 @@ namespace HeatMeetServer
                         }
                         break;
 
+                    case "CREATE_EVENT":
+                        {
+                            if (message.Data is JsonElement evtData)
+                            {
+                                try
+                                {
+                                    string title = evtData.GetProperty("title").GetString() ?? "";
+                                    string? ubicacion = evtData.TryGetProperty("ubicacion", out var u) ? u.GetString() : null;
+                                    string? direccion = evtData.TryGetProperty("direccionUrl", out var d) ? d.GetString() : null;
+                                    DateTime fechaHora = evtData.GetProperty("fechaHora").GetDateTime();
+                                    int groupId = evtData.GetProperty("groupId").GetInt32();
+
+                                    lock (ormLock)
+                                    {
+                                        Groups? group = ormManager.Groups.Find(groupId);
+
+                                        if (group == null)
+                                        {
+                                            response.Data = new { success = false, message = "Group not found" };
+                                            break;
+                                        }
+
+                                        Events newEvent = new Events
+                                        {
+                                            Title = title,
+                                            Ubicacion = ubicacion,
+                                            DireccionUrl = direccion,
+                                            FechaHora = fechaHora,
+                                            GroupId = groupId
+                                        };
+
+                                        ormManager.Events.Add(newEvent);
+                                        ormManager.SaveChanges();
+
+                                        Console.WriteLine($"Event '{title}' created (id={newEvent.Id}) in group {groupId}");
+                                        response.Data = new { success = true, eventId = newEvent.Id };
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    string? realError = ex.InnerException?.Message ?? ex.Message;
+                                    Console.WriteLine($"DATABASE ERROR CREATE_EVENT: {realError}");
+                                    response.Data = new { success = false, message = "DB Error: " + realError };
+                                }
+                            }
+                            else response.Data = new { success = false, message = "Invalid data" };
+                        }
+                        break;
+
+
                     default:
                         {
                             Console.WriteLine(@$"Unkown command {response.Command}");

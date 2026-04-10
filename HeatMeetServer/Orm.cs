@@ -89,9 +89,20 @@ namespace HeatMeetServer
 
         [Required, MaxLength(50)]
         public string Title { get; set; }
+
+        
         public string? Ubicacion { get; set; }
 
+       
+        public string? DireccionUrl { get; set; }
+
+        
+        public DateTime FechaHora { get; set; }
+
+       
         public int GroupId { get; set; }
+
+        [ForeignKey("GroupId")]
         public Groups Group { get; set; }
 
         public List<Votes> Votes { get; set; } = new();
