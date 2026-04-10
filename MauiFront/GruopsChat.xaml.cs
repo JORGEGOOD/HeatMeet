@@ -143,8 +143,8 @@ public partial class GroupsChat : ContentPage
 
             if (response.Data is JsonElement data && data.GetProperty("success").GetBoolean())
             {
-                var messagesJson = data.GetProperty("messages").GetRawText();
-                var messages = JsonSerializer.Deserialize<List<MessageDto>>(messagesJson);
+                string messagesJson = data.GetProperty("messages").GetRawText();
+                List<MessageDto>? messages = JsonSerializer.Deserialize<List<MessageDto>>(messagesJson);
 
                 messages = messages.OrderBy(m => m.CreateDate).ToList();
                 LoadMessages(messages, userId);
@@ -199,7 +199,7 @@ public partial class GroupsChat : ContentPage
             };
 
             NetUtils.NetUtils.SendJson(socket, message);
-            NetworkMessage response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
+            NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
 
             if (response.Data is JsonElement data)
             {
@@ -210,7 +210,7 @@ public partial class GroupsChat : ContentPage
                 }
                 else
                 {
-                    string serverMsg = data.TryGetProperty("message", out JsonElement msgProp)
+                    string? serverMsg = data.TryGetProperty("message", out JsonElement msgProp)
                                        ? msgProp.GetString()
                                        : "Without error details. ";
                     await DisplayAlert("Server error: ", serverMsg, "OK");
