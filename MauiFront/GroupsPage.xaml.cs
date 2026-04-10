@@ -24,6 +24,10 @@ namespace MauiFront
     {
         public ObservableCollection<SchedulerAppointment> EventosAgendados { get; set; }
 
+        //Disponibility button Toggle switch
+        public bool IsVotingDisponibility { get; set; } = false;
+
+
         public GroupsPage()
         {
             InitializeComponent();
@@ -40,6 +44,29 @@ namespace MauiFront
 
         private async void OnSchedulerTapped(object sender, SchedulerTappedEventArgs e)
         {
+            //-- IF TOGGLE SWITCH IS ON --
+            if(DisponibilidadSwitch.IsToggled)
+            {
+                //Get the day clicked to switch it to Can or Can't
+                if(e.Element == SchedulerElement.SchedulerCell && e.Date.HasValue)
+                {
+
+                    //get in the database/preferences if that day was On or Off. (In the appear screen a server database select should be done)
+
+                    //depending on the select above, switch between Can or Can't that day (red or white color)
+
+                    //Send the decision to the server
+
+
+                }
+
+                DisplayAlert("Mensaje", "Has dicho disponibilidad en este dia", "Ok");
+                return;
+            }
+
+
+            //-- IF TOGGLE SWITCH IS OFF --
+
             // Si estamos en el MES, al tocar un día viajamos al DÍA
             if (SchedulerControl.View == SchedulerView.Month)
             {
@@ -67,6 +94,7 @@ namespace MauiFront
                     }
                 }
             }
+
         }
 
         bool isFabOpen = false;

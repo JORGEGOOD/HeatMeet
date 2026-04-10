@@ -10,6 +10,7 @@
         <ScrollView ZIndex="1">
             <VerticalStackLayout Spacing="0">
 
+                <!--Boton Calendario de volver al mes-->
                 <Button Text="← Volver al Mes"
                         Clicked="VolverAlMes_Clicked"
                         BackgroundColor="#0A2A43"
@@ -28,6 +29,7 @@
                     </Button.Triggers>
                 </Button>
 
+                <!--Calendario-->
                 <Frame HeightRequest="500" 
                        Margin="15,15,15,5"
                        BackgroundColor="White"
@@ -43,6 +45,32 @@
                     </scheduler:SfScheduler>
                 </Frame>
 
+                <!-- Toggle Modo disponibilidad -->
+                <HorizontalStackLayout HorizontalOptions="Center" Margin="0,10" Spacing="10">
+                    <Label Text="Modo Disponibilidad" VerticalOptions="Center" FontAttributes="Bold" TextColor="#0A2A43"/>
+                    <Switch x:Name="DisponibilidadSwitch" 
+                    OnColor="#FF6A00" 
+                    ThumbColor="#0A2A43"
+                    IsToggled="{Binding IsVotandoDisponibilidad}"/>
+                </HorizontalStackLayout>
+
+                <!--
+                < Boton "Selecciona tus dias libres" 
+                <Button x:Name="StatusBtn"
+                    Text="Selecciona tus días libres"
+                    IsVisible="{Binding Source={x:Reference DisponibilidadSwitch}, Path=IsToggled}"
+                    BackgroundColor="#FF6A00"
+                    TextColor="White"
+                    CornerRadius="20"
+                    HeightRequest="30"
+                    FontSize="10"
+                    Margin="50,0,50,15"
+                    InputTransparent="True"
+                />   
+                -->
+
+
+                <!-- Mis Grupos -->
                 <Label Text="Mis Grupos" 
                        FontSize="22" 
                        FontAttributes="Bold" 
