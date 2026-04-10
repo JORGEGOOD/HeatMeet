@@ -42,7 +42,7 @@ namespace HeatMeetServer
         //N:M
         public List<Groups> Groups { get; set; } = new();
 
-        disponibilidad = DatesTimes[ 3:7 , 14:7, 15:7  ] 
+        
 
 
     }

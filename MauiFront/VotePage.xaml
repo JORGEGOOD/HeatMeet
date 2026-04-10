@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MauiFront.VotePage"
+             BackgroundColor="#F1EEE8">
+    <ScrollView>
+        <VerticalStackLayout Padding="24,40" Spacing="20">
+
+            <VerticalStackLayout Spacing="4">
+                <Label Text="HeatMeet"
+                       FontSize="32"
+                       FontAttributes="Bold"
+                       TextColor="#1E2A4A"
+                       HorizontalOptions="Center"/>
+                <Label Text="Configura los detalles de tu experiencia"
+                       FontSize="15"
+                       TextColor="#707070"
+                       HorizontalOptions="Center"
+                       Margin="0,0,0,10"/>
+            </VerticalStackLayout>
+
+            <Frame BackgroundColor="White" BorderColor="Transparent" CornerRadius="14" Padding="20" HasShadow="True">
+                <VerticalStackLayout Spacing="18">
+
+                    <Label Text="Crear nueva quedada" FontSize="18" FontAttributes="Bold" TextColor="#1E2A4A"/>
+
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="¿Cómo se llama el plan?" FontSize="13" TextColor="#1E2A4A" FontAttributes="Bold"/>
+                        <Entry x:Name="NombreEvento" 
+                   Placeholder="Ej: Cena de locos, Final de la Champions..."
+                   TextColor="#072033"
+                   FontAttributes="Italic"
+                   HeightRequest="48"/>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="¿Dónde nos vemos?" FontSize="13" TextColor="#1E2A4A" FontAttributes="Bold"/>
+                        <Entry x:Name="NombreLugar" 
+                   Placeholder="Nombre del sitio o casa de alguien"
+                   TextColor="#072033"
+                   HeightRequest="48"/>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Ubicación exacta (o link de Google Maps)" FontSize="13" TextColor="#1E2A4A" FontAttributes="Bold"/>
+                        <Entry x:Name="Direccion"
+                   Placeholder="Pega la ubicación aquí"
+                   TextColor="#072033"
+                   HeightRequest="48"/>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="¿Qué día?" FontSize="13" TextColor="#1E2A4A" FontAttributes="Bold"/>
+                        <Frame BorderColor="#DDDDDD" Padding="10,0" CornerRadius="8" HeightRequest="48">
+                            <DatePicker x:Name="FechaPicker" TextColor="#072033" Format="D"/>
+                        </Frame>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="¿A qué hora?" FontSize="13" TextColor="#1E2A4A" FontAttributes="Bold"/>
+                        <Frame BorderColor="#DDDDDD" Padding="10,0" CornerRadius="8" HeightRequest="48">
+                            <TimePicker x:Name="HoraPicker" TextColor="#072033" Format="HH:mm"/>
+                        </Frame>
+                    </VerticalStackLayout>
+
+                    <Button Text="Crear Evento" 
+                        TextColor="White" 
+                        CornerRadius="14" 
+                        HeightRequest="56"
+                        FontAttributes="Bold"
+                        FontSize="16"
+                        Margin="0,20,0,0">
+                        <Button.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#FF6A00" Offset="0.0"/>
+                                <GradientStop Color="#E63900" Offset="1.0"/>
+                            </LinearGradientBrush>
+                        </Button.Background>
+                    </Button>
+
+                </VerticalStackLayout>
+            </Frame>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

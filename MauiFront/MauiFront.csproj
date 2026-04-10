@@ -55,6 +55,9 @@
     <Compile Update="CreateGroupPage.xaml.cs">
       <DependentUpon>CreateGroupPage.xaml</DependentUpon>
     </Compile>
+    <Compile Update="VotePage.xaml.cs">
+      <DependentUpon>VotePage.xaml</DependentUpon>
+    </Compile>
     <Compile Update="JoinGroups.xaml.cs">
       <DependentUpon>JoinGroups.xaml</DependentUpon>
     </Compile>
@@ -65,6 +68,9 @@
 
   <ItemGroup>
     <MauiXaml Update="CreateGroupPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+    <MauiXaml Update="VotePage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
     <MauiXaml Update="JoinGroups.xaml">
