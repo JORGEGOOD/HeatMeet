@@ -63,7 +63,7 @@
                         </Frame>
                     </VerticalStackLayout>
 
-                    <Button Text="Crear Evento" 
+                    <Button Text="Crear nuevo Evento" 
                         TextColor="White" 
                         CornerRadius="14" 
                         HeightRequest="56"
