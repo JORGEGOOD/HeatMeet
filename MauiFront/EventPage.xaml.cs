@@ -4,19 +4,6 @@ using SharedModels;
 
 namespace MauiFront
 {
-    public class EventDto
-    {
-        public int Id { get; set; }
-        public string Title { get; set; }
-        public string? Ubicacion { get; set; }
-        public string? DireccionUrl { get; set; }
-        public DateTime FechaHora { get; set; }
-        public int GroupId { get; set; }
-
-        public string FechaHoraFormatted =>
-            FechaHora.ToLocalTime().ToString("dd/MM/yyyy  HH:mm");
-    }
-
     public partial class EventPage : ContentPage
     {
         public EventPage()

@@ -105,16 +105,6 @@ namespace HeatMeetServer
         public List<Votes> Votes { get; set; } = new();
     }
 
-    //public class EventDto //in Mauifront
-    //{
-    //    public int Id { get; set; } 
-    //    public int UserId { get; set; } 
-    //    public string Title { get; set; }
-    //    public DateTime Date { get; set; } 
-
-    //    public bool IsEvent { get; set; }
-    //    public bool IsAllDay { get; set; } 
-    //}
 
 
     public class Votes

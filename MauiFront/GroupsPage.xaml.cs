@@ -6,7 +6,6 @@ using System.Text.Json;
 using SharedModels;
 using Syncfusion.Maui.Scheduler;
 
-
 namespace MauiFront
 {
     public class Group
@@ -27,8 +26,8 @@ namespace MauiFront
         public int UserId { get; set; }
         public string Title { get; set; }
         public DateTime Date { get; set; }
-        //public DateTime EndDate { get; set; } <-- No end date
-
+        public string? Location { get; set; }
+        public string? AddressUrl { get; set; }
         public bool IsEvent { get; set; }// If its an event OR an Aviabilty
         public bool IsAllDay { get; set; } //To know if its and hour or the entire day
     }

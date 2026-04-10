@@ -568,9 +568,9 @@ public partial class GroupsChat : ContentPage
                 var ev = new EventDto
                 {
                     Title = data.GetProperty("title").GetString() ?? "",
-                    Ubicacion = data.TryGetProperty("ubicacion", out var u) ? u.GetString() : null,
-                    DireccionUrl = data.TryGetProperty("direccionUrl", out var d) ? d.GetString() : null,
-                    FechaHora = data.GetProperty("fechaHora").GetDateTime()
+                    Location = data.TryGetProperty("ubicacion", out var u) ? u.GetString() : null,
+                    AddressUrl = data.TryGetProperty("direccionUrl", out var d) ? d.GetString() : null,
+                    Date = data.GetProperty("fechaHora").GetDateTime()
                 };
 
                 await Navigation.PushAsync(new EventDetailPage(ev));
