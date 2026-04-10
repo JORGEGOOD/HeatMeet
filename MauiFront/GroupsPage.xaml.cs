@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Net.Sockets;
 using System.Text.Json;
+using SharedModels;
 using Syncfusion.Maui.Scheduler;
 
 
@@ -290,9 +291,6 @@ namespace MauiFront
 
             isFabOpen = !isFabOpen;
         }
-
-        
-       
         
         private async void CreateNewGroup(object sender, EventArgs e)
         {
@@ -311,5 +309,9 @@ namespace MauiFront
             
             SchedulerControl.View = SchedulerView.Month;
         }
+
+
+    
     }
+
 }

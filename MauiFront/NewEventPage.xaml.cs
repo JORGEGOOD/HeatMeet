@@ -4,9 +4,9 @@ using SharedModels;
 
 namespace MauiFront
 {
-    public partial class VotePage : ContentPage
+    public partial class NewEventPage : ContentPage
     {
-        public VotePage()
+        public NewEventPage()
         {
             InitializeComponent();
         }

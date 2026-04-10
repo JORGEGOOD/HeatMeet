@@ -111,6 +111,7 @@ public partial class GroupsChat : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+
         _isChatActive = true;
         Task.Run(async () => await RefreshMessagesLoop());
 
@@ -122,6 +123,7 @@ public partial class GroupsChat : ContentPage
 
         if (groupId == 0)
         {
+
             await DisplayAlert("Error", "Chat couldn't be loaded", "OK");
             return;
         }
@@ -156,11 +158,14 @@ public partial class GroupsChat : ContentPage
             }
 
             NetUtils.NetUtils.CloseSocket(socket);
+
         }
         catch (Exception ex)
         {
             await DisplayAlert("Error", ex.Message, "OK");
         }
+
+        await LoadLastEvent();
     }
 
     private async void OnSendTapped(object sender, EventArgs e)
@@ -502,10 +507,98 @@ public partial class GroupsChat : ContentPage
             if (socket != null) NetUtils.NetUtils.CloseSocket(socket);
         }
     }
+    private async Task LoadLastEvent()
+    {
+        int groupId = Preferences.Get("groupId", 0);
+        if (groupId == 0) return;
+
+        Socket socket = null;
+        try
+        {
+            socket = NetUtils.NetUtils.ConnectToServer();
+
+            NetworkMessage message = new NetworkMessage
+            {
+                Command = "GET_LAST_EVENT",
+                Data = new { groupId }
+            };
+
+            NetUtils.NetUtils.SendJson(socket, message);
+            NetworkMessage response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
+
+            if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
+            {
+                string title = data.GetProperty("title").GetString() ?? "";
+                string fechaStr = data.GetProperty("fechaHora").GetString() ?? "";
+                DateTime.TryParse(fechaStr, out DateTime fecha);
+                string formatted = fecha.ToLocalTime().ToString("dd/MM  HH:mm");
+
+                MainThread.BeginInvokeOnMainThread(() =>
+                    LastEventLabel.Text = $"{title}  -  {formatted}");
+            }
+        }
+        catch { }
+        finally
+        {
+            if (socket != null) NetUtils.NetUtils.CloseSocket(socket);
+        }
+    }
+
+    private async void OnLastEventTapped(object sender, EventArgs e)
+    {
+        int groupId = Preferences.Get("groupId", 0);
+        if (groupId == 0) return;
+
+        Socket socket = null;
+        try
+        {
+            socket = NetUtils.NetUtils.ConnectToServer();
+
+            NetworkMessage message = new NetworkMessage
+            {
+                Command = "GET_LAST_EVENT",
+                Data = new { groupId }
+            };
+
+            NetUtils.NetUtils.SendJson(socket, message);
+            NetworkMessage response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
+
+            if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
+            {
+                var ev = new EventDto
+                {
+                    Title = data.GetProperty("title").GetString() ?? "",
+                    Ubicacion = data.TryGetProperty("ubicacion", out var u) ? u.GetString() : null,
+                    DireccionUrl = data.TryGetProperty("direccionUrl", out var d) ? d.GetString() : null,
+                    FechaHora = data.GetProperty("fechaHora").GetDateTime()
+                };
+
+                await Navigation.PushAsync(new EventDetailPage(ev));
+            }
+            else
+            {
+                await DisplayAlert("Sin eventos", "Este grupo aun no tiene eventos.", "OK");
+            }
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Error", ex.Message, "OK");
+        }
+        finally
+        {
+            if (socket != null) NetUtils.NetUtils.CloseSocket(socket);
+        }
+    }
+
+    private async void OnViewAllEventsTapped(object sender, EventArgs e)
+    {
+        await Navigation.PushAsync(new EventPage());
+    }
 
     private async void PageVote(object sender, EventArgs e)
     {
-        await Navigation.PushAsync(new VotePage());
+        await Navigation.PushAsync(new NewEventPage());
     }
+
 
 }
