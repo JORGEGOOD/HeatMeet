@@ -42,10 +42,28 @@ namespace HeatMeetServer
         //N:M
         public List<Groups> Groups { get; set; } = new();
 
-        disponibilidad = DatesTimes[ 3:7 , 14:7, 15:7  ] 
-
+        public List<UserAvailability> Availabilities { get; set; } = new();
 
     }
+
+    public class UserAvailability
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        public int UserId { get; set; }
+
+        [Required]
+        public DateTime AvailableDate { get; set; } //Only the start date and is the entire day OR the individual hour.
+                                                    //Then cliced on individual hours, 
+                                                    //the entire hour is selected, and the users will select multiple hours 
+        
+        //public int? GroupId { get; set; } <-- Aviability is global (¿¿Aviability per group??)
+    }
+
+
+
 
     public class Groups
     {
