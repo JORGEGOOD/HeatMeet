@@ -4,7 +4,7 @@
              x:Class="MauiFront.GroupsChat"
              BackgroundColor="#F5F0E8">
 
-    <Grid RowDefinitions="70,*,70">
+    <Grid RowDefinitions="70,*,50,70">
 
         <!-- HEADER -->
         <Grid Grid.Row="0"
@@ -76,8 +76,44 @@
             </VerticalStackLayout>
         </ScrollView>
 
-        <!-- BARRA INFERIOR -->
-        <Grid Grid.Row="2"
+        
+        <!-- Botón Crear nuevo evento -->
+        <Frame Grid.Row="2" 
+       BackgroundColor="#F8F9FA" 
+       Margin="0" 
+       Padding="10,5" 
+       BorderColor="#E0E0E0"
+       CornerRadius="0"
+       HasShadow="False">
+
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="10">
+                <Label Text="¿Tenéis planes?" 
+               VerticalOptions="Center" 
+               TextColor="#555" 
+               FontSize="13" 
+               FontAttributes="Italic"/>
+
+                <Button Text="+ Crear Nuevo Evento"
+                BackgroundColor="#FF6A00"
+                TextColor="White"
+                FontSize="12"
+                HeightRequest="35"
+                Padding="15,0"
+                CornerRadius="18"
+                
+                        >
+                    <Button.Shadow>
+                        <Shadow Brush="Black" Offset="0,2" Opacity="0.1" Radius="5"/>
+                    </Button.Shadow>
+                </Button>
+            </HorizontalStackLayout>
+        </Frame>
+
+
+
+
+        <!-- BARRA DE MENSAJES-->
+        <Grid Grid.Row="3"
               BackgroundColor="White"
               Padding="10,0"
               ColumnDefinitions="*,45">
