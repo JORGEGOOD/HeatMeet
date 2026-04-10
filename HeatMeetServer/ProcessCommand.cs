@@ -311,9 +311,9 @@ namespace HeatMeetServer
                                         Events newEvent = new Events
                                         {
                                             Title = title,
-                                            Ubicacion = ubicacion,
-                                            DireccionUrl = direccion,
-                                            FechaHora = fechaHora,
+                                            Location = ubicacion,
+                                            AddressUrl = direccion,
+                                            Date = fechaHora,
                                             GroupId = groupId
                                         };
 

@@ -88,25 +88,34 @@ namespace HeatMeetServer
         public int Id { get; set; }
 
         [Required, MaxLength(50)]
-        public string Title { get; set; }
+        public string Title { get; set; } = "Evento";
+        public string? Location { get; set; }
 
-        
-        public string? Ubicacion { get; set; }
+        public string? AddressUrl { get; set; }
+        public DateTime Date { get; set; }
 
-       
-        public string? DireccionUrl { get; set; }
 
-        
-        public DateTime FechaHora { get; set; }
-
-       
         public int GroupId { get; set; }
-
         [ForeignKey("GroupId")]
-        public Groups Group { get; set; }
+        public Groups? Group { get; set; }
+
+        public bool IsEvent { get; set; }
+        public bool IsAllDay { get; set; }
 
         public List<Votes> Votes { get; set; } = new();
     }
+
+    //public class EventDto //in Mauifront
+    //{
+    //    public int Id { get; set; } 
+    //    public int UserId { get; set; } 
+    //    public string Title { get; set; }
+    //    public DateTime Date { get; set; } 
+
+    //    public bool IsEvent { get; set; }
+    //    public bool IsAllDay { get; set; } 
+    //}
+
 
     public class Votes
     {
