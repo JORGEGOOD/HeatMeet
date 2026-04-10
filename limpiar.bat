@@ -9,10 +9,6 @@ for /d /r %%D in (.vs bin obj) do (
     )
 )
 
-rem Quita archivos de Git si estás en un repo
-git rm -r --cached . >nul 2>&1
-git add . 
-git commit -m "Limpiando carpetas ignoradas" >nul 2>&1
 
 echo Limpieza completada.
 pause
