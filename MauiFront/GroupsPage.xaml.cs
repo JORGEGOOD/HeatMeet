@@ -20,9 +20,23 @@ namespace MauiFront
         public string DisplayImage => "logo.png";
     }
 
+    public class EventDto //<-- This will be an Event AND an aviability, bcs they share most of everything
+    {
+        public int Id { get; set; }
+        public int UserId { get; set; }
+        public string Title { get; set; }
+        public DateTime Date { get; set; }
+        //public DateTime EndDate { get; set; } <-- No end date
+
+        public bool IsEvent { get; set; }// If its an event OR an Aviabilty
+        public bool IsAllDay { get; set; } //To know if its and hour or the entire day
+    }
+
+
     public partial class GroupsPage : ContentPage
     {
-        public ObservableCollection<SchedulerAppointment> EventosAgendados { get; set; }
+        //List of all the events the user has
+        public ObservableCollection<SchedulerAppointment> ScheduledEvents { get; set; }
 
         //Disponibility button Toggle switch
         public bool IsVotingDisponibility { get; set; } = false;
@@ -33,11 +47,11 @@ namespace MauiFront
             InitializeComponent();
 
             // 1. Inicializar la lista de eventos
-            EventosAgendados = new ObservableCollection<SchedulerAppointment>();
+            ScheduledEvents = new ObservableCollection<SchedulerAppointment>();
 
             // 2. Conectar los datos
             this.BindingContext = this;
-            SchedulerControl.AppointmentsSource = EventosAgendados;
+            SchedulerControl.AppointmentsSource = ScheduledEvents;
 
             // TODO: Personalizaremos los colores aquí después de que compile
         }
@@ -51,7 +65,8 @@ namespace MauiFront
                 if(e.Element == SchedulerElement.SchedulerCell && e.Date.HasValue)
                 {
 
-                    //get in the database/preferences if that day was On or Off. (In the appear screen a server database select should be done)
+                    //get in that day was On or Off. (In the appear screen a server database select should be done)
+                        //check in the frontend if its painted or not? Or make a dedicated list as a copy of the server select and ignore frontend?
 
                     //depending on the select above, switch between Can or Can't that day (red or white color)
 
@@ -84,7 +99,7 @@ namespace MauiFront
                     string nombre = await DisplayPromptAsync("Nuevo Evento", "Nombre:", "OK", "Cancelar");
                     if (!string.IsNullOrWhiteSpace(nombre))
                     {
-                        EventosAgendados.Add(new SchedulerAppointment
+                        ScheduledEvents.Add(new SchedulerAppointment
                         {
                             StartTime = e.Date.Value,
                             EndTime = e.Date.Value.AddHours(1),
@@ -108,6 +123,7 @@ namespace MauiFront
             int userId = Preferences.Get("userId", 0);
             if (userId == 0) return;
             Socket socket = null;
+            //--GET GROUPS FROM SERVER--
             try
             {
                 socket = NetUtils.NetUtils.ConnectToServer();
@@ -118,7 +134,7 @@ namespace MauiFront
                 };
 
                 NetUtils.NetUtils.SendJson(socket, message);
-                SharedModels.NetworkMessage response = NetUtils.NetUtils.ReceiveJson<SharedModels.NetworkMessage>(socket);
+                SharedModels.NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<SharedModels.NetworkMessage>(socket);
                 
 
                 if (response.Data is JsonElement data)
@@ -128,7 +144,7 @@ namespace MauiFront
                     if (ok)
                     {
                         JsonElement groupsJson = data.GetProperty("groups");
-                        var grupos = JsonSerializer
+                        List<Group>? grupos = JsonSerializer
                             .Deserialize<List<Group>>(groupsJson.GetRawText());
                         GroupsCollection.ItemsSource = grupos;
                     }
@@ -142,6 +158,80 @@ namespace MauiFront
             {
                 if(socket != null) NetUtils.NetUtils.CloseSocket(socket);
             }
+
+            //--GET USER EVENTS AND AVIABILITY--
+            try
+            {
+                socket = NetUtils.NetUtils.ConnectToServer();
+                //new command
+                SharedModels.NetworkMessage message = new SharedModels.NetworkMessage
+                {
+                    Command = "GET_USER_EVENTS_AND_AVIABILITY",
+                    Data = new { userId }
+                };
+
+                NetUtils.NetUtils.SendJson(socket, message);
+                SharedModels.NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<SharedModels.NetworkMessage>(socket);
+
+                //response
+                if (response.Data is JsonElement data)
+                {
+                    bool ok = data.GetProperty("success").GetBoolean();
+
+                    if (ok)
+                    {
+                        MainThread.BeginInvokeOnMainThread(() =>
+                        {
+                            ScheduledEvents.Clear();
+                            //process list
+                            if(data.TryGetProperty("eventsAndAviability",out JsonElement listJson))
+                            {
+                                List<EventDto>? mixedList = JsonSerializer.Deserialize<List<EventDto>>(listJson.GetRawText());
+
+                                foreach(EventDto eventDto in mixedList)
+                                {
+                                    if(eventDto.IsEvent)//Events
+                                    {
+                                        ScheduledEvents.Add(new SchedulerAppointment//Add event
+                                        {
+                                            Id = eventDto.Id,
+                                            Subject = eventDto.Title,
+                                            StartTime = eventDto.Date.Date,
+                                            EndTime = eventDto.Date.Date.AddHours(1),//<-- By design we make each event have 1 hour duration
+                                            Background = Color.FromArgb("FF6A00")//Event color
+                                        });
+                                    }
+                                    else//Aviabilities //The entire day or just an hour?
+                                    {
+                                        ScheduledEvents.Add(new SchedulerAppointment
+                                        {
+                                            Id = eventDto.Id,
+                                            Subject = eventDto.Title,
+                                            StartTime = eventDto.Date,
+                                            //New IsEntire day, to know if its the entire day or just a specific hour
+                                            EndTime = (eventDto.IsAllDay ? eventDto.Date.Date.AddDays(1).AddSeconds(-1) : eventDto.Date.Date.AddHours(1)),
+                                            IsAllDay = eventDto.IsAllDay,
+                                            Background = Color.FromArgb("#4CAF50"),
+                                        });
+                                    }
+                                }
+
+                            }
+
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Error", "No se pudieron cargar los eventos: " + ex.Message, "OK");
+            }
+            finally
+            {
+                if (socket != null) NetUtils.NetUtils.CloseSocket(socket);
+            }
+
+
         }
 
         //Clic on group → go to chat
