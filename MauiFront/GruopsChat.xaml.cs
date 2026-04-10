@@ -502,4 +502,10 @@ public partial class GroupsChat : ContentPage
             if (socket != null) NetUtils.NetUtils.CloseSocket(socket);
         }
     }
+
+    private async void PageVote(object sender, EventArgs e)
+    {
+        await Navigation.PushAsync(new VotePage());
+    }
+
 }

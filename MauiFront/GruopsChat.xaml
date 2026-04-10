@@ -79,12 +79,12 @@
         
         <!-- Botón Crear nuevo evento -->
         <Frame Grid.Row="2" 
-       BackgroundColor="#F8F9FA" 
-       Margin="0" 
-       Padding="10,5" 
-       BorderColor="#E0E0E0"
-       CornerRadius="0"
-       HasShadow="False">
+           BackgroundColor="#F8F9FA" 
+           Margin="0" 
+           Padding="10,5" 
+           BorderColor="#E0E0E0"
+           CornerRadius="0"
+           HasShadow="False">
 
             <HorizontalStackLayout HorizontalOptions="Center" Spacing="10">
                 <Label Text="¿Tenéis planes?" 
@@ -94,13 +94,14 @@
                FontAttributes="Italic"/>
 
                 <Button Text="+ Crear Nuevo Evento"
-                BackgroundColor="#FF6A00"
-                TextColor="White"
-                FontSize="12"
-                HeightRequest="35"
-                Padding="15,0"
-                CornerRadius="18"
-                
+                        Clicked="PageVote"
+                        BackgroundColor="#FF6A00"
+                        TextColor="White"
+                        FontSize="12"
+                        HeightRequest="35"
+                        Padding="15,0"
+                        CornerRadius="18"
+               
                         >
                     <Button.Shadow>
                         <Shadow Brush="Black" Offset="0,2" Opacity="0.1" Radius="5"/>
