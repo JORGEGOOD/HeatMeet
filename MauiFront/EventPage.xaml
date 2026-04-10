@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MauiFront.EventPage"
+             Title="Eventos del grupo"
+             BackgroundColor="#F5EDE3">
+
+    <Grid RowDefinitions="*">
+        <CollectionView x:Name="EventsCollection"
+                        Margin="16,10"
+                        SelectionMode="None">
+            <CollectionView.EmptyView>
+                <Label Text="No hay eventos en este grupo todavía."
+                       TextColor="#4A6580"
+                       FontSize="14"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"
+                       Margin="0,40,0,0"/>
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Margin="0,6"
+                           Padding="15,12"
+                           CornerRadius="18"
+                           BackgroundColor="White"
+                           BorderColor="#0A2A43"
+                           HasShadow="True">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnEventTapped"/>
+                        </Frame.GestureRecognizers>
+                        <HorizontalStackLayout Spacing="14">
+
+                            <!-- Icono calendario -->
+                            <Frame CornerRadius="12"
+                                   Padding="0"
+                                   HeightRequest="48"
+                                   WidthRequest="48"
+                                   BackgroundColor="#FF6A00"
+                                   BorderColor="Transparent"
+                                   HasShadow="False"
+                                   VerticalOptions="Center">
+                                <Label Text="📅"
+                                       FontSize="22"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center"/>
+                            </Frame>
+
+                            <!-- Nombre y fecha -->
+                            <VerticalStackLayout VerticalOptions="Center" Spacing="3">
+                                <Label Text="{Binding Title}"
+                                       FontSize="16"
+                                       FontAttributes="Bold"
+                                       TextColor="#072033"/>
+                                <Label Text="{Binding FechaHoraFormatted}"
+                                       FontSize="12"
+                                       TextColor="#4A6580"/>
+                            </VerticalStackLayout>
+
+                            <!-- Flecha -->
+                            <Label Text="›"
+                                   FontSize="28"
+                                   TextColor="#C0CEDB"
+                                   VerticalOptions="Center"
+                                   HorizontalOptions="EndAndExpand"
+                                   Margin="0,0,4,0"/>
+                        </HorizontalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>
