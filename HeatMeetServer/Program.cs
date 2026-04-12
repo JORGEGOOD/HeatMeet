@@ -15,21 +15,6 @@ namespace HeatMeetServer
         public string Name { get; set; } = string.Empty;
     }
 
-    public class Group
-    {
-        public string GroupCode { get; set; } = GenerateGroupCode();
-        public string GroupName { get; set; } = string.Empty;
-        public User Admin { get; set; } = new User();
-        public List<User> Members { get; set; } = new();
-        public Dictionary<string, CalendarDay> Availability { get; set; } = new(); // Key: "yyyy-MM-dd"
-        public Dictionary<string, int> Votes { get; set; } = new(); // Key: "yyyy-MM-dd", Value: vote count
-
-        private static string GenerateGroupCode()
-        {
-            //should also make a database check if it exists?
-            return Guid.NewGuid().ToString().Substring(0, 5).ToUpper();
-        }
-    }
 
 
     public class CalendarDay

@@ -194,9 +194,9 @@ namespace HeatMeetServer
                                 try
                                 {
                                     //get json data
-                                    string content = userMessages.GetProperty("content").GetString();
-                                    int userId = userMessages.GetProperty("userId").GetInt32();
-                                    int groupId = userMessages.GetProperty("groupId").GetInt32();
+                                    string? content = userMessages.GetProperty("content").GetString();
+                                    int userId      = userMessages.GetProperty("userId").GetInt32();
+                                    int groupId     = userMessages.GetProperty("groupId").GetInt32();
 
                                     //construct message
                                     Messages newMessage = new Messages
@@ -277,13 +277,13 @@ namespace HeatMeetServer
                             {
                                 try
                                 {
-                                    string title = evtData.GetProperty("title").GetString() ?? "";
-                                    string? ubicacion = evtData.TryGetProperty("ubicacion", out var u) ? u.GetString() : null;
-                                    string? direccion = evtData.TryGetProperty("direccionUrl", out var d) ? d.GetString() : null;
-                                    DateTime rawDate = evtData.GetProperty("fechaHora").GetDateTime();
+                                    string title       = evtData.GetProperty("title").GetString() ?? "";
+                                    string? ubicacion  = evtData.TryGetProperty("ubicacion", out var u) ? u.GetString() : null;
+                                    string? direccion  = evtData.TryGetProperty("direccionUrl", out var d) ? d.GetString() : null;
+                                    DateTime rawDate   = evtData.GetProperty("fechaHora").GetDateTime();
                                     DateTime fechaHora = DateTime.SpecifyKind(rawDate, DateTimeKind.Utc);
-                                    int groupId = evtData.GetProperty("groupId").GetInt32();
-
+                                    int groupId        = evtData.GetProperty("groupId").GetInt32();
+                                    
                                     lock (ormLock)
                                     {
                                         Groups? group = ormManager.Groups.Find(groupId);
@@ -327,9 +327,31 @@ namespace HeatMeetServer
                             if (message.Data is JsonElement evtData)
                             {
                                 try
-                                {
-                                    //POR HACER
-                                    
+                                {                
+                                    string userId = evtData.GetProperty("userId").ToString();
+                                    lock (ormLock)
+                                    {
+
+                                        //search user's groups
+                                        List<int>? userGroupsIds = ormManager.Groups
+                                            .Where(g => g.Users.Any(u => u.Id.ToString() == userId))
+                                            .Select(g=>g.Id).ToList();
+
+                                        //get all events the groups have
+                                        List<Events>? all = ormManager.Events
+                                                  .Where(e => userGroupsIds.Contains(e.GroupId))
+                                                  .Select(e => new Events
+                                                  {
+                                                      Id       = e.Id,
+                                                      UserId   = e.UserId,
+                                                      Title    = e.Title,
+                                                      Date     = e.Date,
+                                                      IsEvent  = e.IsEvent,
+                                                      IsAllDay = e.IsAllDay,
+                                                      GroupId  = e.GroupId
+                                                  }).ToList();
+                                        response.Data = new { success = true, events = all };
+                                    }
                                 }
                                 catch (Exception ex)
                                 {

@@ -180,11 +180,12 @@ namespace MauiFront
 
                     if (ok)
                     {
-                        MainThread.BeginInvokeOnMainThread(() =>
+                        //Separate thread because this can start huge lag spikes
+                        MainThread.BeginInvokeOnMainThread(() => 
                         {
                             ScheduledEvents.Clear();
                             //process list
-                            if(data.TryGetProperty("eventsAndAviability",out JsonElement listJson))
+                            if(data.TryGetProperty("events",out JsonElement listJson))
                             {
                                 List<EventDto>? mixedList = JsonSerializer.Deserialize<List<EventDto>>(listJson.GetRawText());
 
@@ -201,7 +202,7 @@ namespace MauiFront
                                             Background = Color.FromArgb("FF6A00")//Event color
                                         });
                                     }
-                                    else//Aviabilities //The entire day or just an hour?
+                                    else//Aviabilities
                                     {
                                         ScheduledEvents.Add(new SchedulerAppointment
                                         {
@@ -215,7 +216,6 @@ namespace MauiFront
                                         });
                                     }
                                 }
-
                             }
 
                         });

@@ -32,7 +32,7 @@ namespace NetUtils
 
         public static Socket ConnectToServer()
         {
-            Socket socket = CreateClientSocket("192.168.111.40", 8888);
+            Socket socket = CreateClientSocket("192.168.1.100", 8888);
             return socket;
         }
 

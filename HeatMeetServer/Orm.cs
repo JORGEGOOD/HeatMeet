@@ -17,9 +17,9 @@ namespace HeatMeetServer
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)//config code
         { 
             base.OnConfiguring(optionsBuilder);
-            optionsBuilder.UseNpgsql(@$"Host=192.168.111.40;" +
+            optionsBuilder.UseNpgsql(@$"Host=192.168.1.100;" +
                                     "Port=5432;" +
-                                    "Username=Alumno;" + //school pc has this default user
+                                    "Username=Alumno;" + 
                                     "Password=AlumnoIFP;" +
                                     "Database=HeatMeet;");
         }
@@ -42,28 +42,9 @@ namespace HeatMeetServer
         //N:M
         public List<Groups> Groups { get; set; } = new();
 
-        public List<UserAvailability> Availabilities { get; set; } = new();
+        public List<Events> Events { get; set; } = new();
 
     }
-
-    public class UserAvailability
-    {
-        [Key]
-        public int Id { get; set; }
-
-        [Required]
-        public int UserId { get; set; }
-
-        [Required]
-        public DateTime AvailableDate { get; set; } //Only the start date and is the entire day OR the individual hour.
-                                                    //Then cliced on individual hours, 
-                                                    //the entire hour is selected, and the users will select multiple hours 
-        
-        //public int? GroupId { get; set; } <-- Aviability is global (¿¿Aviability per group??)
-    }
-
-
-
 
     public class Groups
     {
@@ -82,7 +63,8 @@ namespace HeatMeetServer
         public List<Messages> Messages { get; set; } = new(); //individual messages
     }
 
-    public class Events
+
+    public class Events //Aviabilities and events got merged, now events is both
     {
         [Key]
         public int Id { get; set; }
@@ -94,6 +76,7 @@ namespace HeatMeetServer
         public string? AddressUrl { get; set; }
         public DateTime Date { get; set; }
 
+        public int UserId { get; set; }//<-- For the disponibility
 
         public int GroupId { get; set; }
         [ForeignKey("GroupId")]
