@@ -1,12 +1,17 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using SharedModels;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using SharedModels;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace HeatMeetServer
 {
@@ -321,7 +326,6 @@ namespace HeatMeetServer
                             else response.Data = new { success = false, message = "Invalid data" };
                         }
                         break;
-
                     case "GET_USER_EVENTS_AND_AVIABILITY":
                         {
                             if (message.Data is JsonElement evtData)
@@ -331,7 +335,6 @@ namespace HeatMeetServer
                                     string userId = evtData.GetProperty("userId").ToString();
                                     lock (ormLock)
                                     {
-
                                         //search user's groups
                                         List<int>? userGroupsIds = ormManager.Groups
                                             .Where(g => g.Users.Any(u => u.Id.ToString() == userId))
@@ -339,7 +342,7 @@ namespace HeatMeetServer
 
                                         //get all events the groups have
                                         List<Events>? all = ormManager.Events
-                                                  .Where(e => userGroupsIds.Contains(e.GroupId))
+                                                  .Where(e => userGroupsIds.Contains(e.GroupId.Value))
                                                   .Select(e => new Events
                                                   {
                                                       Id       = e.Id,
@@ -364,6 +367,56 @@ namespace HeatMeetServer
                         }
                         break;
 
+                    case "SAVE_AVIABILITY":
+                        {
+                            if (message.Data is JsonElement avbData)
+                            {
+                                try
+                                {
+                                    int userId = avbData.GetProperty("userId").GetInt32();
+                                    DateTime date = DateTime.SpecifyKind(avbData.GetProperty("dateSelected").GetDateTime(), DateTimeKind.Utc);
+                                    bool isAllDay = avbData.GetProperty("isAllDay").GetBoolean();
+                                    lock (ormLock)
+                                    {
+                                        //this is the same as the front, we search if it exists,
+                                        //then create/delete accordingly          
+                                        Events? exists = ormManager.Events//            V V V V if this event exists V V V V
+                                                         .FirstOrDefault(e=>e.UserId == userId && e.Date ==date && !e.IsEvent);
+
+                                        if (exists != null)
+                                        {//if disponibility exists, we delete it
+                                            ormManager.Events .Remove(exists);
+                                            Console.WriteLine("Disponibility event deleted");
+                                        }
+                                        else
+                                        {//if disponibility doesn't exists, we create it
+                                            Events newEvent = new Events
+                                            {
+                                                UserId = userId,
+                                                Date = date,
+                                                IsEvent = false,
+                                                IsAllDay = isAllDay, 
+                                                Title = isAllDay ? "🔴 Disponible todo el día" : "🔴 Disponible (Hora)",
+                                                GroupId = null
+                                            };
+                                            ormManager.Events.Add(newEvent);
+                                            Console.WriteLine("Disponibility event created");
+                                        }
+                                        ormManager.SaveChanges();
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    string? realError = ex.InnerException?.Message ?? ex.Message;
+                                    Console.WriteLine($"DATABASE ERROR SAVE AVIABILITY: {realError}");
+                                    response.Data = new { success = false, message = "DB Error: " + realError };
+                                }
+                            }
+                            else response.Data = new { success = false, message = "Invalid data" };
+                        }
+                        break;
+
+
                     default:
                         {
                             Console.WriteLine(@$"Unkown command {response.Command}");
@@ -381,3 +434,4 @@ namespace HeatMeetServer
         }
     }
 }
+

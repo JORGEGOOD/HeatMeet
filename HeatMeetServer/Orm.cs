@@ -78,7 +78,7 @@ namespace HeatMeetServer
 
         public int UserId { get; set; }//<-- For the disponibility
 
-        public int GroupId { get; set; }
+        public int? GroupId { get; set; }
         [ForeignKey("GroupId")]
         public Groups? Group { get; set; }
 

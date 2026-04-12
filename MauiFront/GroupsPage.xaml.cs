@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Syncfusion.Maui.Scheduler;
 using System.Collections.ObjectModel;
-using System.Net.Sockets;
 using System.Text.Json;
-using SharedModels;
-using Syncfusion.Maui.Scheduler;
 
 namespace MauiFront
 {
@@ -58,62 +54,111 @@ namespace MauiFront
 
         private async void OnSchedulerTapped(object sender, SchedulerTappedEventArgs e)
         {
-            //-- IF TOGGLE SWITCH IS ON --
+            //-- IF TOGGLE SWITCH IS ON -- 
             if(DisponibilidadSwitch.IsToggled)
             {
-                //Get the day clicked to switch it to Can or Can't
-                if(e.Element == SchedulerElement.SchedulerCell && e.Date.HasValue)
-                {
+                if(e.Element != SchedulerElement.SchedulerCell && !e.Date.HasValue) return;
 
-                    //get in that day was On or Off. (In the appear screen a server database select should be done)
-                        //check in the frontend if its painted or not? Or make a dedicated list as a copy of the server select and ignore frontend?
+                // Un/Mark the day/hour as disponible
 
-                    //depending on the select above, switch between Can or Can't that day (red or white color)
+                //Search if it was marked or unmarked
+                DateTime dateSelected = e.Date.Value.Date.ToUniversalTime();
+                SchedulerAppointment? marked = ScheduledEvents.Cast<SchedulerAppointment>()                    
+                           .FirstOrDefault(x => x.StartTime.Date == dateSelected && x.Id.ToString()=="-1");
+                if (marked != null)
+                {//If its marked, delete it
+                    
+                    ScheduledEvents.Remove(marked);
 
-                    //Send the decision to the server
-
-
+                    //Send server delete Aviability
+                    System.Net.Sockets.Socket? socket = null;
+                    try
+                    {
+                        socket = NetUtils.NetUtils.ConnectToServer();
+                        SharedModels.NetworkMessage message = new SharedModels.NetworkMessage
+                        {
+                            Command = "SAVE_AVIABILITY",
+                            Data = new
+                            {
+                                userId = Preferences.Get("userId", 0),
+                                dateSelected = dateSelected,
+                                isAllDay = SchedulerControl.View != SchedulerView.Day//if its month view, disp. is all day
+                            }
+                        };
+                        NetUtils.NetUtils.SendJson(socket, message);
+                    }
+                    catch (Exception ex)
+                    {
+                        await DisplayAlert("Error", "No se pudieron cargar los eventos: " + ex.Message, "OK");
+                    }
+                    finally
+                    {
+                        if (socket != null) NetUtils.NetUtils.CloseSocket(socket);
+                    }
                 }
+                else
+                {//If its unmarked, create it
+                    SchedulerAppointment newAviab = new SchedulerAppointment
+                    {
+                        Id = -1, //<--This will save us from a problem above this command
+                        Subject = "🔴 Disponible",
+                        StartTime = e.Date.Value.Date,
+                        EndTime = e.Date.Value.Date.AddDays(1).AddSeconds(-1),
+                        IsAllDay = true,
+                        Background = Color.FromArgb("#FF0000") //Alternative smooth red: #E57373
+                    };
+                    ScheduledEvents.Add(newAviab);
 
-                DisplayAlert("Mensaje", "Has dicho disponibilidad en este dia", "Ok");
+                    //Send server the new aviability
+                    var dto = new EventDto//SchedulerAppointment is private so it can't have "IsEvent" so this is a dupe
+                    {
+                        UserId = Preferences.Get("userId", 0),
+                        Title = newAviab.Subject,
+                        Date = newAviab.StartTime,
+                        IsEvent = false,
+                        IsAllDay = newAviab.IsAllDay,
+                        //NO groupId, aviability is for everyone
+                    };
+
+                    //Send server create Aviability
+                    System.Net.Sockets.Socket? socket = null;
+                    try
+                    {
+                        socket = NetUtils.NetUtils.ConnectToServer();
+                        SharedModels.NetworkMessage message = new SharedModels.NetworkMessage
+                        {
+                            Command = "SAVE_AVIABILITY",
+                            Data = new { dto }
+                        };
+                        NetUtils.NetUtils.SendJson(socket, message);
+                    }
+                    catch (Exception ex)
+                    {
+                        await DisplayAlert("Error", "No se pudieron cargar los eventos: " + ex.Message, "OK");
+                    }
+                    finally
+                    {
+                        if (socket != null) NetUtils.NetUtils.CloseSocket(socket);
+                    }
+                }
                 return;
             }
 
-
-            //-- IF TOGGLE SWITCH IS OFF --
-
-            // Si estamos en el MES, al tocar un día viajamos al DÍA
+            //-- IF DISPONIBILITY SWITCH IS OFF --
+            //If Month view, go to day view
             if (SchedulerControl.View == SchedulerView.Month)
             {
-                if (e.Element == SchedulerElement.SchedulerCell && e.Date.HasValue)
-                {
-                    SchedulerControl.DisplayDate = e.Date.Value;
-                    SchedulerControl.View = SchedulerView.Day;
-                }
+                SchedulerControl.DisplayDate = e.Date.Value;
+                SchedulerControl.View = SchedulerView.Day;
             }
-            // Si ya estamos en el DÍA, entonces sí pedimos el nombre del evento
             else if (SchedulerControl.View == SchedulerView.Day)
             {
-                if (e.Element == SchedulerElement.SchedulerCell && e.Date.HasValue)
-                {
-                    string nombre = await DisplayPromptAsync("Nuevo Evento", "Nombre:", "OK", "Cancelar");
-                    if (!string.IsNullOrWhiteSpace(nombre))
-                    {
-                        ScheduledEvents.Add(new SchedulerAppointment
-                        {
-                            StartTime = e.Date.Value,
-                            EndTime = e.Date.Value.AddHours(1),
-                            Subject = nombre,
-                            Background = Color.FromArgb("#FF6A00")
-                        });
-                    }
-                }
+                //in the future, we may expand the event on clicked
+                //For the moment we only create events on the group chat   
             }
-
         }
 
         bool isFabOpen = false;
-
         protected override async void OnAppearing()
         {
             base.OnAppearing();
@@ -122,7 +167,7 @@ namespace MauiFront
 
             int userId = Preferences.Get("userId", 0);
             if (userId == 0) return;
-            Socket socket = null;
+            System.Net.Sockets.Socket socket = null;
             //--GET GROUPS FROM SERVER--
             try
             {
