@@ -26,7 +26,7 @@ namespace MauiFront
         public string? AddressUrl { get; set; }
         public bool IsEvent { get; set; }// If its an event OR an Aviabilty
         public bool IsAllDay { get; set; } //To know if its and hour or the entire day
-        public int GroupId { get; set; }
+        public int? GroupId { get; set; }
     }
 
 
@@ -55,8 +55,17 @@ namespace MauiFront
 
         private async void OnSchedulerTapped(object sender, SchedulerTappedEventArgs e)
         {
+
+            if (e.Element == SchedulerElement.Appointment || !e.Date.HasValue)
+            {
+                // Aquí podrías poner lógica para BORRAR el evento si quieres,
+                // pero por ahora pongamos un return para evitar el error.
+                return;
+            }
+
+
             //-- IF TOGGLE SWITCH IS ON -- 
-            if(DisponibilidadSwitch.IsToggled)
+            if (DisponibilidadSwitch.IsToggled)
             {
                 if(e.Element != SchedulerElement.SchedulerCell && !e.Date.HasValue) return;
 
@@ -226,10 +235,10 @@ namespace MauiFront
                 //response
                 if (response?.Data is JsonElement data)
                 {
-                    await MainThread.InvokeOnMainThreadAsync(async () =>
-                    {
-                        await DisplayAlert("DEBUG DATA", data.ToString(), "OK");
-                    });
+                    //await MainThread.InvokeOnMainThreadAsync(async () =>
+                    //{
+                    //    await DisplayAlert("DEBUG DATA", data.ToString(), "OK");
+                    //});
                     
                     bool ok = data.GetProperty("success").GetBoolean();
                     if (ok)
