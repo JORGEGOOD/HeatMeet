@@ -525,16 +525,24 @@ public partial class GroupsChat : ContentPage
 
             NetUtils.NetUtils.SendJson(socket, message);
             NetworkMessage response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
-
             if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
             {
                 string title = data.GetProperty("title").GetString() ?? "";
                 string fechaStr = data.GetProperty("fechaHora").GetString() ?? "";
                 DateTime.TryParse(fechaStr, out DateTime fecha);
-                string formatted = fecha.ToLocalTime().ToString("dd/MM  HH:mm");
+                string formatted = fecha.ToLocalTime().ToString("dd/MM/yyyy  HH:mm");
+
+                string location = data.TryGetProperty("ubicacion", out var loc)
+                                  ? (loc.GetString() ?? "") : "";
 
                 MainThread.BeginInvokeOnMainThread(() =>
-                    LastEventLabel.Text = $"{title}  -  {formatted}");
+                {
+                    ProposalTitle.Text = title;
+                    ProposalDate.Text = "📅 " + formatted;
+                    ProposalLocation.Text = string.IsNullOrWhiteSpace(location)
+                                            ? "" : "📍 " + location;
+                    EventProposalCard.IsVisible = true;
+                });
             }
         }
         catch { }

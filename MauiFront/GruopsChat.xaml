@@ -76,70 +76,81 @@
             </VerticalStackLayout>
         </ScrollView>
 
-        
+        <!-- Tarjeta Propuesta -->
+        <Frame x:Name="EventProposalCard"
+           Grid.Row="2"
+           CornerRadius="15"
+           BorderColor="#FF8C00"
+           BackgroundColor="White"
+           Padding="15"
+           Margin="10,5"
+           HasShadow="True"
+           IsVisible="False">
+            <VerticalStackLayout Spacing="8">
+                <HorizontalStackLayout Spacing="10">
+                    <Image Source="calendar_icon.png" WidthRequest="24" HeightRequest="24"/>
+                    <Label Text="Propuesta"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   TextColor="#2B3E50"/>
+                </HorizontalStackLayout>
+                <Label x:Name="ProposalTitle"
+               FontSize="16"
+               FontAttributes="Bold"
+               TextColor="#222"/>
+                <Label x:Name="ProposalDate"
+               FontSize="13"
+               TextColor="Gray"/>
+                <Label x:Name="ProposalLocation"
+               FontSize="13"
+               TextColor="Gray"/>
+                <Button Text="Votar"
+                BackgroundColor="#FF6A00"
+                TextColor="White"
+                CornerRadius="20"
+                HeightRequest="45"/>
+            </VerticalStackLayout>
+        </Frame>
+
+
         <!-- Botón Crear nuevo evento -->
         <Frame Grid.Row="2"
-       BackgroundColor="#F8F9FA"
-       Margin="0"
-       Padding="10,5"
-       BorderColor="#E0E0E0"
-       CornerRadius="0"
-       HasShadow="False">
+           BackgroundColor="#F8F9FA"
+           Margin="0"
+           Padding="10,5"
+           BorderColor="#E0E0E0"
+           CornerRadius="0"
+           HasShadow="False">
 
-            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+            <HorizontalStackLayout Spacing="6" HorizontalOptions="End" VerticalOptions="Center">
 
-                <!-- Último evento (tappeable) -->
-                <Frame Grid.Column="0"
-               BorderColor="#0A2A43"
-               CornerRadius="12"
-               Padding="10,4"
-               BackgroundColor="White"
-               HasShadow="False"
-               VerticalOptions="Center">
-                    <Frame.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="OnLastEventTapped"/>
-                    </Frame.GestureRecognizers>
-                    <Label x:Name="LastEventLabel"
-                   Text="Sin eventos aún"
-                   TextColor="#0A2A43"
-                   FontSize="12"
-                   FontAttributes="Italic"
-                   VerticalOptions="Center"
-                   LineBreakMode="TailTruncation"/>
-                </Frame>
+                <!-- Ver todos los eventos -->
+                <Button Text="≡"
+                FontSize="18"
+                FontAttributes="Bold"
+                BackgroundColor="#0A2A43"
+                TextColor="White"
+                WidthRequest="38"
+                HeightRequest="35"
+                CornerRadius="10"
+                Padding="0"
+                Clicked="OnViewAllEventsTapped"/>
 
-                <!-- Botones juntos a la derecha -->
-                <HorizontalStackLayout Grid.Column="1" Spacing="6" VerticalOptions="Center">
+                <!-- Crear nuevo evento -->
+                <Button Text="+ Evento"
+                Clicked="PageVote"
+                BackgroundColor="#FF6A00"
+                TextColor="White"
+                FontSize="12"
+                HeightRequest="35"
+                Padding="12,0"
+                CornerRadius="18">
+                    <Button.Shadow>
+                        <Shadow Brush="Black" Offset="0,2" Opacity="0.1" Radius="5"/>
+                    </Button.Shadow>
+                </Button>
 
-                    <!-- Ver todos los eventos -->
-                    <Button Text="≡"
-                    FontSize="18"
-                    FontAttributes="Bold"
-                    BackgroundColor="#0A2A43"
-                    TextColor="White"
-                    WidthRequest="38"
-                    HeightRequest="35"
-                    CornerRadius="10"
-                    Padding="0"
-                    Clicked="OnViewAllEventsTapped"/>
-
-                    <!-- Crear nuevo evento -->
-                    <Button Text="+ Evento"
-                    Clicked="PageVote"
-                    BackgroundColor="#FF6A00"
-                    TextColor="White"
-                    FontSize="12"
-                    HeightRequest="35"
-                    Padding="12,0"
-                    CornerRadius="18">
-                        <Button.Shadow>
-                            <Shadow Brush="Black" Offset="0,2" Opacity="0.1" Radius="5"/>
-                        </Button.Shadow>
-                    </Button>
-
-                </HorizontalStackLayout>
-
-            </Grid>
+            </HorizontalStackLayout>
         </Frame>
 
 

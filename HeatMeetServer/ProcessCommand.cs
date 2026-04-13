@@ -431,6 +431,34 @@ namespace HeatMeetServer
                             else response.Data = new { success = false, message = "Invalid data" };
                         }
                         break;
+                    case "GET_LAST_EVENT":
+                        {
+                            if (message.Data is JsonElement evtData)
+                            {
+                                int groupId = evtData.GetProperty("groupId").GetInt32();
+                                lock (ormLock)
+                                {
+                                    Events? lastEvent = ormManager.Events
+                                        .Where(e => e.GroupId == groupId && e.IsEvent == true)
+                                        .OrderByDescending(e => e.Date)
+                                        .FirstOrDefault();
+
+                                    if (lastEvent == null)
+                                        response.Data = new { success = false, message = "No events found" };
+                                    else
+                                        response.Data = new
+                                        {
+                                            success = true,
+                                            title = lastEvent.Title,
+                                            fechaHora = lastEvent.Date,
+                                            ubicacion = lastEvent.Location ?? "",
+                                            direccionUrl = lastEvent.AddressUrl ?? ""
+                                        };
+                                }
+                            }
+                            else response.Data = new { success = false, message = "Invalid data" };
+                        }
+                        break;
 
 
                     default:
