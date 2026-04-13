@@ -11,32 +11,52 @@ namespace MauiFront
             InitializeComponent();
         }
 
+        private async void OnEventCardTapped(object sender, EventArgs e)
+        {
+            
+            var frame = sender as Frame;
+
+            
+            if (frame?.BindingContext is EventDto ev)
+            {
+                
+                await Navigation.PushAsync(new EventDetailPage(ev));
+            }
+        }
+
+
         protected override async void OnAppearing()
         {
             base.OnAppearing();
-
             int groupId = Preferences.Get("groupId", 0);
+            int userId = Preferences.Get("userId", 0);
             if (groupId == 0) return;
 
             Socket socket = null;
             try
             {
                 socket = NetUtils.NetUtils.ConnectToServer();
-
                 NetworkMessage message = new NetworkMessage
                 {
-                    Command = "GET_GROUP_EVENTS",
-                    Data = new { groupId }
+                    Command = "GET_USER_EVENTS_AND_AVIABILITY",
+                    Data = new { userId }
                 };
-
                 NetUtils.NetUtils.SendJson(socket, message);
                 NetworkMessage response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
 
                 if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
                 {
-                    var eventsJson = data.GetProperty("events").GetRawText();
-                    var events = JsonSerializer.Deserialize<List<EventDto>>(eventsJson);
-                    EventsCollection.ItemsSource = events;
+                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                    var all = JsonSerializer.Deserialize<List<EventDto>>(
+                                  data.GetProperty("events").GetRawText(), options);
+
+                    // Filtrar solo eventos reales de este grupo
+                    var groupEvents = all?
+                        .Where(e => e.IsEvent && e.GroupId == groupId)
+                        .OrderByDescending(e => e.Date)
+                        .ToList();
+
+                    EventsCollection.ItemsSource = groupEvents ?? new List<EventDto>();
                 }
                 else
                 {
@@ -51,12 +71,6 @@ namespace MauiFront
             {
                 if (socket != null) NetUtils.NetUtils.CloseSocket(socket);
             }
-        }
-
-        private async void OnEventTapped(object sender, EventArgs e)
-        {
-            if (sender is Frame frame && frame.BindingContext is EventDto ev)
-                await Navigation.PushAsync(new EventDetailPage(ev));
         }
     }
 }
