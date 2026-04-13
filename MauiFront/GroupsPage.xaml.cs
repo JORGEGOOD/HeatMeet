@@ -168,7 +168,6 @@ namespace MauiFront
         protected override async void OnAppearing()
         {
             base.OnAppearing();
-            await Task.Delay(100);//for possible bugs
             Shell.SetNavBarIsVisible(this, true);
 
             int userId = Preferences.Get("userId", 0);
@@ -223,10 +222,7 @@ namespace MauiFront
 
                 NetUtils.NetUtils.SendJson(socket, message);
                 SharedModels.NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<SharedModels.NetworkMessage>(socket);
-                await MainThread.InvokeOnMainThreadAsync(async () =>
-                {
-                    await DisplayAlert("DEBUG", $"Response null? {response == null}", "OK");
-                });
+
                 //response
                 if (response?.Data is JsonElement data)
                 {
@@ -234,11 +230,8 @@ namespace MauiFront
                     {
                         await DisplayAlert("DEBUG DATA", data.ToString(), "OK");
                     });
+                    
                     bool ok = data.GetProperty("success").GetBoolean();
-                    await MainThread.InvokeOnMainThreadAsync(async () =>
-                    {
-                        await DisplayAlert("DEBUG SUCCESS", $"Success = {ok}", "OK");
-                    });
                     if (ok)
                     {
                         //Separate thread because this can start huge lag spikes
@@ -248,8 +241,12 @@ namespace MauiFront
 
                             if (data.TryGetProperty("events", out JsonElement listJson))
                             {
+                                // Usamos opciones para ignorar mayúsculas/minúsculas
+                                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+
                                 List<EventDto>? mixedList =
-                                    JsonSerializer.Deserialize<List<EventDto>>(listJson.GetRawText());
+                                    JsonSerializer.Deserialize<List<EventDto>>(listJson.GetRawText(),options);
 
                                 foreach (EventDto eventDto in mixedList)
                                 {
@@ -279,6 +276,13 @@ namespace MauiFront
                                         });
                                     }
                                 }
+                            }
+                            if (ScheduledEvents.Count > 0)
+                            {
+                                // A veces Syncfusion necesita un pequeño empujón si la colección se limpia y llena muy rápido
+                                var temp = ScheduledEvents;
+                                SchedulerControl.AppointmentsSource = null;
+                                SchedulerControl.AppointmentsSource = temp;
                             }
                         });
                     }
