@@ -26,6 +26,7 @@ namespace MauiFront
         public string? AddressUrl { get; set; }
         public bool IsEvent { get; set; }// If its an event OR an Aviabilty
         public bool IsAllDay { get; set; } //To know if its and hour or the entire day
+        public int GroupId { get; set; }
     }
 
 
@@ -128,7 +129,12 @@ namespace MauiFront
                         SharedModels.NetworkMessage message = new SharedModels.NetworkMessage
                         {
                             Command = "SAVE_AVIABILITY",
-                            Data = new { dto }
+                            Data = new 
+                            {
+                                userId = dto.UserId,
+                                dateSelected = dto.Date,
+                                isAllDay = dto.IsAllDay
+                            }
                         };
                         NetUtils.NetUtils.SendJson(socket, message);
                     }
@@ -217,52 +223,63 @@ namespace MauiFront
 
                 NetUtils.NetUtils.SendJson(socket, message);
                 SharedModels.NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<SharedModels.NetworkMessage>(socket);
-
-                //response
-                if (response.Data is JsonElement data)
+                await MainThread.InvokeOnMainThreadAsync(async () =>
                 {
+                    await DisplayAlert("DEBUG", $"Response null? {response == null}", "OK");
+                });
+                //response
+                if (response?.Data is JsonElement data)
+                {
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                    {
+                        await DisplayAlert("DEBUG DATA", data.ToString(), "OK");
+                    });
                     bool ok = data.GetProperty("success").GetBoolean();
-
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                    {
+                        await DisplayAlert("DEBUG SUCCESS", $"Success = {ok}", "OK");
+                    });
                     if (ok)
                     {
                         //Separate thread because this can start huge lag spikes
-                        MainThread.BeginInvokeOnMainThread(() => 
+                        MainThread.BeginInvokeOnMainThread(async () =>
                         {
                             ScheduledEvents.Clear();
-                            //process list
-                            if(data.TryGetProperty("events",out JsonElement listJson))
-                            {
-                                List<EventDto>? mixedList = JsonSerializer.Deserialize<List<EventDto>>(listJson.GetRawText());
 
-                                foreach(EventDto eventDto in mixedList)
+                            if (data.TryGetProperty("events", out JsonElement listJson))
+                            {
+                                List<EventDto>? mixedList =
+                                    JsonSerializer.Deserialize<List<EventDto>>(listJson.GetRawText());
+
+                                foreach (EventDto eventDto in mixedList)
                                 {
-                                    if(eventDto.IsEvent)//Events
-                                    {
-                                        ScheduledEvents.Add(new SchedulerAppointment//Add event
-                                        {
-                                            Id = eventDto.Id,
-                                            Subject = eventDto.Title,
-                                            StartTime = eventDto.Date.Date,
-                                            EndTime = eventDto.Date.Date.AddHours(1),//<-- By design we make each event have 1 hour duration
-                                            Background = Color.FromArgb("FF6A00")//Event color
-                                        });
-                                    }
-                                    else//Aviabilities
+                                    if (eventDto.IsEvent)
                                     {
                                         ScheduledEvents.Add(new SchedulerAppointment
                                         {
                                             Id = eventDto.Id,
                                             Subject = eventDto.Title,
-                                            StartTime = eventDto.Date,
-                                            //New IsEntire day, to know if its the entire day or just a specific hour
-                                            EndTime = (eventDto.IsAllDay ? eventDto.Date.Date.AddDays(1).AddSeconds(-1) : eventDto.Date.Date.AddHours(1)),
+                                            StartTime = eventDto.Date.ToLocalTime(),
+                                            EndTime = eventDto.Date.ToLocalTime().AddHours(1),
+                                            Background = Color.FromArgb("FF6A00")
+                                        });
+                                    }
+                                    else
+                                    {
+                                        ScheduledEvents.Add(new SchedulerAppointment
+                                        {
+                                            Id = eventDto.Id,
+                                            Subject = eventDto.Title,
+                                            StartTime = eventDto.Date.ToLocalTime(),
+                                            EndTime = eventDto.IsAllDay
+                                                ? eventDto.Date.ToLocalTime().Date.AddDays(1).AddSeconds(-1)
+                                                : eventDto.Date.ToLocalTime().AddHours(1),
                                             IsAllDay = eventDto.IsAllDay,
                                             Background = Color.FromArgb("#4CAF50"),
                                         });
                                     }
                                 }
                             }
-
                         });
                     }
                 }
@@ -275,8 +292,6 @@ namespace MauiFront
             {
                 if (socket != null) NetUtils.NetUtils.CloseSocket(socket);
             }
-
-
         }
 
         //Clic on group → go to chat

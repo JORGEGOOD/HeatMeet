@@ -27,7 +27,6 @@ namespace NetUtils
             int index = host.AddressList.ToList().FindIndex((e) => e.AddressFamily == AddressFamily.InterNetwork);
 
             return host.AddressList[index].ToString();
-
         }
 
         public static Socket ConnectToServer()

@@ -287,8 +287,8 @@ namespace HeatMeetServer
                                     string? direccion  = evtData.TryGetProperty("direccionUrl", out var d) ? d.GetString() : null;
                                     DateTime rawDate   = evtData.GetProperty("fechaHora").GetDateTime();
                                     DateTime fechaHora = DateTime.SpecifyKind(rawDate, DateTimeKind.Utc);
-                                    int groupId        = evtData.GetProperty("groupId").GetInt32();
-                                    
+                                    int groupId        = evtData.TryGetProperty("groupId", out var g) ? g.GetInt32(): 0;
+                                    bool IsEvent = evtData.GetProperty("isEvent").GetBoolean();
                                     lock (ormLock)
                                     {
                                         Groups? group = ormManager.Groups.Find(groupId);
@@ -306,7 +306,7 @@ namespace HeatMeetServer
                                             AddressUrl = direccion,
                                             Date = fechaHora,   
                                             GroupId = groupId,
-                                            IsEvent = true         
+                                            IsEvent = IsEvent        
                                         };
 
                                         ormManager.Events.Add(newEvent);
@@ -331,28 +331,33 @@ namespace HeatMeetServer
                             if (message.Data is JsonElement evtData)
                             {
                                 try
-                                {                
-                                    string userId = evtData.GetProperty("userId").ToString();
+                                {
+                                    int userId = evtData.GetProperty("userId").GetInt32();
                                     lock (ormLock)
                                     {
                                         //search user's groups
                                         List<int>? userGroupsIds = ormManager.Groups
-                                            .Where(g => g.Users.Any(u => u.Id.ToString() == userId))
+                                            .Where(g => g.Users.Any(u => u.Id == userId))
                                             .Select(g=>g.Id).ToList();
 
                                         //get all events the groups have
-                                        List<Events>? all = ormManager.Events
-                                                  .Where(e => userGroupsIds.Contains(e.GroupId.Value))
-                                                  .Select(e => new Events
-                                                  {
-                                                      Id       = e.Id,
-                                                      UserId   = e.UserId,
-                                                      Title    = e.Title,
-                                                      Date     = e.Date,
-                                                      IsEvent  = e.IsEvent,
-                                                      IsAllDay = e.IsAllDay,
-                                                      GroupId  = e.GroupId
-                                                  }).ToList();
+                                        var all = ormManager.Events
+                                                .Where(e =>
+                                                    (e.GroupId != null && userGroupsIds.Contains(e.GroupId.Value))
+                                                    || (e.UserId == userId && !e.IsEvent) 
+                                                )
+                                                .Select(e => new
+                                                {
+                                                    id = e.Id,
+                                                    userId = e.UserId,
+                                                    title = e.Title,
+                                                    date = e.Date,
+                                                    isEvent = e.IsEvent,
+                                                    isAllDay = e.IsAllDay,
+                                                    groupId = e.GroupId
+                                                })
+                                                .ToList();
+
                                         response.Data = new { success = true, events = all };
                                     }
                                 }
@@ -385,22 +390,33 @@ namespace HeatMeetServer
 
                                         if (exists != null)
                                         {//if disponibility exists, we delete it
+                                            Console.WriteLine("---- DELETE AVAILABILITY ----");
+                                            Console.WriteLine($"Found existing event:");
+                                            Console.WriteLine($"Id: {exists.Id}");
+                                            Console.WriteLine($"UserId: {exists.UserId}");
+                                            Console.WriteLine($"Date (DB): {exists.Date:O}");
+                                            Console.WriteLine($"Date (Incoming): {date:O}");
+                                            Console.WriteLine($"IsAllDay: {exists.IsAllDay}");
+                                            Console.WriteLine($"IsEvent: {exists.IsEvent}");
                                             ormManager.Events .Remove(exists);
-                                            Console.WriteLine("Disponibility event deleted");
                                         }
                                         else
                                         {//if disponibility doesn't exists, we create it
+                                            Console.WriteLine("---- CREATE AVAILABILITY ----");
+                                            Console.WriteLine($"Creating new event with:");
+                                            Console.WriteLine($"UserId: {userId}");
+                                            Console.WriteLine($"Date: {date:O}");
+                                            Console.WriteLine($"IsAllDay: {isAllDay}");
                                             Events newEvent = new Events
                                             {
                                                 UserId = userId,
                                                 Date = date,
                                                 IsEvent = false,
                                                 IsAllDay = isAllDay, 
-                                                Title = isAllDay ? "🔴 Disponible todo el día" : "🔴 Disponible (Hora)",
+                                                Title = isAllDay ? "🔴 Disponible" : "🔴 Disponible (Hora)",
                                                 GroupId = null
                                             };
                                             ormManager.Events.Add(newEvent);
-                                            Console.WriteLine("Disponibility event created");
                                         }
                                         ormManager.SaveChanges();
                                     }
@@ -410,6 +426,34 @@ namespace HeatMeetServer
                                     string? realError = ex.InnerException?.Message ?? ex.Message;
                                     Console.WriteLine($"DATABASE ERROR SAVE AVIABILITY: {realError}");
                                     response.Data = new { success = false, message = "DB Error: " + realError };
+                                }
+                            }
+                            else response.Data = new { success = false, message = "Invalid data" };
+                        }
+                        break;
+                    case "GET_LAST_EVENT":
+                        {
+                            if (message.Data is JsonElement evtData)
+                            {
+                                int groupId = evtData.GetProperty("groupId").GetInt32();
+                                lock (ormLock)
+                                {
+                                    Events? lastEvent = ormManager.Events
+                                        .Where(e => e.GroupId == groupId && e.IsEvent == true)
+                                        .OrderByDescending(e => e.Date)
+                                        .FirstOrDefault();
+
+                                    if (lastEvent == null)
+                                        response.Data = new { success = false, message = "No events found" };
+                                    else
+                                        response.Data = new
+                                        {
+                                            success = true,
+                                            title = lastEvent.Title,
+                                            fechaHora = lastEvent.Date,
+                                            ubicacion = lastEvent.Location ?? "",
+                                            direccionUrl = lastEvent.AddressUrl ?? ""
+                                        };
                                 }
                             }
                             else response.Data = new { success = false, message = "Invalid data" };

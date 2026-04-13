@@ -184,7 +184,6 @@ namespace HeatMeetServer
                 while (serverSocket.IsBound)
                 {
                     Socket clientSocket = serverSocket.Accept();
-                    Console.WriteLine($"Client connected!");
                     Thread clientThread = new Thread(HandleClient);
                     clientThread.Start(clientSocket);
                 }

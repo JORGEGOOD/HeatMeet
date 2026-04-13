@@ -21,14 +21,13 @@ namespace HeatMeetServer
                 NetworkMessage message = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(client);
 
                 if (message == null) return;
-                if (message.Command != "RELOAD_MESSAGES")
+                if (message.Command != "RELOAD_CHAT_MESSAGES")
                 {
                     Console.WriteLine($" Command received: {message.Command}");
                 }
                 NetworkMessage response = ProcessCommand(message);
 
                 NetUtils.NetUtils.SendJson(client, response);
-                Console.WriteLine($" Answer sent");
 
             }
             catch (Exception ex)
@@ -38,7 +37,6 @@ namespace HeatMeetServer
             finally
             {
                 NetUtils.NetUtils.CloseSocket(client);
-                Console.WriteLine(" Client disconnected");
             }
         }
     }
