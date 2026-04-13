@@ -4,7 +4,7 @@
              x:Class="MauiFront.GroupsChat"
              BackgroundColor="#F5F0E8">
 
-    <Grid RowDefinitions="70,*,50,70">
+    <Grid RowDefinitions="70,*,Auto,50,70">
 
         <!-- HEADER -->
         <Grid Grid.Row="0"
@@ -19,12 +19,10 @@
                TextColor="#222"
                VerticalOptions="Center"
                HorizontalOptions="Center">
-                 
                 <Label.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnBackTapped"/>
                 </Label.GestureRecognizers>
             </Label>
-
 
             <!-- Avatar circular -->
             <Frame Grid.Column="1"
@@ -36,10 +34,8 @@
                HasShadow="False"
                BackgroundColor="Transparent"
                VerticalOptions="Center"
-               HorizontalOptions="Center">  
-
-                <Image Source="logo.png"
-                Aspect="AspectFill"/>
+               HorizontalOptions="Center">
+                <Image Source="logo.png" Aspect="AspectFill"/>
             </Frame>
 
             <!-- Nombre del grupo -->
@@ -49,8 +45,7 @@
                FontAttributes="Bold"
                VerticalOptions="Center"
                TextColor="#222"
-               Margin="8,0,0,0"/>   
-
+               Margin="8,0,0,0"/>
 
             <!-- Tres puntos -->
             <Button Grid.Column="3"
@@ -62,89 +57,94 @@
                     VerticalOptions="Center"
                     Clicked="OnMenuTapped"
                     Padding="8,4"
-                    Margin="0,0,20,0"/> 
+                    Margin="0,0,20,0"/>
         </Grid>
 
-        <!-- Messages -->
+        <!-- MENSAJES -->
         <ScrollView x:Name="ChatScrollView" Grid.Row="1" Padding="15,10">
-            <VerticalStackLayout x:Name="MessagesContainer" Spacing="10">
-                
-                
-                <!--Its null on the start-->
-                
-                
-            </VerticalStackLayout>
+            <VerticalStackLayout x:Name="MessagesContainer" Spacing="10"/>
         </ScrollView>
 
-        <!-- Tarjeta Propuesta -->
+       
+        <!-- TARJETA PROPUESTA -->
         <Frame x:Name="EventProposalCard"
            Grid.Row="2"
-           CornerRadius="15"
+           CornerRadius="12"
            BorderColor="#FF8C00"
            BackgroundColor="White"
-           Padding="15"
-           Margin="10,5"
-           HasShadow="True"
+           Padding="12,8"
+           Margin="10,4"
+           HasShadow="False"
            IsVisible="False">
-            <VerticalStackLayout Spacing="8">
-                <HorizontalStackLayout Spacing="10">
-                    <Image Source="calendar_icon.png" WidthRequest="24" HeightRequest="24"/>
+            <HorizontalStackLayout Spacing="10">
+
+                <!-- Icono -->
+                <Image Source="calendar_icon.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
+
+                <!-- Contenido -->
+                <VerticalStackLayout Spacing="2" HorizontalOptions="FillAndExpand">
                     <Label Text="Propuesta"
-                   FontSize="18"
-                   FontAttributes="Bold"
-                   TextColor="#2B3E50"/>
-                </HorizontalStackLayout>
-                <Label x:Name="ProposalTitle"
-               FontSize="16"
-               FontAttributes="Bold"
-               TextColor="#222"/>
-                <Label x:Name="ProposalDate"
-               FontSize="13"
-               TextColor="Gray"/>
-                <Label x:Name="ProposalLocation"
-               FontSize="13"
-               TextColor="Gray"/>
+                       FontSize="11"
+                       FontAttributes="Bold"
+                       TextColor="#FF6A00"/>
+                    <Label x:Name="ProposalTitle"
+                       FontSize="14"
+                       FontAttributes="Bold"
+                       TextColor="#222"/>
+                    <HorizontalStackLayout Spacing="8">
+                        <Label x:Name="ProposalDate"
+                           FontSize="11"
+                           TextColor="Gray"/>
+                        <Label x:Name="ProposalLocation"
+                           FontSize="11"
+                           TextColor="Gray"/>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+
+                <!-- Botón Votar -->
                 <Button Text="Votar"
-                BackgroundColor="#FF6A00"
-                TextColor="White"
-                CornerRadius="20"
-                HeightRequest="45"/>
-            </VerticalStackLayout>
+                    BackgroundColor="#FF6A00"
+                    TextColor="White"
+                    CornerRadius="14"
+                    HeightRequest="32"
+                    Padding="12,0"
+                    VerticalOptions="Center"
+                    FontSize="12"/>
+
+            </HorizontalStackLayout>
         </Frame>
 
-
-        <!-- Botón Crear nuevo evento -->
-        <Frame Grid.Row="2"
-           BackgroundColor="#F8F9FA"
-           Margin="0"
-           Padding="10,5"
-           BorderColor="#E0E0E0"
-           CornerRadius="0"
-           HasShadow="False">
-
+        <!-- BARRA BOTONES -->
+        <Frame Grid.Row="3"
+               BackgroundColor="#F8F9FA"
+               Margin="0"
+               Padding="10,5"
+               BorderColor="#E0E0E0"
+               CornerRadius="0"
+               HasShadow="False">
             <HorizontalStackLayout Spacing="6" HorizontalOptions="End" VerticalOptions="Center">
 
                 <!-- Ver todos los eventos -->
                 <Button Text="≡"
-                FontSize="18"
-                FontAttributes="Bold"
-                BackgroundColor="#0A2A43"
-                TextColor="White"
-                WidthRequest="38"
-                HeightRequest="35"
-                CornerRadius="10"
-                Padding="0"
-                Clicked="OnViewAllEventsTapped"/>
+                        FontSize="18"
+                        FontAttributes="Bold"
+                        BackgroundColor="#0A2A43"
+                        TextColor="White"
+                        WidthRequest="38"
+                        HeightRequest="35"
+                        CornerRadius="10"
+                        Padding="0"
+                        Clicked="OnViewAllEventsTapped"/>
 
                 <!-- Crear nuevo evento -->
                 <Button Text="+ Evento"
-                Clicked="PageVote"
-                BackgroundColor="#FF6A00"
-                TextColor="White"
-                FontSize="12"
-                HeightRequest="35"
-                Padding="12,0"
-                CornerRadius="18">
+                        Clicked="PageVote"
+                        BackgroundColor="#FF6A00"
+                        TextColor="White"
+                        FontSize="12"
+                        HeightRequest="35"
+                        Padding="12,0"
+                        CornerRadius="18">
                     <Button.Shadow>
                         <Shadow Brush="Black" Offset="0,2" Opacity="0.1" Radius="5"/>
                     </Button.Shadow>
@@ -153,12 +153,8 @@
             </HorizontalStackLayout>
         </Frame>
 
-
-
-
-
-        <!-- BARRA DE MENSAJES-->
-        <Grid Grid.Row="3"
+        <!-- BARRA DE MENSAJES -->
+        <Grid Grid.Row="4"
               BackgroundColor="White"
               Padding="10,0"
               ColumnDefinitions="*,45">
