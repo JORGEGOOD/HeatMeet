@@ -516,32 +516,97 @@ public partial class GroupsChat : ContentPage
         try
         {
             socket = NetUtils.NetUtils.ConnectToServer();
-
             NetworkMessage message = new NetworkMessage
             {
                 Command = "GET_LAST_EVENT",
                 Data = new { groupId }
             };
-
             NetUtils.NetUtils.SendJson(socket, message);
             NetworkMessage response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
+
             if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
             {
                 string title = data.GetProperty("title").GetString() ?? "";
                 string fechaStr = data.GetProperty("fechaHora").GetString() ?? "";
                 DateTime.TryParse(fechaStr, out DateTime fecha);
                 string formatted = fecha.ToLocalTime().ToString("dd/MM/yyyy  HH:mm");
-
                 string location = data.TryGetProperty("ubicacion", out var loc)
-                                  ? (loc.GetString() ?? "") : "";
+                                   ? (loc.GetString() ?? "") : "";
 
                 MainThread.BeginInvokeOnMainThread(() =>
                 {
-                    ProposalTitle.Text = title;
-                    ProposalDate.Text = "📅 " + formatted;
-                    ProposalLocation.Text = string.IsNullOrWhiteSpace(location)
-                                            ? "" : "📍 " + location;
-                    EventProposalCard.IsVisible = true;
+                    // Tarjeta dentro del scroll como un mensaje
+                    var card = new Frame
+                    {
+                        CornerRadius = 12,
+                        BorderColor = Color.FromArgb("#FF8C00"),
+                        BackgroundColor = Colors.White,
+                        Padding = new Thickness(12, 10),
+                        Margin = new Thickness(20, 4),
+                        HasShadow = false,
+                        HorizontalOptions = LayoutOptions.Fill
+                    };
+
+                    var header = new HorizontalStackLayout { Spacing = 8 };
+                    header.Children.Add(new Image
+                    {
+                        Source = "calendar_icon.png",
+                        WidthRequest = 18,
+                        HeightRequest = 18,
+                        VerticalOptions = LayoutOptions.Center
+                    });
+                    header.Children.Add(new Label
+                    {
+                        Text = "Propuesta",
+                        FontSize = 13,
+                        FontAttributes = FontAttributes.Bold,
+                        TextColor = Color.FromArgb("#FF6A00"),
+                        VerticalOptions = LayoutOptions.Center
+                    });
+
+                    var titleLabel = new Label
+                    {
+                        Text = title,
+                        FontSize = 14,
+                        FontAttributes = FontAttributes.Bold,
+                        TextColor = Color.FromArgb("#222")
+                    };
+
+                    var detailsRow = new HorizontalStackLayout { Spacing = 10 };
+                    detailsRow.Children.Add(new Label
+                    {
+                        Text = "📅 " + formatted,
+                        FontSize = 12,
+                        TextColor = Colors.Gray
+                    });
+                    if (!string.IsNullOrWhiteSpace(location))
+                        detailsRow.Children.Add(new Label
+                        {
+                            Text = "📍 " + location,
+                            FontSize = 12,
+                            TextColor = Colors.Gray
+                        });
+
+                    var votarBtn = new Button
+                    {
+                        Text = "Votar",
+                        BackgroundColor = Color.FromArgb("#FF6A00"),
+                        TextColor = Colors.White,
+                        CornerRadius = 20,
+                        HeightRequest = 38,
+                        HorizontalOptions = LayoutOptions.Fill,
+                        FontSize = 13
+                    };
+
+                    var stack = new VerticalStackLayout { Spacing = 6 };
+                    stack.Children.Add(header);
+                    stack.Children.Add(titleLabel);
+                    stack.Children.Add(detailsRow);
+                    stack.Children.Add(votarBtn);
+
+                    card.Content = stack;
+                    MessagesContainer.Children.Add(card);
+                    ScrollToBottom();
                 });
             }
         }

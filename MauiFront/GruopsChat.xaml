@@ -66,53 +66,7 @@
         </ScrollView>
 
        
-        <!-- TARJETA PROPUESTA -->
-        <Frame x:Name="EventProposalCard"
-           Grid.Row="2"
-           CornerRadius="12"
-           BorderColor="#FF8C00"
-           BackgroundColor="White"
-           Padding="12,8"
-           Margin="10,4"
-           HasShadow="False"
-           IsVisible="False">
-            <HorizontalStackLayout Spacing="10">
-
-                <!-- Icono -->
-                <Image Source="calendar_icon.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
-
-                <!-- Contenido -->
-                <VerticalStackLayout Spacing="2" HorizontalOptions="FillAndExpand">
-                    <Label Text="Propuesta"
-                       FontSize="11"
-                       FontAttributes="Bold"
-                       TextColor="#FF6A00"/>
-                    <Label x:Name="ProposalTitle"
-                       FontSize="14"
-                       FontAttributes="Bold"
-                       TextColor="#222"/>
-                    <HorizontalStackLayout Spacing="8">
-                        <Label x:Name="ProposalDate"
-                           FontSize="11"
-                           TextColor="Gray"/>
-                        <Label x:Name="ProposalLocation"
-                           FontSize="11"
-                           TextColor="Gray"/>
-                    </HorizontalStackLayout>
-                </VerticalStackLayout>
-
-                <!-- Botón Votar -->
-                <Button Text="Votar"
-                    BackgroundColor="#FF6A00"
-                    TextColor="White"
-                    CornerRadius="14"
-                    HeightRequest="32"
-                    Padding="12,0"
-                    VerticalOptions="Center"
-                    FontSize="12"/>
-
-            </HorizontalStackLayout>
-        </Frame>
+       
 
         <!-- BARRA BOTONES -->
         <Frame Grid.Row="3"
