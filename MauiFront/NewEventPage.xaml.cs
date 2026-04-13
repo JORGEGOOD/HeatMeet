@@ -48,7 +48,8 @@ namespace MauiFront
                         ubicacion = NombreLugar.Text?.Trim(),
                         direccionUrl = Direccion.Text?.Trim(),
                         fechaHora = fechaHoraUtc,
-                        groupId = groupId
+                        groupId = groupId,
+                        isEvent = true
                     }
                 };
 

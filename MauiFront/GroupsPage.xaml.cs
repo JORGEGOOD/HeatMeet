@@ -128,7 +128,12 @@ namespace MauiFront
                         SharedModels.NetworkMessage message = new SharedModels.NetworkMessage
                         {
                             Command = "SAVE_AVIABILITY",
-                            Data = new { dto }
+                            Data = new 
+                            {
+                                userId = dto.UserId,
+                                dateSelected = dto.Date,
+                                isAllDay = dto.IsAllDay
+                            }
                         };
                         NetUtils.NetUtils.SendJson(socket, message);
                     }
@@ -217,12 +222,22 @@ namespace MauiFront
 
                 NetUtils.NetUtils.SendJson(socket, message);
                 SharedModels.NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<SharedModels.NetworkMessage>(socket);
-
-                //response
-                if (response.Data is JsonElement data)
+                await MainThread.InvokeOnMainThreadAsync(async () =>
                 {
+                    await DisplayAlert("DEBUG", $"Response null? {response == null}", "OK");
+                });
+                //response
+                if (response?.Data is JsonElement data)
+                {
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                    {
+                        await DisplayAlert("DEBUG DATA", data.ToString(), "OK");
+                    });
                     bool ok = data.GetProperty("success").GetBoolean();
-
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                    {
+                        await DisplayAlert("DEBUG SUCCESS", $"Success = {ok}", "OK");
+                    });
                     if (ok)
                     {
                         //Separate thread because this can start huge lag spikes
@@ -275,8 +290,6 @@ namespace MauiFront
             {
                 if (socket != null) NetUtils.NetUtils.CloseSocket(socket);
             }
-
-
         }
 
         //Clic on group → go to chat
