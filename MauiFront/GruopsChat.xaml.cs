@@ -585,7 +585,11 @@ public partial class GroupsChat : ContentPage
                         HeightRequest = 38,
                         HorizontalOptions = LayoutOptions.Fill,
                         FontSize = 13
+                        
                     };
+                    votarBtn.Clicked += OnVotarClicked;
+
+
 
                     var stack = new VerticalStackLayout { Spacing = 6 };
                     stack.Children.Add(header);
@@ -593,9 +597,11 @@ public partial class GroupsChat : ContentPage
                     stack.Children.Add(detailsRow);
                     stack.Children.Add(votarBtn);
 
+                    
                     card.Content = stack;
                     MessagesContainer.Children.Add(card);
                 });
+                
             }
         }
         catch { }
@@ -603,6 +609,11 @@ public partial class GroupsChat : ContentPage
         {
             if (socket != null) NetUtils.NetUtils.CloseSocket(socket);
         }
+    }
+
+    private void VotarBtn_Clicked(object? sender, EventArgs e)
+    {
+        throw new NotImplementedException();
     }
 
     private async void OnLastEventTapped(object sender, EventArgs e)
@@ -656,10 +667,18 @@ public partial class GroupsChat : ContentPage
         await Navigation.PushAsync(new EventPage());
     }
 
-    private async void PageVote(object sender, EventArgs e)
+    private async void NewEvent(object sender, EventArgs e)
     {
         await Navigation.PushAsync(new NewEventPage());
     }
+
+    private async void OnVotarClicked(object? sender, EventArgs e)
+    {
+      
+        await Navigation.PushAsync(new VotePage());
+        
+    }
+
 
 
 }

@@ -83,6 +83,8 @@ namespace HeatMeetServer
         public Groups? Group { get; set; }
 
         public bool IsEvent { get; set; }
+
+        public bool IsDrafT { get; set; }
         public bool IsAllDay { get; set; }
 
         public List<Votes> Votes { get; set; } = new();

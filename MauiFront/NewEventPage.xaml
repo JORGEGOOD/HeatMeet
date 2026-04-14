@@ -12,7 +12,7 @@
                        FontAttributes="Bold"
                        TextColor="#1E2A4A"
                        HorizontalOptions="Center"/>
-                <Label Text="Configura los detalles de tu experiencia"
+                <Label Text="Es hora de Votar"
                        FontSize="15"
                        TextColor="#707070"
                        HorizontalOptions="Center"

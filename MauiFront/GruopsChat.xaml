@@ -92,7 +92,7 @@
 
                 <!-- Crear nuevo evento -->
                 <Button Text="+ Evento"
-                        Clicked="PageVote"
+                        Clicked="NewEvent"
                         BackgroundColor="#FF6A00"
                         TextColor="White"
                         FontSize="12"

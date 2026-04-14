@@ -29,9 +29,7 @@
 
   <ItemGroup>
     <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
-	  <MauiSplashScreen Include="Resources\AppIcon\appicon.svg"
-					Color="#0F172A"
-					BaseSize="64,64" />
+	  <MauiSplashScreen Include="Resources\AppIcon\appicon.svg" Color="#0F172A" BaseSize="64,64" />
     <MauiImage Include="Resources\Images\*" />
     <MauiImage Update="Resources\Images\dotnet_bot.png" Resize="True" BaseSize="300,185" />
     <MauiFont Include="Resources\Fonts\*" />
@@ -62,6 +60,9 @@
     <Compile Update="EventDetailPage.xaml.cs">
       <DependentUpon>EventDetailPage.xaml</DependentUpon>
     </Compile>
+    <Compile Update="VotePage.xaml.cs">
+      <DependentUpon>VotePage.xaml</DependentUpon>
+    </Compile>
     <Compile Update="NewEventPage.xaml.cs">
       <DependentUpon>VotePage.xaml</DependentUpon>
     </Compile>
@@ -81,6 +82,9 @@
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
     <MauiXaml Update="EventDetailPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+    <MauiXaml Update="VotePage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
     <MauiXaml Update="NewEventPage.xaml">

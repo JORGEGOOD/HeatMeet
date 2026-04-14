@@ -33,7 +33,6 @@ namespace MauiFront
             DateTime fechaHoraUtc = fechaHoraLocal.ToUniversalTime(); // Esto le pone el Kind.Utc
 
            
-
             Socket socket = null;
             try
             {
