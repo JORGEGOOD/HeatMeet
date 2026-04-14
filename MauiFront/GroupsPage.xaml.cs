@@ -26,7 +26,7 @@ namespace MauiFront
         public string? AddressUrl { get; set; }
         public bool IsEvent { get; set; }// If its an event OR an Aviabilty
         public bool IsAllDay { get; set; } //To know if its and hour or the entire day
-        public int GroupId { get; set; }
+        public int? GroupId { get; set; }
 
         public string FechaHoraFormatted => Date.ToLocalTime().ToString("dd/MM/yyyy  HH:mm");
     }
