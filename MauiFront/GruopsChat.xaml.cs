@@ -34,7 +34,7 @@ public partial class GroupsChat : ContentPage
         int senderId = msg.UserId != 0 ? msg.UserId : msg.userId;
         bool isMine = senderId == currentUserId;
 
-        var headerGrid = new Grid
+        Grid? headerGrid = new Grid
         {
             ColumnDefinitions =
             {
@@ -44,7 +44,7 @@ public partial class GroupsChat : ContentPage
             Margin = new Thickness(2, 0, 2, 3)
         };
 
-        var nameLabel = new Label
+        Label? nameLabel = new Label
         {
             Text = isMine ? "Tú " : (msg.UserName ?? "Usuario"),
             FontSize = 11,
@@ -53,7 +53,7 @@ public partial class GroupsChat : ContentPage
             HorizontalOptions = LayoutOptions.Start
         };
 
-        var dateLabel = new Label
+        Label? dateLabel = new Label
         {
             Text = msg.CreateDate.ToLocalTime().ToString("dd/MM  HH:mm"),
             FontSize = 11,
@@ -64,20 +64,20 @@ public partial class GroupsChat : ContentPage
         headerGrid.Add(nameLabel, 0, 0);
         headerGrid.Add(dateLabel, 1, 0);
 
-        var contentLabel = new Label
+        Label? contentLabel = new Label
         {
             Text = msg.Content,
             FontSize = 14,
             TextColor = isMine ? Colors.White : Color.FromArgb("#222")
         };
 
-        var bubble = new VerticalStackLayout
+        VerticalStackLayout? bubble = new VerticalStackLayout
         {
             Spacing = 0,
             Children = { headerGrid, contentLabel }
         };
 
-        var frame = new Frame
+        Frame? frame = new Frame
         {
             BackgroundColor = isMine ? Color.FromArgb("#2C3E6B") : Colors.White,
             CornerRadius = 16,
@@ -91,14 +91,16 @@ public partial class GroupsChat : ContentPage
 
         if (msg.Id > _lastMessageId)
             _lastMessageId = msg.Id;
-
-        ScrollToBottom();
     }
 
     private async void ScrollToBottom()
     {
-        await Task.Delay(50);
+        await Task.Delay(100);
         await ChatScrollView.ScrollToAsync(MessagesContainer, ScrollToPosition.End, false);
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            await ChatScrollView.ScrollToAsync(MessagesContainer, ScrollToPosition.End, false);
+        });
     }
 
     void LoadMessages(List<MessageDto> mensajes, int currentUserId)
@@ -106,11 +108,13 @@ public partial class GroupsChat : ContentPage
         MessagesContainer.Children.Clear();
         foreach (MessageDto? msg in mensajes)
             AddMessage(msg, currentUserId);
-        ScrollToBottom();
     }
+
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+
+        MessagesContainer.ChildAdded += OnChildAddedScroll;//Maui trolls bcs it freezes the screen, so this doesnt work when spammed
 
         _isChatActive = true;
         Task.Run(async () => await RefreshMessagesLoop());
@@ -124,7 +128,7 @@ public partial class GroupsChat : ContentPage
         if (groupId == 0)
         {
 
-            await DisplayAlert("Error", "Chat couldn't be loaded", "OK");
+            await DisplayAlert("Error", "Chat couldn't be loaded: groupId is 0", "OK");
             return;
         }
 
@@ -158,7 +162,6 @@ public partial class GroupsChat : ContentPage
             }
 
             NetUtils.NetUtils.CloseSocket(socket);
-
         }
         catch (Exception ex)
         {
@@ -168,7 +171,21 @@ public partial class GroupsChat : ContentPage
         await LoadLastEvent();
     }
 
-    private async void OnSendTapped(object sender, EventArgs e)
+
+    //Theese 2 pieces of code are to delete "freezed" functions that cause problems when re-called later 
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        _isChatActive = false;
+        //Remove ScrollToBottom() because it fails when acumulated
+        MessagesContainer.ChildAdded -= OnChildAddedScroll;
+    }
+    private void OnChildAddedScroll(object? sender, ElementEventArgs e) => ScrollToBottom();
+
+
+
+
+    private async void OnSendTapped(object sender, EventArgs e)//Send indivual message
     {
         if (string.IsNullOrWhiteSpace(MessageEntry.Text)) return;
 
@@ -181,7 +198,7 @@ public partial class GroupsChat : ContentPage
             int groupId = Preferences.Get("groupId", 0);
             int userId = Preferences.Get("userId", 0);
 
-            //Optimism chat technology --> Creates content-only message and refill when server sends details
+            //Optimism chat technology --> Send content-only message and refill it when server answers details
             MessageDto messageFront = new MessageDto
             {
                 Id = 0,
@@ -299,11 +316,7 @@ public partial class GroupsChat : ContentPage
         }
     }
 
-    protected override void OnDisappearing()
-    {
-        base.OnDisappearing();
-        _isChatActive = false;
-    }
+
 
 
 
@@ -317,9 +330,6 @@ public partial class GroupsChat : ContentPage
     {
         //Dynamic mute button label based on current preference
         int groupId = Preferences.Get("groupId", 0);
-        bool isMuted = Preferences.Get($"muted_group_{groupId}", false);
-        string muteText = isMuted ? "🔔 Activar notificaciones" : "🔕 Silenciar notificaciones";
-
         string action = await DisplayActionSheet
         (
             "Opciones del grupo",
@@ -327,7 +337,6 @@ public partial class GroupsChat : ContentPage
             null,
             "📋 Copiar código del grupo",
             "ℹ️  Info del grupo",
-            muteText,
             "🚪 Salir del grupo"
         );
 
@@ -340,9 +349,6 @@ public partial class GroupsChat : ContentPage
                 await OnGroupInfo();
                 break;
             case "🔕 Silenciar notificaciones":
-            case "🔔 Activar notificaciones":
-                OnMuteToggle();
-                break;
             case "🚪 Salir del grupo":
                 await OnLeaveGroup();
                 break;
@@ -438,23 +444,6 @@ public partial class GroupsChat : ContentPage
         {
             if (socket != null) NetUtils.NetUtils.CloseSocket(socket);
         }
-    }
-
-    // ─── Mute / Unmute notifications (local preference) ──────────────
-    private void OnMuteToggle()
-    {
-        int groupId = Preferences.Get("groupId", 0);
-        string key = $"muted_group_{groupId}";
-        bool isMuted = Preferences.Get(key, false);
-
-        Preferences.Set(key, !isMuted);
-
-        string msg = !isMuted
-            ? "🔕 Notificaciones silenciadas para este grupo."
-            : "🔔 Notificaciones activadas para este grupo.";
-
-        MainThread.BeginInvokeOnMainThread(async () =>
-            await DisplayAlert("Notificaciones", msg, "OK"));
     }
 
     // ─── Leave the group ───────────────────────────────────────────────────
@@ -606,7 +595,6 @@ public partial class GroupsChat : ContentPage
 
                     card.Content = stack;
                     MessagesContainer.Children.Add(card);
-                    ScrollToBottom();
                 });
             }
         }
