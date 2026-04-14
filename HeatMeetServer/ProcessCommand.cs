@@ -304,9 +304,10 @@ namespace HeatMeetServer
                                             Title = title,
                                             Location = ubicacion,
                                             AddressUrl = direccion,
-                                            Date = fechaHora,   
+                                            Date = fechaHora,
                                             GroupId = groupId,
-                                            IsEvent = IsEvent        
+                                            IsEvent = IsEvent,
+                                            IsDrafT = true   
                                         };
 
                                         ormManager.Events.Add(newEvent);
@@ -343,8 +344,8 @@ namespace HeatMeetServer
                                         //get all events the groups have
                                         var all = ormManager.Events
                                                 .Where(e =>
-                                                    (e.GroupId != null && userGroupsIds.Contains(e.GroupId.Value))
-                                                    || (e.UserId == userId && !e.IsEvent) 
+                                                    (e.GroupId != null && userGroupsIds.Contains(e.GroupId.Value) && !e.IsDrafT)
+                                                    || (e.UserId == userId && !e.IsEvent)
                                                 )
                                                 .Select(e => new
                                                 {
@@ -439,21 +440,114 @@ namespace HeatMeetServer
                                 lock (ormLock)
                                 {
                                     Events? lastEvent = ormManager.Events
-                                        .Where(e => e.GroupId == groupId && e.IsEvent == true)
+                                        .Where(e => e.GroupId == groupId && e.IsEvent == true && e.IsDrafT == true)
                                         .OrderByDescending(e => e.Date)
                                         .FirstOrDefault();
 
                                     if (lastEvent == null)
-                                        response.Data = new { success = false, message = "No events found" };
+                                        response.Data = new { success = false, message = "No draft events found" };
                                     else
                                         response.Data = new
                                         {
                                             success = true,
+                                            eventId = lastEvent.Id,
                                             title = lastEvent.Title,
                                             fechaHora = lastEvent.Date,
                                             ubicacion = lastEvent.Location ?? "",
                                             direccionUrl = lastEvent.AddressUrl ?? ""
                                         };
+                                }
+                            }
+                            else response.Data = new { success = false, message = "Invalid data" };
+                        }
+                        break;
+                    case "VOTE_EVENT":
+                        {
+                            if (message.Data is JsonElement voteData)
+                            {
+                                try
+                                {
+                                    int eventId = voteData.GetProperty("eventId").GetInt32();
+                                    int userId = voteData.GetProperty("userId").GetInt32();
+                                    bool accepts = voteData.GetProperty("accepts").GetBoolean();
+
+                                    lock (ormLock)
+                                    {
+                                        Events? evt = ormManager.Events
+                                            .Include(e => e.Group)
+                                            .ThenInclude(g => g.Users)
+                                            .FirstOrDefault(e => e.Id == eventId);
+
+                                        if (evt == null)
+                                        {
+                                            response.Data = new { success = false, message = "Event not found" };
+                                            break;
+                                        }
+
+                                        // Si vota NO → eliminar directamente
+                                        if (!accepts)
+                                        {
+                                            ormManager.Events.Remove(evt);
+                                            ormManager.SaveChanges();
+                                            response.Data = new { success = true, result = "deleted" };
+                                            break;
+                                        }
+
+                                        // Si vota SI → guardar voto
+                                        bool alreadyVoted = ormManager.Votes
+                                            .Any(v => v.EventId == eventId && v.UserId == userId);
+
+                                        if (!alreadyVoted)
+                                        {
+                                            ormManager.Votes.Add(new Votes
+                                            {
+                                                EventId = eventId,
+                                                UserId = userId,
+                                                Date = DateTime.UtcNow,
+                                                HourStart = TimeSpan.Zero,
+                                                HourEnd = TimeSpan.Zero
+                                            });
+                                            ormManager.SaveChanges();
+                                        }
+
+                                        // Comprobar si todos han votado
+                                        int totalMembers = evt.Group?.Users?.Count ?? 0;
+                                        int totalVotes = ormManager.Votes.Count(v => v.EventId == eventId);
+
+                                        if (totalMembers > 0 && totalVotes >= totalMembers)
+                                        {
+                                            // Todos votaron SI → confirmar evento
+                                            evt.IsDrafT = false;
+                                            ormManager.SaveChanges();
+                                            response.Data = new { success = true, result = "confirmed" };
+                                        }
+                                        else
+                                        {
+                                            response.Data = new { success = true, result = "voted", votes = totalVotes, total = totalMembers };
+                                        }
+                                    }
+
+                                    // Timer 2 minutos → eliminar si sigue siendo draft
+                                    int capturedId = voteData.GetProperty("eventId").GetInt32();
+                                    Task.Run(async () =>
+                                    {
+                                        await Task.Delay(TimeSpan.FromMinutes(2));
+                                        lock (ormLock)
+                                        {
+                                            Events? draft = ormManager.Events.Find(capturedId);
+                                            if (draft != null && draft.IsDrafT)
+                                            {
+                                                ormManager.Events.Remove(draft);
+                                                ormManager.SaveChanges();
+                                                Console.WriteLine($"Draft event {capturedId} auto-deleted after 2 minutes.");
+                                            }
+                                        }
+                                    });
+                                }
+                                catch (Exception ex)
+                                {
+                                    string? realError = ex.InnerException?.Message ?? ex.Message;
+                                    response.Data = new { success = false, message = "DB Error: " + realError };
                                 }
                             }
                             else response.Data = new { success = false, message = "Invalid data" };
