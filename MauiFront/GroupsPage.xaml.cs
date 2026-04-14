@@ -1,5 +1,4 @@
-﻿using Google.Android.Material.DatePicker;
-using Syncfusion.Maui.Scheduler;
+﻿using Syncfusion.Maui.Scheduler;
 using System.Collections.ObjectModel;
 using System.Text.Json;
 
@@ -46,21 +45,16 @@ namespace MauiFront
         {
             InitializeComponent();
 
-            // 1. Inicializar la lista de eventos
+            //Creates an event list and calendar, then links them together, so by adding a new event it creates it on calendar also
             ScheduledEvents = new ObservableCollection<SchedulerAppointment>();
 
-            // 2. Conectar los datos
             this.BindingContext = this;
             SchedulerControl.AppointmentsSource = ScheduledEvents;
-
-            // TODO: Personalizaremos los colores aquí después de que compile
         }
 
         private async void OnSchedulerTapped(object sender, SchedulerTappedEventArgs e)
         {
-
-            if (e.Element == SchedulerElement.Appointment || !e.Date.HasValue)return;
-
+            if (e.Element == SchedulerElement.Appointment || !e.Date.HasValue) return; 
             DateTime dateSelected = e.Date.Value.Date;
 
             //-- IF TOGGLE SWITCH IS ON -- 
@@ -115,7 +109,7 @@ namespace MauiFront
                         StartTime = e.Date.Value.Date,
                         EndTime = e.Date.Value.Date.AddDays(1).AddSeconds(-1),
                         IsAllDay = true,
-                        Background = Color.FromArgb("#FF0000") //Alternative smooth red: #E57373
+                        Background = Color.FromArgb("#E57373") 
                     };
                     ScheduledEvents.Add(newAviab);
 
@@ -271,7 +265,7 @@ namespace MauiFront
                                                 ? eventDto.Date.ToLocalTime().Date.AddDays(1).AddSeconds(-1)
                                                 : eventDto.Date.ToLocalTime().AddHours(1),
                                             IsAllDay = eventDto.IsAllDay,
-                                            Background = Color.FromArgb("#4CAF50"),
+                                            Background = Color.FromArgb("#E57373"),
                                         });
                                     }
                                 }
