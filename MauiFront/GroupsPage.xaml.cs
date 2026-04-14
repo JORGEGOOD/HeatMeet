@@ -45,38 +45,29 @@ namespace MauiFront
         {
             InitializeComponent();
 
-            // 1. Inicializar la lista de eventos
+            //Creates an event list and calendar, then links them together, so by adding a new event it creates it on calendar also
             ScheduledEvents = new ObservableCollection<SchedulerAppointment>();
 
-            // 2. Conectar los datos
             this.BindingContext = this;
             SchedulerControl.AppointmentsSource = ScheduledEvents;
-
-            // TODO: Personalizaremos los colores aquí después de que compile
         }
 
         private async void OnSchedulerTapped(object sender, SchedulerTappedEventArgs e)
         {
-
-            if (e.Element == SchedulerElement.Appointment || !e.Date.HasValue)
-            {
-                // Aquí podrías poner lógica para BORRAR el evento si quieres,
-                // pero por ahora pongamos un return para evitar el error.
-                return;
-            }
-
+            if (e.Element == SchedulerElement.Appointment || !e.Date.HasValue) return; 
+            DateTime dateSelected = e.Date.Value.Date;
 
             //-- IF TOGGLE SWITCH IS ON -- 
             if (DisponibilidadSwitch.IsToggled)
             {
                 if(e.Element != SchedulerElement.SchedulerCell && !e.Date.HasValue) return;
+                if (e.Date == null) return;
+
 
                 // Un/Mark the day/hour as disponible
-
                 //Search if it was marked or unmarked
-                DateTime dateSelected = e.Date.Value.Date.ToUniversalTime();
                 SchedulerAppointment? marked = ScheduledEvents.Cast<SchedulerAppointment>()                    
-                           .FirstOrDefault(x => x.StartTime.Date == dateSelected && x.Id.ToString()=="-1");
+                           .FirstOrDefault(x => x.StartTime.Date == dateSelected.ToUniversalTime() && x.Id.ToString()=="-1");
                 if (marked != null)
                 {//If its marked, delete it
                     
@@ -93,7 +84,7 @@ namespace MauiFront
                             Data = new
                             {
                                 userId = Preferences.Get("userId", 0),
-                                dateSelected = dateSelected,
+                                dateSelected = dateSelected.ToUniversalTime(),
                                 isAllDay = SchedulerControl.View != SchedulerView.Day//if its month view, disp. is all day
                             }
                         };
@@ -113,12 +104,12 @@ namespace MauiFront
                 {//If its unmarked, create it
                     SchedulerAppointment newAviab = new SchedulerAppointment
                     {
-                        Id = -1, //<--This will save us from a problem above this command
+                        Id = -1, //This solves a bug
                         Subject = "🔴 Disponible",
                         StartTime = e.Date.Value.Date,
                         EndTime = e.Date.Value.Date.AddDays(1).AddSeconds(-1),
                         IsAllDay = true,
-                        Background = Color.FromArgb("#FF0000") //Alternative smooth red: #E57373
+                        Background = Color.FromArgb("#E57373") 
                     };
                     ScheduledEvents.Add(newAviab);
 
@@ -162,17 +153,15 @@ namespace MauiFront
                 return;
             }
 
-            //-- IF DISPONIBILITY SWITCH IS OFF --
-            //If Month view, go to day view
             if (SchedulerControl.View == SchedulerView.Month)
             {
-                SchedulerControl.DisplayDate = e.Date.Value;
-                SchedulerControl.View = SchedulerView.Day;
-            }
-            else if (SchedulerControl.View == SchedulerView.Day)
-            {
-                //in the future, we may expand the event on clicked
-                //For the moment we only create events on the group chat   
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    await Task.Yield();//Important, waits till code ends to update calendar, can be reverse and cause bugs
+
+                    SchedulerControl.DisplayDate = dateSelected;
+                    SchedulerControl.View = SchedulerView.Day;
+                });
             }
         }
 
@@ -276,7 +265,7 @@ namespace MauiFront
                                                 ? eventDto.Date.ToLocalTime().Date.AddDays(1).AddSeconds(-1)
                                                 : eventDto.Date.ToLocalTime().AddHours(1),
                                             IsAllDay = eventDto.IsAllDay,
-                                            Background = Color.FromArgb("#4CAF50"),
+                                            Background = Color.FromArgb("#E57373"),
                                         });
                                     }
                                 }
