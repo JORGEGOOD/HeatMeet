@@ -42,7 +42,7 @@ namespace MauiFront
 
                 if (response.Data is not JsonElement data)
                 {
-                    await DisplayAlert("Error", "Respuesta inválida del servidor", "OK");
+                    //await DisplayAlert("Error", "Respuesta inválida del servidor", "OK");
                     return;
                 }
 

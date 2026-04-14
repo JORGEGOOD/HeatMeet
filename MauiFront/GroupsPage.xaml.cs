@@ -101,6 +101,7 @@ namespace MauiFront
                     }
                     catch (Exception ex)
                     {
+
                         await DisplayAlert("Error", "No se pudieron cargar los eventos: " + ex.Message, "OK");
                     }
                     finally
@@ -197,7 +198,6 @@ namespace MauiFront
                 NetUtils.NetUtils.SendJson(socket, message);
                 SharedModels.NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<SharedModels.NetworkMessage>(socket);
                 
-
                 if (response.Data is JsonElement data)
                 {
                     bool ok = data.GetProperty("success").GetBoolean();
@@ -236,12 +236,7 @@ namespace MauiFront
 
                 //response
                 if (response?.Data is JsonElement data)
-                {
-                    //await MainThread.InvokeOnMainThreadAsync(async () =>
-                    //{
-                    //    await DisplayAlert("DEBUG DATA", data.ToString(), "OK");
-                    //});
-                    
+                {   
                     bool ok = data.GetProperty("success").GetBoolean();
                     if (ok)
                     {
@@ -255,9 +250,7 @@ namespace MauiFront
                                 // Usamos opciones para ignorar mayúsculas/minúsculas
                                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
-
-                                List<EventDto>? mixedList =
-                                    JsonSerializer.Deserialize<List<EventDto>>(listJson.GetRawText(),options);
+                                List<EventDto>? mixedList = JsonSerializer.Deserialize<List<EventDto>>(listJson.GetRawText(),options);
 
                                 foreach (EventDto eventDto in mixedList)
                                 {
@@ -308,6 +301,10 @@ namespace MauiFront
                 if (socket != null) NetUtils.NetUtils.CloseSocket(socket);
             }
         }
+
+
+
+
 
         //Clic on group → go to chat
         private async void OnGroupTapped(object sender, EventArgs e)
