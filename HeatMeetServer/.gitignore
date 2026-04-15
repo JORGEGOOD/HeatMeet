@@ -1,0 +1,119 @@
+############################################
+# Build results
+############################################
+bin/
+obj/
+out/
+TestResults/
+
+############################################
+# Visual Studio
+############################################
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.VC.db
+*.VC.opendb
+
+############################################
+# Rider / VS Code
+############################################
+.idea/
+.vscode/
+*.code-workspace
+
+############################################
+# Logs
+############################################
+*.log
+
+############################################
+# NuGet
+############################################
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+project.lock.json
+project.assets.json
+
+############################################
+# MAUI / Xamarin / Android
+############################################
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+*.so
+*.keystore
+*.jks
+*.aar
+
+# Android build folders
+**/android/bin/
+**/android/obj/
+
+############################################
+# iOS / MacCatalyst
+############################################
+*.ipa
+*.dSYM.zip
+*.dSYM
+*.mobileprovision
+
+# Xcode
+*.xcworkspace
+*.xcuserdata/
+*.xcuserstate
+DerivedData/
+
+############################################
+# Windows
+############################################
+AppPackages/
+BundleArtifacts/
+Package.StoreAssociation.xml
+_pkginfo.txt
+
+############################################
+# Temporary files
+############################################
+*.tmp
+*.temp
+*.bak
+*.swp
+*.cache
+*.pdb
+
+############################################
+# OS files
+############################################
+.DS_Store
+Thumbs.db
+desktop.ini
+
+############################################
+# Resharper
+############################################
+_ReSharper*/
+*.DotSettings.user
+
+############################################
+# MAUI specific generated files
+############################################
+**/Platforms/**/bin/
+**/Platforms/**/obj/
+
+############################################
+# Publish folder
+############################################
+publish/
+
+############################################
+# Secrets (if using user secrets)
+############################################
+secrets.json
+appsettings.Development.json
