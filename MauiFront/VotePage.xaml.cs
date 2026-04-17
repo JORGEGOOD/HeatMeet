@@ -20,7 +20,12 @@ namespace MauiFront
         {
             base.OnAppearing();
             await LoadDraftEvent();
-            await LoadGroupAvailability();
+            if (SchedulerControl.MonthView != null)
+            {
+                SchedulerControl.MonthView.CellTemplate = BuildMonthCellTemplate();
+            }
+
+            _ = LoadGroupAvailability();
         }
 
         private async Task LoadDraftEvent()
@@ -134,6 +139,12 @@ namespace MauiFront
                         SchedulerControl.MonthView.CellTemplate = BuildMonthCellTemplate();
                     });
                 }
+                // Después de recibir la respuesta del socket
+                if (response == null || response.Data == null)
+                {
+                    // Si falla la red, no hacemos nada o limpiamos, pero NO lanzamos error
+                    return;
+                }
             }
             catch (Exception ex)
             {
@@ -148,15 +159,14 @@ namespace MauiFront
         {
             return new DataTemplate(() =>
             {
-                var grid = new Grid { Padding = 4 };
+                // Forzamos el Grid a ser transparente para no tapar el calendario
+                var grid = new Grid { BackgroundColor = Colors.Transparent };
 
-                
-                var heatShape = new BoxView
+                var bg = new BoxView
                 {
                     HorizontalOptions = LayoutOptions.Fill,
                     VerticalOptions = LayoutOptions.Fill,
-                    CornerRadius = 12, 
-                    Color = Colors.Transparent
+                    Color = Colors.White // Color base siempre blanco
                 };
 
                 var label = new Label
@@ -164,31 +174,27 @@ namespace MauiFront
                     HorizontalOptions = LayoutOptions.Center,
                     VerticalOptions = LayoutOptions.Center,
                     FontSize = 14,
-                    TextColor = Color.FromArgb("#444"),
-                    FontAttributes = FontAttributes.Bold
+                    TextColor = Color.FromArgb("#222")
                 };
 
-                grid.Children.Add(heatShape);
+                grid.Children.Add(bg);
                 grid.Children.Add(label);
 
                 grid.BindingContextChanged += (s, e) =>
                 {
                     if (grid.BindingContext is Syncfusion.Maui.Scheduler.SchedulerMonthCellDetails details)
                     {
-                        
                         DateTime day = details.DateTime.Date;
                         label.Text = details.DateTime.Day.ToString();
 
                         
-                        if (DayColors != null && DayColors.TryGetValue(day, out Color color))
+                        if (DayColors.TryGetValue(day, out Color color))
                         {
-                            heatShape.Color = color;
-                            label.TextColor = Colors.White; 
+                            bg.Color = color;
                         }
                         else
                         {
-                            heatShape.Color = Colors.Transparent;
-                            label.TextColor = Color.FromArgb("#444"); 
+                            bg.Color = Colors.White;
                         }
                     }
                 };
