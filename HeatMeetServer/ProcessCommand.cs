@@ -554,6 +554,38 @@ namespace HeatMeetServer
                         }
                         break;
 
+                    case "GET_GROUP_AVAILABILITY":
+                        {
+                            if (message.Data is JsonElement evtData)
+                            {
+                                int groupId = evtData.GetProperty("groupId").GetInt32();
+                                lock (ormLock)
+                                {
+                                    
+                                    List<int> memberIds = ormManager.Groups
+                                        .Include(g => g.Users)
+                                        .FirstOrDefault(g => g.Id == groupId)
+                                        ?.Users.Select(u => u.Id).ToList() ?? new List<int>();
+
+                                   
+                                    var availabilities = ormManager.Events
+                                        .Where(e => memberIds.Contains(e.UserId) && !e.IsEvent)
+                                        .Select(e => new
+                                        {
+                                            userId = e.UserId,
+                                            date = e.Date,
+                                            isAllDay = e.IsAllDay,
+                                            title = e.Title
+                                        })
+                                        .ToList();
+
+                                    response.Data = new { success = true, availabilities };
+                                }
+                            }
+                            else response.Data = new { success = false, message = "Invalid data" };
+                        }
+                        break;
+
 
                     default:
                         {
