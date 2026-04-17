@@ -333,30 +333,21 @@ public partial class GroupsChat : ContentPage
 
     private async void OnMenuTapped(object sender, EventArgs e)
     {
-        //Dynamic mute button label based on current preference
-        int groupId = Preferences.Get("groupId", 0);
-        string action = await DisplayActionSheet
-        (
+        string action = await DisplayActionSheet(
             "Opciones del grupo",
             "Cancelar",
             null,
             "📋 Copiar código del grupo",
-            "ℹ️  Info del grupo",
             "🚪 Salir del grupo"
         );
 
-        switch (action)
+        if (action == "📋 Copiar código del grupo")
         {
-            case "📋 Copiar código del grupo":
-                await OnCopyGroupCode();
-                break;
-            case "ℹ️  Info del grupo":
-                await OnGroupInfo();
-                break;
-            case "🔕 Silenciar notificaciones":
-            case "🚪 Salir del grupo":
-                await OnLeaveGroup();
-                break;
+            await OnCopyGroupCode();
+        }
+        else if (action != null && action.Contains("Salir"))
+        {
+            await OnLeaveGroup();
         }
     }
 
@@ -456,7 +447,7 @@ public partial class GroupsChat : ContentPage
     {
         bool confirm = await DisplayAlert(
             "🚪 Salir del grupo",
-            "¿Seguro que quieres salir? Ya no podrás leer los mensajes de este grupo.",
+            "¿Seguro que quieres salir? Ya no podrás leer los mensajes.",
             "Salir",
             "Cancelar");
 
@@ -464,7 +455,9 @@ public partial class GroupsChat : ContentPage
 
         int groupId = Preferences.Get("groupId", 0);
         int userId = Preferences.Get("userId", 0);
+
         Socket socket = null;
+
         try
         {
             socket = NetUtils.NetUtils.ConnectToServer();
@@ -474,21 +467,30 @@ public partial class GroupsChat : ContentPage
                 Command = "LEAVE_GROUP",
                 Data = new { groupId, userId }
             };
-            NetUtils.NetUtils.SendJson(socket, message);
 
+            NetUtils.NetUtils.SendJson(socket, message);
             var response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
+
+            System.Diagnostics.Debug.WriteLine(response?.Data?.ToString());
 
             if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
             {
-                _isChatActive = false; //stops the refresh loop
+                _isChatActive = false;
+
+                Preferences.Remove("groupId");
+                Preferences.Remove("groupName");
+
                 await DisplayAlert("👋", "Has salido del grupo.", "OK");
-                await Navigation.PopAsync();
+
+                await Navigation.PopToRootAsync();
             }
             else
             {
                 string serverMsg = response?.Data is JsonElement d2 &&
                                    d2.TryGetProperty("message", out JsonElement mp)
-                                   ? mp.GetString() : "No se pudo salir del grupo.";
+                                   ? mp.GetString()
+                                   : "No se pudo salir del grupo.";
+
                 await DisplayAlert("Error", serverMsg, "OK");
             }
         }
