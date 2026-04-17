@@ -107,7 +107,7 @@ namespace MauiFront
                         }
                     }
 
-                    
+
                     DayColors.Clear();
                     foreach (var kvp in countPerDay)
                     {
@@ -120,13 +120,17 @@ namespace MauiFront
                         };
                     }
 
-                    // Forzar refresco del scheduler
+                    
                     MainThread.BeginInvokeOnMainThread(() =>
                     {
-                        SchedulerControl.MonthView = new Syncfusion.Maui.Scheduler.SchedulerMonthView
+                        
+                        var newMonthView = new Syncfusion.Maui.Scheduler.SchedulerMonthView
                         {
                             CellTemplate = BuildMonthCellTemplate()
                         };
+
+                        
+                        SchedulerControl.MonthView = newMonthView;
                     });
                 }
             }
@@ -144,19 +148,11 @@ namespace MauiFront
             return new DataTemplate(() =>
             {
                 var grid = new Grid();
-
-                var bg = new BoxView
-                {
-                    HorizontalOptions = LayoutOptions.Fill,
-                    VerticalOptions = LayoutOptions.Fill,
-                    Color = Colors.White
-                };
-
+                var bg = new BoxView { Color = Colors.White }; 
                 var label = new Label
                 {
                     HorizontalOptions = LayoutOptions.Center,
                     VerticalOptions = LayoutOptions.Center,
-                    FontSize = 14,
                     TextColor = Color.FromArgb("#222")
                 };
 
@@ -165,19 +161,21 @@ namespace MauiFront
 
                 grid.BindingContextChanged += (s, e) =>
                 {
-                    if (grid.BindingContext is Syncfusion.Maui.Scheduler.SchedulerMonthCellDetails details)
+                    var layout = s as Grid;
+                    if (layout?.BindingContext is Syncfusion.Maui.Scheduler.SchedulerMonthCellDetails details)
                     {
                         DateTime day = details.DateTime.Date;
                         label.Text = details.DateTime.Day.ToString();
+
                         
                         if (DayColors.TryGetValue(day, out Color color))
+                        {
                             bg.Color = color;
+                        }
                         else
                         {
                             bg.Color = Colors.White;
                         }
-                            
-                            
                     }
                 };
 
