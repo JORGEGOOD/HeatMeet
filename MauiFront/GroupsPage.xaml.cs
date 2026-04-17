@@ -55,19 +55,21 @@ namespace MauiFront
         private async void OnSchedulerTapped(object sender, SchedulerTappedEventArgs e)
         {
             if (e.Element == SchedulerElement.Appointment || !e.Date.HasValue) return; 
+            
             DateTime dateSelected = e.Date.Value.Date;
 
             //-- IF TOGGLE SWITCH IS ON -- 
             if (DisponibilidadSwitch.IsToggled)
             {
-                if(e.Element != SchedulerElement.SchedulerCell && !e.Date.HasValue) return;
+                if (!e.Date.HasValue && e.Element != SchedulerElement.Appointment) return;
+                
                 if (e.Date == null) return;
 
 
                 // Un/Mark the day/hour as disponible
                 //Search if it was marked or unmarked
                 SchedulerAppointment? marked = ScheduledEvents.Cast<SchedulerAppointment>()                    
-                           .FirstOrDefault(x => x.StartTime.Date == dateSelected.ToUniversalTime() && x.Id.ToString()=="-1");
+                           .FirstOrDefault(x => x.StartTime.Date == dateSelected.ToUniversalTime() && x.Subject.Contains("Disponible"));
                 if (marked != null)
                 {//If its marked, delete it
                     
@@ -236,7 +238,7 @@ namespace MauiFront
 
                             if (data.TryGetProperty("events", out JsonElement listJson))
                             {
-                                // Usamos opciones para ignorar mayúsculas/minúsculas
+                                //                                              VVV Ignore case sensitive
                                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
                                 List<EventDto>? mixedList = JsonSerializer.Deserialize<List<EventDto>>(listJson.GetRawText(),options);

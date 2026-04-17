@@ -31,18 +31,18 @@ namespace NetUtils
 
         public static Socket ConnectToServer()
         {
-            Socket socket = CreateClientSocket("192.168.1.67", 8888);
+            Socket socket = CreateClientSocket("192.168.111.44", 8888);
             return socket;
         }
 
         public static void SendJson(Socket s, object data)
         {
             s.SendTimeout = 10000;
-            //custom option to avoid possible infinite sending loop
+
             JsonSerializerOptions options = new JsonSerializerOptions 
             { 
-                ReferenceHandler = ReferenceHandler.IgnoreCycles,//<-- Ignore possible Orm infinites
-                WriteIndented = false//<-- Ignore pretty printing, it should already be by default tho
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,//<-- Ignore theoretically possible Orm infinites
+                WriteIndented = false//<-- Ignore pretty printing. Faster, should be default tho
             };
 
             string json = JsonSerializer.Serialize(data,options);
