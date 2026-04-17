@@ -4,43 +4,6 @@ using System.Text.Json;
 
 namespace MauiFront
 {
-    public class Group
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string InviteCode { get; set; }
-        public DateTime CreateDate { get; set; }
-        public List<object> Users { get; set; } = new();
-        public List<object> Events { get; set; } = new();
-        public List<object> Messages { get; set; } = new();
-        public string DisplayImage => "logo.png";
-    }
-
-    public class EventDto //<-- This will be an Event AND an aviability, bcs they share most of everything
-    {
-        public int Id { get; set; }
-        public int UserId { get; set; }
-        public string Title { get; set; }
-        public DateTime Date { get; set; }
-        public DateTime CreateDate { get; set; }//TODO: Does the server send this? Check it
-
-        public string? Location { get; set; }
-        public string? AddressUrl { get; set; }
-        public bool IsEvent { get; set; }// If its an event OR an Aviabilty
-        public bool IsAllDay { get; set; } //To know if its and hour or the entire day
-        public int? GroupId { get; set; }
-
-        public string DateTimeFormatted => Date.ToLocalTime().ToString("dd/MM/yyyy  HH:mm");
-    }
-    public class AvailabilityDto
-    {
-        public int UserId { get; set; }
-        public DateTime Date { get; set; }
-        public bool IsAllDay { get; set; }
-        public string Title { get; set; }
-    }
-
-
     public partial class GroupsPage : ContentPage
     {
         //List of all the events the user has
@@ -205,8 +168,8 @@ namespace MauiFront
                     if (ok)
                     {
                         JsonElement groupsJson = data.GetProperty("groups");
-                        List<Group>? grupos = JsonSerializer
-                            .Deserialize<List<Group>>(groupsJson.GetRawText());
+                        List<GroupDto>? grupos = JsonSerializer
+                            .Deserialize<List<GroupDto>>(groupsJson.GetRawText());
                         GroupsCollection.ItemsSource = grupos;
                     }
                 }
@@ -302,14 +265,10 @@ namespace MauiFront
             }
         }
 
-
-
-
-
         //Clic on group → go to chat
         private async void OnGroupTapped(object sender, EventArgs e)
         {
-            if (sender is Frame frame && frame.BindingContext is Group grupo)
+            if (sender is Frame frame && frame.BindingContext is GroupDto grupo)
             {
                 Preferences.Set("groupId", grupo.Id);
                 Preferences.Set("groupName", grupo.Name);
@@ -318,7 +277,7 @@ namespace MauiFront
             }
         }
 
-        //Animation button create or join croup
+        //Create or join croup animation
         private async void ToggleFabMenu(object sender, EventArgs e)
         {
             if (!isFabOpen)
@@ -359,7 +318,6 @@ namespace MauiFront
                 CrearLayout.IsVisible = false;
                 UnirseLayout.IsVisible = false;
             }
-
             isFabOpen = !isFabOpen;
         }
         

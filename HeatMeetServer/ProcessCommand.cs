@@ -589,6 +589,49 @@ namespace HeatMeetServer
                         }
                         break;
 
+                    case "LEAVE_GROUP":
+                        {
+                            if (message.Data is JsonElement leaveData)
+                            {
+                                int groupId = leaveData.GetProperty("groupId").GetInt32();
+                                int userId = leaveData.GetProperty("userId").GetInt32();
+
+                                lock (ormLock)
+                                {
+                                    Groups? group = ormManager.Groups
+                                        .Include(g => g.Users)
+                                        .FirstOrDefault(g => g.Id == groupId);
+
+                                    Users? user = ormManager.Users.FirstOrDefault(u => u.Id == userId);
+
+                                    if (group == null)
+                                    {
+                                        response.Data = new { success = false, message = "Group not found" };
+                                    }
+                                    else if (user == null)
+                                    {
+                                        response.Data = new { success = false, message = "User not found" };
+                                    }
+                                    else if (!group.Users.Any(u => u.Id == userId))
+                                    {
+                                        response.Data = new { success = false, message = "User is not in this group" };
+                                    }
+                                    else
+                                    {
+                                        group.Users.Remove(user);
+                                        ormManager.SaveChanges();
+
+                                        response.Data = new { success = true, message = "User left the group" };
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                response.Data = new { success = false, message = "Invalid data" };
+                            }
+                        }
+                        break;
+
 
                     default:
                         {

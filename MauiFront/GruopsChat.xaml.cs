@@ -17,32 +17,6 @@ public partial class GroupsChat : ContentPage
     {
         await Navigation.PopAsync();
     }
-
-    public class MessageDto
-    {
-        public int Id { get; set; }
-        public int UserId { get; set; }
-        public string Content { get; set; }
-        public DateTime CreateDate { get; set; }
-        public int userId { get; set; }
-        public string UserName { get; set; }
-    }
-
-    public class ChatItem //Both message AND event. In future could also contain img, videos, stickers and more
-    {
-        public DateTime CreateDate { get; set; }
-        
-        public MessageDto? Message { get; set; }
-        public EventDto? Event { get; set; }
-
-
-        public bool IsMessage => Message != null;
-        public bool IsEvent => Event != null;
-
-        //Who created it
-        public int AuthorId => IsMessage ? Message.UserId : (Event?.UserId ?? 0);
-    }
-
     void AddChatItem(ChatItem item, int currentUserId)
     {
         if(item.IsMessage && item.Message != null)
@@ -56,7 +30,6 @@ public partial class GroupsChat : ContentPage
             AddEventCard(item.Event);
         }
     }
-
 
     void AddMessage(MessageDto? msg, int currentUserId)//Add individual message
     {
@@ -129,7 +102,7 @@ public partial class GroupsChat : ContentPage
         {
             string formattedDate = ev.Date.ToLocalTime().ToString("dd/MM/yyyy  HH:mm");
 
-            var card = new Frame
+            Frame card = new()
             {
                 CornerRadius = 12,
                 BorderColor = Color.FromArgb("#FF8C00"),
@@ -157,7 +130,7 @@ public partial class GroupsChat : ContentPage
                 VerticalOptions = LayoutOptions.Center
             });
 
-            var titleLabel = new Label
+            Label titleLabel = new()
             {
                 Text = ev.Title,
                 FontSize = 14,
@@ -183,7 +156,7 @@ public partial class GroupsChat : ContentPage
                 });
             }
 
-            var votarBtn = new Button
+            Button votarBtn = new()
             {
                 Text = "Votar",
                 BackgroundColor = Color.FromArgb("#FF6A00"),
@@ -257,7 +230,7 @@ public partial class GroupsChat : ContentPage
             return;
         }
 
-        try //LOAD MESSAGES AND EVENTS
+        try//Load messages and events
         {
             Socket socket = NetUtils.NetUtils.ConnectToServer();
 
@@ -284,7 +257,6 @@ public partial class GroupsChat : ContentPage
                     events = JsonSerializer.Deserialize<List<EventDto>>(eventsJson.GetRawText()) ?? new();
                 }
                 
-
                 LoadMessages(messages, events, userId);
 
                 NetworkMessage ack = new NetworkMessage //TODO: get rid of this ACK garbage
@@ -301,17 +273,14 @@ public partial class GroupsChat : ContentPage
         {
             await DisplayAlert("Error", ex.Message, "OK");
         }
-
-        //await LoadLastEvent();
     }
 
 
-    //Theese 2 pieces of code are to delete "freezed" functions that cause problems when re-called later in the chat
+    //This is a failed attempt to trick Maui into killing the screen when we get out instead of the usual 2-3sec
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
         _isChatActive = false;
-        //Remove ScrollToBottom() because it fails when acumulated
         MessagesContainer.ChildAdded -= OnChildAddedScroll;
     }
     private void OnChildAddedScroll(object? sender, ElementEventArgs e) => ScrollToBottom();
@@ -411,13 +380,12 @@ public partial class GroupsChat : ContentPage
                     }
                 };
 
-                NetUtils.NetUtils.SendJson(socket, message);
-                var response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
+                NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
 
                 if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
                 {
-                    var messagesJson = data.GetProperty("messages").GetRawText();
-                    var newMessages = JsonSerializer.Deserialize<List<MessageDto>>(messagesJson);
+                    string messagesJson = data.GetProperty("messages").GetRawText();
+                    List<MessageDto>? newMessages = JsonSerializer.Deserialize<List<MessageDto>>(messagesJson);
 
                     if (newMessages != null && newMessages.Count > 0)
                     {
@@ -450,42 +418,27 @@ public partial class GroupsChat : ContentPage
         }
     }
 
-
-
-
-
-
-
     // =========================================================================
     // 3 Point menú
     // =========================================================================
 
     private async void OnMenuTapped(object sender, EventArgs e)
     {
-        //Dynamic mute button label based on current preference
-        int groupId = Preferences.Get("groupId", 0);
-        string action = await DisplayActionSheet
-        (
+        string action = await DisplayActionSheet(
             "Opciones del grupo",
             "Cancelar",
             null,
             "📋 Copiar código del grupo",
-            "ℹ️  Info del grupo",
             "🚪 Salir del grupo"
         );
 
-        switch (action)
+        if (action == "📋 Copiar código del grupo")
         {
-            case "📋 Copiar código del grupo":
-                await OnCopyGroupCode();
-                break;
-            case "ℹ️  Info del grupo":
-                await OnGroupInfo();
-                break;
-            case "🔕 Silenciar notificaciones":
-            case "🚪 Salir del grupo":
-                await OnLeaveGroup();
-                break;
+            await OnCopyGroupCode();
+        }
+        else if (action != null && action.Contains("Salir"))
+        {
+            await OnLeaveGroup();
         }
     }
 
@@ -493,7 +446,7 @@ public partial class GroupsChat : ContentPage
     private async Task OnCopyGroupCode()
     {
         int groupId = Preferences.Get("groupId", 0);
-        Socket socket = null;
+        Socket? socket = null;
         try
         {
             socket = NetUtils.NetUtils.ConnectToServer();
@@ -516,7 +469,7 @@ public partial class GroupsChat : ContentPage
             }
             else
             {
-                string serverMsg = response?.Data is JsonElement d2 &&
+                string? serverMsg = response?.Data is JsonElement d2 &&
                                    d2.TryGetProperty("message", out JsonElement mp)
                                    ? mp.GetString() : "No se pudo obtener el código.";
                 await DisplayAlert("Error", serverMsg, "OK");
@@ -537,7 +490,7 @@ public partial class GroupsChat : ContentPage
     {
         int groupId = Preferences.Get("groupId", 0);
         string groupName = Preferences.Get("groupName", "(Grupo)");
-        Socket socket = null;
+        Socket? socket = null;
         try
         {
             socket = NetUtils.NetUtils.ConnectToServer();
@@ -554,8 +507,8 @@ public partial class GroupsChat : ContentPage
             if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
             {
                 int memberCount = data.GetProperty("memberCount").GetInt32();
-                string createdBy = data.GetProperty("createdBy").GetString();
-                string createdAt = data.GetProperty("createdAt").GetString();
+                string? createdBy = data.GetProperty("createdBy").GetString();
+                string? createdAt = data.GetProperty("createdAt").GetString();
 
                 await DisplayAlert(
                     $"ℹ️ {groupName}",
@@ -585,7 +538,7 @@ public partial class GroupsChat : ContentPage
     {
         bool confirm = await DisplayAlert(
             "🚪 Salir del grupo",
-            "¿Seguro que quieres salir? Ya no podrás leer los mensajes de este grupo.",
+            "¿Seguro que quieres salir? Ya no podrás leer los mensajes.",
             "Salir",
             "Cancelar");
 
@@ -593,7 +546,13 @@ public partial class GroupsChat : ContentPage
 
         int groupId = Preferences.Get("groupId", 0);
         int userId = Preferences.Get("userId", 0);
+<<<<<<< Updated upstream
+
         Socket socket = null;
+
+=======
+        Socket? socket = null;
+>>>>>>> Stashed changes
         try
         {
             socket = NetUtils.NetUtils.ConnectToServer();
@@ -603,21 +562,30 @@ public partial class GroupsChat : ContentPage
                 Command = "LEAVE_GROUP",
                 Data = new { groupId, userId }
             };
-            NetUtils.NetUtils.SendJson(socket, message);
 
+            NetUtils.NetUtils.SendJson(socket, message);
             var response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
+
+            System.Diagnostics.Debug.WriteLine(response?.Data?.ToString());
 
             if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
             {
-                _isChatActive = false; //stops the refresh loop
+                _isChatActive = false;
+
+                Preferences.Remove("groupId");
+                Preferences.Remove("groupName");
+
                 await DisplayAlert("👋", "Has salido del grupo.", "OK");
-                await Navigation.PopAsync();
+
+                await Navigation.PopToRootAsync();
             }
             else
             {
-                string serverMsg = response?.Data is JsonElement d2 &&
+                string? serverMsg = response?.Data is JsonElement d2 &&
                                    d2.TryGetProperty("message", out JsonElement mp)
-                                   ? mp.GetString() : "No se pudo salir del grupo.";
+                                   ? mp.GetString()
+                                   : "No se pudo salir del grupo.";
+
                 await DisplayAlert("Error", serverMsg, "OK");
             }
         }
@@ -625,54 +593,6 @@ public partial class GroupsChat : ContentPage
         {
             await DisplayAlert("Error", ex.Message, "OK");
         }
-        finally
-        {
-            if (socket != null) NetUtils.NetUtils.CloseSocket(socket);
-        }
-    }
-
-
-    private async Task LoadLastEvent()
-    {
-        int groupId = Preferences.Get("groupId", 0);
-        if (groupId == 0) return;
-
-        Socket socket = null;
-        try
-        {
-            socket = NetUtils.NetUtils.ConnectToServer();
-            NetworkMessage message = new NetworkMessage
-            {
-                Command = "GET_LAST_EVENT",
-                Data = new { groupId }
-            };
-            NetUtils.NetUtils.SendJson(socket, message);
-            NetworkMessage response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
-
-            if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
-            {
-                string title = data.GetProperty("title").GetString() ?? "";
-                string fechaStr = data.GetProperty("fechaHora").GetString() ?? "";
-                DateTime.TryParse(fechaStr, out DateTime fecha);
-                string formatted = fecha.ToLocalTime().ToString("dd/MM/yyyy  HH:mm");
-                string location = data.TryGetProperty("ubicacion", out var loc)
-                                   ? (loc.GetString() ?? "") : "";
-                int id = data.GetProperty("eventId").GetInt32();
-
-                //construir evento
-                EventDto eventDisplay = new EventDto
-                {
-                    Id = id,
-                    Title = title,
-                    Date = fecha,
-                    Location = location,
-                   
-                };
-
-                AddEventCard(eventDisplay);
-            }
-        }
-        catch { }
         finally
         {
             if (socket != null) NetUtils.NetUtils.CloseSocket(socket);
@@ -689,7 +609,7 @@ public partial class GroupsChat : ContentPage
         int groupId = Preferences.Get("groupId", 0);
         if (groupId == 0) return;
 
-        Socket socket = null;
+        Socket? socket = null;
         try
         {
             socket = NetUtils.NetUtils.ConnectToServer();
@@ -701,7 +621,7 @@ public partial class GroupsChat : ContentPage
             };
 
             NetUtils.NetUtils.SendJson(socket, message);
-            NetworkMessage response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
+            NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
 
             if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
             {
