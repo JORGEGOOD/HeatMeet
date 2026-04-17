@@ -22,13 +22,15 @@ namespace MauiFront
         public int UserId { get; set; }
         public string Title { get; set; }
         public DateTime Date { get; set; }
+        public DateTime CreateDate { get; set; }//TODO: Does the server send this? Check it
+
         public string? Location { get; set; }
         public string? AddressUrl { get; set; }
         public bool IsEvent { get; set; }// If its an event OR an Aviabilty
         public bool IsAllDay { get; set; } //To know if its and hour or the entire day
         public int? GroupId { get; set; }
 
-        public string FechaHoraFormatted => Date.ToLocalTime().ToString("dd/MM/yyyy  HH:mm");
+        public string DateTimeFormatted => Date.ToLocalTime().ToString("dd/MM/yyyy  HH:mm");
     }
     public class AvailabilityDto
     {

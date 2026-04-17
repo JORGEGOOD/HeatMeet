@@ -170,30 +170,25 @@ namespace HeatMeetServer
                         {
                             if (message.Data is JsonElement groupMessages)
                             {
-                                int groupId = groupMessages.GetProperty("groupId").GetInt32();
+                                int groupId = groupMessages.GetProperty("groupId").GetInt32();//get groupId for the database select
                                 lock (ormLock)
                                 {
                                     //MESSAGES
-                                    //select and retreat messages,into a json and send back
                                     var messages = ormManager.Messages.Where(m => m.GroupId == groupId).Select(m => new { m.Content, m.CreateDate, m.UserId, UserName = m.User.Name }).ToList();
-                                    //if no messages null list
-                                    if (messages == null || messages.Count == 0) response.Data = new { success = false, messages = new List<object>() };
                                     //EVENTS
-                                    //var events = ormManager.Events.Where(e => e.GroupId == groupId && e.IsEvent == true).Select(e => new { e.Id, e.IsEvent });
-
-                                    else
+                                    var events = ormManager.Events.Where(e => e.GroupId == groupId && e.IsEvent == true)
+                                                .Select(e => new{ e.Id, e.Title, e.Location, e.Date, e.CreateDate, e.IsEvent, e.IsAllDay,e.UserId}).ToList();
+                                    //send
+                                    response.Data = new
                                     {
-                                        //send all messages
-                                        response.Data = new
-                                        {
-                                            success  = true,
-                                            messages = messages,
-                                            events   = new List<object>()
-                                        };
-                                    }
+                                        success  = true,
+                                        messages = messages, //.ToList() always returns a list even if null
+                                        events   = events  
+                                    };
+                                    
                                 }
                             }
-                            else response.Data = new { success = false, message = "Invalid data" };
+                            else response.Data = new { success = false, message = "Invalid data"};
                         }
                         break;
                     case "SEND_CHAT_MESSAGE":
