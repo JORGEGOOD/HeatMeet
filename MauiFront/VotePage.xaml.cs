@@ -120,17 +120,18 @@ namespace MauiFront
                         };
                     }
 
-                    
+
                     MainThread.BeginInvokeOnMainThread(() =>
                     {
                         
-                        var newMonthView = new Syncfusion.Maui.Scheduler.SchedulerMonthView
+                        if (SchedulerControl.MonthView == null)
                         {
-                            CellTemplate = BuildMonthCellTemplate()
-                        };
+                            SchedulerControl.MonthView = new Syncfusion.Maui.Scheduler.SchedulerMonthView();
+                        }
 
                         
-                        SchedulerControl.MonthView = newMonthView;
+                        SchedulerControl.MonthView.CellTemplate = null;
+                        SchedulerControl.MonthView.CellTemplate = BuildMonthCellTemplate();
                     });
                 }
             }
@@ -147,34 +148,47 @@ namespace MauiFront
         {
             return new DataTemplate(() =>
             {
-                var grid = new Grid();
-                var bg = new BoxView { Color = Colors.White }; 
+                var grid = new Grid { Padding = 4 };
+
+                
+                var heatShape = new BoxView
+                {
+                    HorizontalOptions = LayoutOptions.Fill,
+                    VerticalOptions = LayoutOptions.Fill,
+                    CornerRadius = 12, 
+                    Color = Colors.Transparent
+                };
+
                 var label = new Label
                 {
                     HorizontalOptions = LayoutOptions.Center,
                     VerticalOptions = LayoutOptions.Center,
-                    TextColor = Color.FromArgb("#222")
+                    FontSize = 14,
+                    TextColor = Color.FromArgb("#444"),
+                    FontAttributes = FontAttributes.Bold
                 };
 
-                grid.Children.Add(bg);
+                grid.Children.Add(heatShape);
                 grid.Children.Add(label);
 
                 grid.BindingContextChanged += (s, e) =>
                 {
-                    var layout = s as Grid;
-                    if (layout?.BindingContext is Syncfusion.Maui.Scheduler.SchedulerMonthCellDetails details)
+                    if (grid.BindingContext is Syncfusion.Maui.Scheduler.SchedulerMonthCellDetails details)
                     {
+                        
                         DateTime day = details.DateTime.Date;
                         label.Text = details.DateTime.Day.ToString();
 
                         
-                        if (DayColors.TryGetValue(day, out Color color))
+                        if (DayColors != null && DayColors.TryGetValue(day, out Color color))
                         {
-                            bg.Color = color;
+                            heatShape.Color = color;
+                            label.TextColor = Colors.White; 
                         }
                         else
                         {
-                            bg.Color = Colors.White;
+                            heatShape.Color = Colors.Transparent;
+                            label.TextColor = Color.FromArgb("#444"); 
                         }
                     }
                 };
