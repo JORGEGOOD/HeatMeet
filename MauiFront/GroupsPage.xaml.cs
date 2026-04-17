@@ -30,6 +30,13 @@ namespace MauiFront
 
         public string FechaHoraFormatted => Date.ToLocalTime().ToString("dd/MM/yyyy  HH:mm");
     }
+    public class AvailabilityDto
+    {
+        public int UserId { get; set; }
+        public DateTime Date { get; set; }
+        public bool IsAllDay { get; set; }
+        public string Title { get; set; }
+    }
 
 
     public partial class GroupsPage : ContentPage

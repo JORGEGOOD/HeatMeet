@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+              xmlns:scheduler="clr-namespace:Syncfusion.Maui.Scheduler;assembly=Syncfusion.Maui.Scheduler"
              x:Class="MauiFront.VotePage"
              BackgroundColor="#F1EEE8">
     <ScrollView>
@@ -17,6 +18,22 @@
                        TextColor="#707070"
                        HorizontalOptions="Center"/>
             </VerticalStackLayout>
+            
+            <Frame HeightRequest="500" 
+                Margin="15,15,15,5"
+                BackgroundColor="White"
+                CornerRadius="20"
+                BorderColor="Transparent"
+                HasShadow="True"
+                Padding="0">
+
+                <scheduler:SfScheduler x:Name="SchedulerControl"
+                            View="Month"
+                            Tapped="OnSchedulerTapped"
+                            AppointmentsSource="{Binding EventosAgendados}">
+                </scheduler:SfScheduler>
+                
+            </Frame>
 
             <!-- Detalles del evento -->
             <Frame BackgroundColor="White"

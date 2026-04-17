@@ -1,4 +1,5 @@
-﻿using System.Net.Sockets;
+﻿using System.Collections.ObjectModel;
+using System.Net.Sockets;
 using System.Text.Json;
 using SharedModels;
 
@@ -7,16 +8,19 @@ namespace MauiFront
     public partial class VotePage : ContentPage
     {
         private int _eventId;
+        public ObservableCollection<Syncfusion.Maui.Scheduler.SchedulerAppointment> EventosAgendados { get; set; } = new();
 
         public VotePage()
         {
             InitializeComponent();
+            BindingContext = this;
         }
 
         protected override async void OnAppearing()
         {
             base.OnAppearing();
             await LoadDraftEvent();
+            await LoadGroupAvailability();
         }
 
 
@@ -71,7 +75,68 @@ namespace MauiFront
 
         private async void OnRechazar(object sender, EventArgs e)
             => await Votar(false);
+        private async Task LoadGroupAvailability()
+        {
+            int groupId = Preferences.Get("groupId", 0);
+            if (groupId == 0) return;
 
+            Socket socket = null;
+            try
+            {
+                socket = NetUtils.NetUtils.ConnectToServer();
+                NetworkMessage message = new NetworkMessage
+                {
+                    Command = "GET_GROUP_AVAILABILITY",
+                    Data = new { groupId }
+                };
+                NetUtils.NetUtils.SendJson(socket, message);
+                NetworkMessage response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
+
+                if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
+                {
+                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                    var list = JsonSerializer.Deserialize<List<AvailabilityDto>>(
+                                   data.GetProperty("availabilities").GetRawText(), options);
+
+                    EventosAgendados.Clear();
+                    if (list != null)
+                    {
+                        // Colores distintos por userId
+                        string[] colors = { "#4CAF50", "#2196F3", "#9C27B0", "#F44336", "#FF9800" };
+                        var userColorMap = new Dictionary<int, string>();
+                        int colorIndex = 0;
+
+                        foreach (var av in list)
+                        {
+                            if (!userColorMap.ContainsKey(av.UserId))
+                            {
+                                userColorMap[av.UserId] = colors[colorIndex % colors.Length];
+                                colorIndex++;
+                            }
+
+                            EventosAgendados.Add(new Syncfusion.Maui.Scheduler.SchedulerAppointment
+                            {
+                                Subject = av.Title,
+                                StartTime = av.Date.ToLocalTime(),
+                                EndTime = av.IsAllDay
+                                            ? av.Date.ToLocalTime().Date.AddDays(1).AddSeconds(-1)
+                                            : av.Date.ToLocalTime().AddHours(1),
+                                IsAllDay = av.IsAllDay,
+                                Background = Color.FromArgb(userColorMap[av.UserId])
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"LoadGroupAvailability error: {ex.Message}");
+            }
+            finally
+            {
+                if (socket != null) NetUtils.NetUtils.CloseSocket(socket);
+            }
+        }
         private async Task Votar(bool accepts)
         {
             int userId = Preferences.Get("userId", 0);
@@ -117,6 +182,7 @@ namespace MauiFront
                     RechazarBtn.IsEnabled = true;
                 }
             }
+
             catch (Exception ex)
             {
                 await DisplayAlert("Error", ex.Message, "OK");
@@ -127,6 +193,11 @@ namespace MauiFront
             {
                 if (socket != null) NetUtils.NetUtils.CloseSocket(socket);
             }
+
+        }
+        private void OnSchedulerTapped(object sender, Syncfusion.Maui.Scheduler.SchedulerTappedEventArgs e)
+        {
+            
         }
     }
 }
