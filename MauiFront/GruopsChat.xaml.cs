@@ -132,13 +132,14 @@ public partial class GroupsChat : ContentPage
             return;
         }
 
-        try
+        try //LOAD MESSAGES AND EVENTS
         {
             Socket socket = NetUtils.NetUtils.ConnectToServer();
 
+            //Get messages
             NetworkMessage message = new NetworkMessage
             {
-                Command = "GET_GROUP_MESSAGES",
+                Command = "GET_GROUP_MESSAGES_AND_EVENTS",
                 Data = new { groupId }
             };
 
@@ -147,13 +148,17 @@ public partial class GroupsChat : ContentPage
 
             if (response.Data is JsonElement data && data.GetProperty("success").GetBoolean())
             {
+                //get messages
                 string messagesJson = data.GetProperty("messages").GetRawText();
                 List<MessageDto>? messages = JsonSerializer.Deserialize<List<MessageDto>>(messagesJson);
 
-                messages = messages.OrderBy(m => m.CreateDate).ToList();
+                //get events
+
+          
+
                 LoadMessages(messages, userId);
 
-                NetworkMessage ack = new NetworkMessage
+                NetworkMessage ack = new NetworkMessage //TODO: get rid of this ACK garbage
                 {
                     Command = "ACK",
                     Data = new { success = true }
@@ -172,7 +177,7 @@ public partial class GroupsChat : ContentPage
     }
 
 
-    //Theese 2 pieces of code are to delete "freezed" functions that cause problems when re-called later 
+    //Theese 2 pieces of code are to delete "freezed" functions that cause problems when re-called later in the chat
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
@@ -496,6 +501,8 @@ public partial class GroupsChat : ContentPage
             if (socket != null) NetUtils.NetUtils.CloseSocket(socket);
         }
     }
+
+
     private async Task LoadLastEvent()
     {
         int groupId = Preferences.Get("groupId", 0);

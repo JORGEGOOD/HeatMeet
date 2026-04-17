@@ -70,6 +70,8 @@ namespace HeatMeetServer
         public string? Location { get; set; }
 
         public string? AddressUrl { get; set; }
+
+        public DateTime CreateDate { get; set; }
         public DateTime Date { get; set; }
 
         public int UserId { get; set; }//<-- For the disponibility

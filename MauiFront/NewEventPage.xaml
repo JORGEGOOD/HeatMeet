@@ -64,7 +64,7 @@
                     </VerticalStackLayout>
 
                     <Button Text="Crear nuevo Evento"
-                        Clicked="CrearEvento_Clicked"
+                        Clicked="CreateEvent_Clicked"
                         TextColor="White" 
                         CornerRadius="14" 
                         HeightRequest="56"

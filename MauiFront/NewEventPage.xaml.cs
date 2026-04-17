@@ -11,7 +11,7 @@ namespace MauiFront
             InitializeComponent();
         }
 
-        private async void CrearEvento_Clicked(object sender, EventArgs e)
+        private async void CreateEvent_Clicked(object sender, EventArgs e)
         {
             
             if (string.IsNullOrWhiteSpace(NombreEvento.Text))
@@ -27,11 +27,10 @@ namespace MauiFront
                 return;
             }
 
-            // Combinar fecha y hora
-            // En NewEventPage.xaml.cs
-            DateTime fechaHoraLocal = FechaPicker.Date + HoraPicker.Time;
-            DateTime fechaHoraUtc = fechaHoraLocal.ToUniversalTime(); // Esto le pone el Kind.Utc
-
+            //Combine datetime in NewEventPage.xaml.cs
+            DateTime localDateTime = FechaPicker.Date + HoraPicker.Time;
+            DateTime dateTimeUtc = localDateTime.ToUniversalTime();
+            DateTime createDateUtc = DateTime.UtcNow;
            
             Socket socket = null;
             try
@@ -46,9 +45,11 @@ namespace MauiFront
                         title = NombreEvento.Text.Trim(),
                         ubicacion = NombreLugar.Text?.Trim(),
                         direccionUrl = Direccion.Text?.Trim(),
-                        fechaHora = fechaHoraUtc,
+                        fechaHora = dateTimeUtc,
+                        createDate = createDateUtc,
                         groupId = groupId,
                         isEvent = true   
+
                     }
                 };
 
@@ -58,8 +59,7 @@ namespace MauiFront
                 if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
                 {
                     await DisplayAlert("¡Listo!", "Evento creado correctamente.", "OK");
-
-                    // Limpiar formulario
+                    //clear form
                     NombreEvento.Text = string.Empty;
                     NombreLugar.Text = string.Empty;
                     Direccion.Text = string.Empty;
@@ -68,7 +68,7 @@ namespace MauiFront
                 }
                 else
                 {
-                    string serverMsg = response?.Data is JsonElement d2 &&
+                    string? serverMsg = response?.Data is JsonElement d2 &&
                                        d2.TryGetProperty("message", out JsonElement mp)
                                        ? mp.GetString() : "No se pudo crear el evento.";
                     await DisplayAlert("Error", serverMsg, "OK");
@@ -81,6 +81,7 @@ namespace MauiFront
             finally
             {
                 if (socket != null) NetUtils.NetUtils.CloseSocket(socket);
+                //TODO: return to chat or last screen
             }
         }
     }

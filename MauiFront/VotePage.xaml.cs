@@ -19,6 +19,10 @@ namespace MauiFront
             await LoadDraftEvent();
         }
 
+
+
+
+
         private async Task LoadDraftEvent()
         {
             int groupId = Preferences.Get("groupId", 0);
@@ -34,7 +38,7 @@ namespace MauiFront
                     Data = new { groupId }
                 };
                 NetUtils.NetUtils.SendJson(socket, message);
-                NetworkMessage response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
+                NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
 
                 if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
                 {
@@ -74,7 +78,7 @@ namespace MauiFront
             AceptarBtn.IsEnabled = false;
             RechazarBtn.IsEnabled = false;
 
-            Socket socket = null;
+            Socket? socket = null;
             try
             {
                 socket = NetUtils.NetUtils.ConnectToServer();
@@ -84,7 +88,7 @@ namespace MauiFront
                     Data = new { eventId = _eventId, userId, accepts }
                 };
                 NetUtils.NetUtils.SendJson(socket, message);
-                NetworkMessage response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
+                NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
 
                 if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
                 {
@@ -105,7 +109,7 @@ namespace MauiFront
                 }
                 else
                 {
-                    string msg = response?.Data is JsonElement d2 &&
+                    string? msg = response?.Data is JsonElement d2 &&
                                  d2.TryGetProperty("message", out JsonElement mp)
                                  ? mp.GetString() : "Error al votar.";
                     await DisplayAlert("Error", msg, "OK");

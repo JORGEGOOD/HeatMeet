@@ -166,25 +166,29 @@ namespace HeatMeetServer
                             else response.Data = new { success = false, message = "Invalid data" };
                         }
                         break;
-                    case "GET_GROUP_MESSAGES":
+                    case "GET_GROUP_MESSAGES_AND_EVENTS":
                         {
                             if (message.Data is JsonElement groupMessages)
                             {
                                 int groupId = groupMessages.GetProperty("groupId").GetInt32();
                                 lock (ormLock)
                                 {
-                                    //now we do select to the database and retreat the messages, put in into a json and send back
+                                    //MESSAGES
+                                    //select and retreat messages,into a json and send back
                                     var messages = ormManager.Messages.Where(m => m.GroupId == groupId).Select(m => new { m.Content, m.CreateDate, m.UserId, UserName = m.User.Name }).ToList();
-                                    if (messages == null || messages.Count == 0)
-                                        response.Data = new { success = false, messages = new List<object>() };
+                                    //if no messages null list
+                                    if (messages == null || messages.Count == 0) response.Data = new { success = false, messages = new List<object>() };
+                                    //EVENTS
+                                    var events = ormManager.Events.Where(e=>e.GroupId == groupId && e.IsEvent==true).Select(e=> new {e.Id,e.IsEvent })
 
                                     else
                                     {
                                         //send all messages
                                         response.Data = new
                                         {
-                                            success = true,
-                                            messages = messages
+                                            success  = true,
+                                            messages = messages,
+                                            events   = new List<object>()
                                         };
                                     }
                                 }
@@ -282,13 +286,16 @@ namespace HeatMeetServer
                             {
                                 try
                                 {
-                                    string title       = evtData.GetProperty("title").GetString() ?? "";
-                                    string? ubicacion  = evtData.TryGetProperty("ubicacion", out var u) ? u.GetString() : null;
-                                    string? direccion  = evtData.TryGetProperty("direccionUrl", out var d) ? d.GetString() : null;
-                                    DateTime rawDate   = evtData.GetProperty("fechaHora").GetDateTime();
-                                    DateTime fechaHora = DateTime.SpecifyKind(rawDate, DateTimeKind.Utc);
-                                    int groupId        = evtData.TryGetProperty("groupId", out var g) ? g.GetInt32(): 0;
-                                    bool IsEvent = evtData.GetProperty("isEvent").GetBoolean();
+                                    string title           = evtData.GetProperty("title").GetString() ?? "";
+                                    string? ubicacion      = evtData.TryGetProperty("ubicacion", out var u) ? u.GetString() : null;
+                                    string? direccion      = evtData.TryGetProperty("direccionUrl", out var d) ? d.GetString() : null;
+                                    DateTime rawDate       = evtData.GetProperty("fechaHora").GetDateTime();
+                                    DateTime fechaHora     = DateTime.SpecifyKind(rawDate, DateTimeKind.Utc);
+                                    DateTime createRawDate = evtData.GetProperty("createDate").GetDateTime();
+                                    DateTime createDate    = DateTime.SpecifyKind(createRawDate, DateTimeKind.Utc);
+                                    int groupId            = evtData.TryGetProperty("groupId", out var g) ? g.GetInt32(): 0;
+                                    bool IsEvent           = evtData.GetProperty("isEvent").GetBoolean();
+                                    
                                     lock (ormLock)
                                     {
                                         Groups? group = ormManager.Groups.Find(groupId);
@@ -305,6 +312,7 @@ namespace HeatMeetServer
                                             Location = ubicacion,
                                             AddressUrl = direccion,
                                             Date = fechaHora,
+                                            CreateDate = createDate,
                                             GroupId = groupId,
                                             IsEvent = IsEvent,
                                             IsDrafT = true   
