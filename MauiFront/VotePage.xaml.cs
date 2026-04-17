@@ -159,14 +159,14 @@ namespace MauiFront
         {
             return new DataTemplate(() =>
             {
-                // Forzamos el Grid a ser transparente para no tapar el calendario
+                
                 var grid = new Grid { BackgroundColor = Colors.Transparent };
 
                 var bg = new BoxView
                 {
                     HorizontalOptions = LayoutOptions.Fill,
                     VerticalOptions = LayoutOptions.Fill,
-                    Color = Colors.White // Color base siempre blanco
+                    Color = Colors.White 
                 };
 
                 var label = new Label
@@ -187,7 +187,7 @@ namespace MauiFront
                         DateTime day = details.DateTime.Date;
                         label.Text = details.DateTime.Day.ToString();
 
-                        
+
                         if (DayColors.TryGetValue(day, out Color color))
                         {
                             bg.Color = color;
