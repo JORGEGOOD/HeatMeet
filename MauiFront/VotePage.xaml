@@ -18,21 +18,18 @@
                        TextColor="#707070"
                        HorizontalOptions="Center"/>
             </VerticalStackLayout>
-            
-            <Frame HeightRequest="500" 
-                Margin="15,15,15,5"
-                BackgroundColor="White"
-                CornerRadius="20"
-                BorderColor="Transparent"
-                HasShadow="True"
-                Padding="0">
 
+            <Frame HeightRequest="500" 
+                   Margin="15,15,15,5"
+                   BackgroundColor="White"
+                   CornerRadius="20"
+                   BorderColor="Transparent"
+                   HasShadow="True"
+                   Padding="0">
                 <scheduler:SfScheduler x:Name="SchedulerControl"
-                            View="Month"
-                            Tapped="OnSchedulerTapped"
-                            AppointmentsSource="{Binding EventosAgendados}">
+                           View="Month"
+                           Tapped="OnSchedulerTapped">
                 </scheduler:SfScheduler>
-                
             </Frame>
 
             <!-- Detalles del evento -->

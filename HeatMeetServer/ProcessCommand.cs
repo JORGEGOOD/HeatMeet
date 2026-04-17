@@ -179,7 +179,7 @@ namespace HeatMeetServer
                                     //if no messages null list
                                     if (messages == null || messages.Count == 0) response.Data = new { success = false, messages = new List<object>() };
                                     //EVENTS
-                                    var events = ormManager.Events.Where(e=>e.GroupId == groupId && e.IsEvent==true).Select(e=> new {e.Id,e.IsEvent })
+                                    //var events = ormManager.Events.Where(e => e.GroupId == groupId && e.IsEvent == true).Select(e => new { e.Id, e.IsEvent });
 
                                     else
                                     {

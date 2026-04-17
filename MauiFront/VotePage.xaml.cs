@@ -8,7 +8,7 @@ namespace MauiFront
     public partial class VotePage : ContentPage
     {
         private int _eventId;
-        public ObservableCollection<Syncfusion.Maui.Scheduler.SchedulerAppointment> EventosAgendados { get; set; } = new();
+        public Dictionary<DateTime, Color> DayColors { get; set; } = new();
 
         public VotePage()
         {
@@ -22,10 +22,6 @@ namespace MauiFront
             await LoadDraftEvent();
             await LoadGroupAvailability();
         }
-
-
-
-
 
         private async Task LoadDraftEvent()
         {
@@ -98,34 +94,40 @@ namespace MauiFront
                     var list = JsonSerializer.Deserialize<List<AvailabilityDto>>(
                                    data.GetProperty("availabilities").GetRawText(), options);
 
-                    EventosAgendados.Clear();
+                    
+                    var countPerDay = new Dictionary<DateTime, int>();
                     if (list != null)
                     {
-                        // Colores distintos por userId
-                        string[] colors = { "#4CAF50", "#2196F3", "#9C27B0", "#F44336", "#FF9800" };
-                        var userColorMap = new Dictionary<int, string>();
-                        int colorIndex = 0;
-
                         foreach (var av in list)
                         {
-                            if (!userColorMap.ContainsKey(av.UserId))
-                            {
-                                userColorMap[av.UserId] = colors[colorIndex % colors.Length];
-                                colorIndex++;
-                            }
-
-                            EventosAgendados.Add(new Syncfusion.Maui.Scheduler.SchedulerAppointment
-                            {
-                                Subject = av.Title,
-                                StartTime = av.Date.ToLocalTime(),
-                                EndTime = av.IsAllDay
-                                            ? av.Date.ToLocalTime().Date.AddDays(1).AddSeconds(-1)
-                                            : av.Date.ToLocalTime().AddHours(1),
-                                IsAllDay = av.IsAllDay,
-                                Background = Color.FromArgb(userColorMap[av.UserId])
-                            });
+                            DateTime day = av.Date.ToLocalTime().Date;
+                            if (!countPerDay.ContainsKey(day))
+                                countPerDay[day] = 0;
+                            countPerDay[day]++;
                         }
                     }
+
+                    
+                    DayColors.Clear();
+                    foreach (var kvp in countPerDay)
+                    {
+                        DayColors[kvp.Key] = kvp.Value switch
+                        {
+                            1 => Color.FromArgb("#FFE0B2"),
+                            2 => Color.FromArgb("#FFB347"),
+                            3 => Color.FromArgb("#FF6A00"),
+                            _ => Color.FromArgb("#E63900")
+                        };
+                    }
+
+                    // Forzar refresco del scheduler
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        SchedulerControl.MonthView = new Syncfusion.Maui.Scheduler.SchedulerMonthView
+                        {
+                            CellTemplate = BuildMonthCellTemplate()
+                        };
+                    });
                 }
             }
             catch (Exception ex)
@@ -136,6 +138,51 @@ namespace MauiFront
             {
                 if (socket != null) NetUtils.NetUtils.CloseSocket(socket);
             }
+        }
+        private DataTemplate BuildMonthCellTemplate()
+        {
+            return new DataTemplate(() =>
+            {
+                var grid = new Grid();
+
+                var bg = new BoxView
+                {
+                    HorizontalOptions = LayoutOptions.Fill,
+                    VerticalOptions = LayoutOptions.Fill,
+                    Color = Colors.White
+                };
+
+                var label = new Label
+                {
+                    HorizontalOptions = LayoutOptions.Center,
+                    VerticalOptions = LayoutOptions.Center,
+                    FontSize = 14,
+                    TextColor = Color.FromArgb("#222")
+                };
+
+                grid.Children.Add(bg);
+                grid.Children.Add(label);
+
+                grid.BindingContextChanged += (s, e) =>
+                {
+                    if (grid.BindingContext is Syncfusion.Maui.Scheduler.SchedulerMonthCellDetails details)
+                    {
+                        DateTime day = details.DateTime.Date;
+                        label.Text = details.DateTime.Day.ToString();
+                        
+                        if (DayColors.TryGetValue(day, out Color color))
+                            bg.Color = color;
+                        else
+                        {
+                            bg.Color = Colors.White;
+                        }
+                            
+                            
+                    }
+                };
+
+                return grid;
+            });
         }
         private async Task Votar(bool accepts)
         {
