@@ -1,7 +1,6 @@
 ﻿using System.Net.Sockets;
 using System.Text.Json;
 using SharedModels;
-
 namespace MauiFront;
 
 public partial class GroupsChat : ContentPage
@@ -29,7 +28,37 @@ public partial class GroupsChat : ContentPage
         public string UserName { get; set; }
     }
 
-    void AddMessage(MessageDto? msg, int currentUserId)
+    public class ChatItem //Both message AND event. In future could also contain img, videos, stickers and more
+    {
+        public DateTime CreateDate { get; set; }
+        
+        public MessageDto? Message { get; set; }
+        public EventDto? Event { get; set; }
+
+
+        public bool IsMessage => Message != null;
+        public bool IsEvent => Event != null;
+
+        //Who created it
+        public int AuthorId => IsMessage ? Message.UserId : (Event?.UserId ?? 0);
+    }
+
+    void AddChatItem(ChatItem item, int currentUserId)
+    {
+        if(item.IsMessage && item.Message != null)
+        {
+            //we process this as a message
+            AddMessage(item.Message, currentUserId);
+        }
+        if(item.IsEvent && item.Event != null)
+        {
+            //we process this as an event
+            AddEventCard(item.Event);
+        }
+    }
+
+
+    void AddMessage(MessageDto? msg, int currentUserId)//Add individual message
     {
         int senderId = msg.UserId != 0 ? msg.UserId : msg.userId;
         bool isMine = senderId == currentUserId;
@@ -93,6 +122,94 @@ public partial class GroupsChat : ContentPage
             _lastMessageId = msg.Id;
     }
 
+    private void AddEventCard(EventDto ev)
+    {
+        // Aseguramos que la UI se actualice en el hilo principal
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            string formattedDate = ev.Date.ToLocalTime().ToString("dd/MM/yyyy  HH:mm");
+
+            var card = new Frame
+            {
+                CornerRadius = 12,
+                BorderColor = Color.FromArgb("#FF8C00"),
+                BackgroundColor = Colors.White,
+                Padding = new Thickness(12, 10),
+                Margin = new Thickness(20, 4),
+                HasShadow = false,
+                HorizontalOptions = LayoutOptions.Fill
+            };
+
+            var header = new HorizontalStackLayout { Spacing = 8 };
+            header.Children.Add(new Image
+            {
+                Source = "calendar_icon.png", // Asegúrate de que este recurso exista
+                WidthRequest = 18,
+                HeightRequest = 18,
+                VerticalOptions = LayoutOptions.Center
+            });
+            header.Children.Add(new Label
+            {
+                Text = "Propuesta",
+                FontSize = 13,
+                FontAttributes = FontAttributes.Bold,
+                TextColor = Color.FromArgb("#FF6A00"),
+                VerticalOptions = LayoutOptions.Center
+            });
+
+            var titleLabel = new Label
+            {
+                Text = ev.Title,
+                FontSize = 14,
+                FontAttributes = FontAttributes.Bold,
+                TextColor = Color.FromArgb("#222")
+            };
+
+            var detailsRow = new HorizontalStackLayout { Spacing = 10 };
+            detailsRow.Children.Add(new Label
+            {
+                Text = "📅 " + formattedDate,
+                FontSize = 12,
+                TextColor = Colors.Gray
+            });
+
+            if (!string.IsNullOrWhiteSpace(ev.Location))
+            {
+                detailsRow.Children.Add(new Label
+                {
+                    Text = "📍 " + ev.Location,
+                    FontSize = 12,
+                    TextColor = Colors.Gray
+                });
+            }
+
+            var votarBtn = new Button
+            {
+                Text = "Votar",
+                BackgroundColor = Color.FromArgb("#FF6A00"),
+                TextColor = Colors.White,
+                CornerRadius = 20,
+                HeightRequest = 38,
+                HorizontalOptions = LayoutOptions.Fill,
+                FontSize = 13
+            };
+
+            votarBtn.ClassId = ev.Id.ToString();
+            votarBtn.Clicked += OnVotarClicked;
+
+            var stack = new VerticalStackLayout { Spacing = 6 };
+            stack.Children.Add(header);
+            stack.Children.Add(titleLabel);
+            stack.Children.Add(detailsRow);
+            stack.Children.Add(votarBtn);
+
+            card.Content = stack;
+            MessagesContainer.Children.Add(card);//Insert event into the messages container
+        });
+    }
+
+
+
     private async void ScrollToBottom()
     {
         await Task.Delay(100);
@@ -103,11 +220,19 @@ public partial class GroupsChat : ContentPage
         });
     }
 
-    void LoadMessages(List<MessageDto> mensajes, int currentUserId)
+    void LoadMessages(List<MessageDto> messages, List<EventDto> events, int currentUserId)
     {
         MessagesContainer.Children.Clear();
-        foreach (MessageDto? msg in mensajes)
-            AddMessage(msg, currentUserId);
+
+        //Join messages and events
+        List<ChatItem> chatItems = new List<ChatItem>();
+        chatItems.AddRange(messages.Select(m => new ChatItem { CreateDate = m.CreateDate, Message = m }));//add messages to list
+        chatItems.AddRange(events.Select(e => new ChatItem { CreateDate = e.CreateDate, Event = e }));    //add events to list
+        //Sort list
+        List<ChatItem> sortedChatItems = chatItems.OrderBy(c => c.CreateDate).ToList();
+
+        //Add each individual item
+        foreach (ChatItem item in sortedChatItems) AddChatItem(item, currentUserId);
     }
 
     protected override async void OnAppearing()
@@ -146,17 +271,21 @@ public partial class GroupsChat : ContentPage
             NetUtils.NetUtils.SendJson(socket, message);
             NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
 
-            if (response.Data is JsonElement data && data.GetProperty("success").GetBoolean())
+            if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
             {
                 //get messages
                 string messagesJson = data.GetProperty("messages").GetRawText();
                 List<MessageDto>? messages = JsonSerializer.Deserialize<List<MessageDto>>(messagesJson);
 
                 //get events
+                List<EventDto>? events = new();
+                if(data.TryGetProperty("events",out JsonElement eventsJson))
+                {
+                    events = JsonSerializer.Deserialize<List<EventDto>>(eventsJson.GetRawText()) ?? new();
+                }
+                
 
-          
-
-                LoadMessages(messages, userId);
+                LoadMessages(messages, events, userId);
 
                 NetworkMessage ack = new NetworkMessage //TODO: get rid of this ACK garbage
                 {
@@ -173,7 +302,7 @@ public partial class GroupsChat : ContentPage
             await DisplayAlert("Error", ex.Message, "OK");
         }
 
-        await LoadLastEvent();
+        //await LoadLastEvent();
     }
 
 
@@ -528,87 +657,19 @@ public partial class GroupsChat : ContentPage
                 string formatted = fecha.ToLocalTime().ToString("dd/MM/yyyy  HH:mm");
                 string location = data.TryGetProperty("ubicacion", out var loc)
                                    ? (loc.GetString() ?? "") : "";
+                int id = data.GetProperty("eventId").GetInt32();
 
-                MainThread.BeginInvokeOnMainThread(() =>
+                //construir evento
+                EventDto eventDisplay = new EventDto
                 {
-                    // Tarjeta dentro del scroll como un mensaje
-                    var card = new Frame
-                    {
-                        CornerRadius = 12,
-                        BorderColor = Color.FromArgb("#FF8C00"),
-                        BackgroundColor = Colors.White,
-                        Padding = new Thickness(12, 10),
-                        Margin = new Thickness(20, 4),
-                        HasShadow = false,
-                        HorizontalOptions = LayoutOptions.Fill
-                    };
+                    Id = id,
+                    Title = title,
+                    Date = fecha,
+                    Location = location,
+                   
+                };
 
-                    var header = new HorizontalStackLayout { Spacing = 8 };
-                    header.Children.Add(new Image
-                    {
-                        Source = "calendar_icon.png",
-                        WidthRequest = 18,
-                        HeightRequest = 18,
-                        VerticalOptions = LayoutOptions.Center
-                    });
-                    header.Children.Add(new Label
-                    {
-                        Text = "Propuesta",
-                        FontSize = 13,
-                        FontAttributes = FontAttributes.Bold,
-                        TextColor = Color.FromArgb("#FF6A00"),
-                        VerticalOptions = LayoutOptions.Center
-                    });
-
-                    var titleLabel = new Label
-                    {
-                        Text = title,
-                        FontSize = 14,
-                        FontAttributes = FontAttributes.Bold,
-                        TextColor = Color.FromArgb("#222")
-                    };
-
-                    var detailsRow = new HorizontalStackLayout { Spacing = 10 };
-                    detailsRow.Children.Add(new Label
-                    {
-                        Text = "📅 " + formatted,
-                        FontSize = 12,
-                        TextColor = Colors.Gray
-                    });
-                    if (!string.IsNullOrWhiteSpace(location))
-                        detailsRow.Children.Add(new Label
-                        {
-                            Text = "📍 " + location,
-                            FontSize = 12,
-                            TextColor = Colors.Gray
-                        });
-
-                    var votarBtn = new Button
-                    {
-                        Text = "Votar",
-                        BackgroundColor = Color.FromArgb("#FF6A00"),
-                        TextColor = Colors.White,
-                        CornerRadius = 20,
-                        HeightRequest = 38,
-                        HorizontalOptions = LayoutOptions.Fill,
-                        FontSize = 13
-                        
-                    };
-                    votarBtn.Clicked += OnVotarClicked;
-
-
-
-                    var stack = new VerticalStackLayout { Spacing = 6 };
-                    stack.Children.Add(header);
-                    stack.Children.Add(titleLabel);
-                    stack.Children.Add(detailsRow);
-                    stack.Children.Add(votarBtn);
-
-                    
-                    card.Content = stack;
-                    MessagesContainer.Children.Add(card);
-                });
-                
+                AddEventCard(eventDisplay);
             }
         }
         catch { }
