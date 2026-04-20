@@ -53,7 +53,6 @@ namespace HeatMeetServer
         public string InviteCode { get; set; }
         public DateTime CreateDate { get; set; }
 
-        public string EmojiIcon { get; set; } = "📅";
         public List<Users> Users { get; set; } = new();
         public List<Events> Events { get; set; } = new();//messages and events are separated
         public List<Messages> Messages { get; set; } = new(); //individual messages
