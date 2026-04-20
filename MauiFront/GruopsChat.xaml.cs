@@ -538,7 +538,7 @@ public partial class GroupsChat : ContentPage
     {
         bool confirm = await DisplayAlert(
             "🚪 Salir del grupo",
-            "¿Seguro que quieres salir? Ya no podrás leer los mensajes.",
+            "¿Seguro que quieres salir? Se te elimara del grupo.",
             "Salir",
             "Cancelar");
 
@@ -546,13 +546,9 @@ public partial class GroupsChat : ContentPage
 
         int groupId = Preferences.Get("groupId", 0);
         int userId = Preferences.Get("userId", 0);
-<<<<<<< Updated upstream
 
-        Socket socket = null;
-
-=======
         Socket? socket = null;
->>>>>>> Stashed changes
+
         try
         {
             socket = NetUtils.NetUtils.ConnectToServer();

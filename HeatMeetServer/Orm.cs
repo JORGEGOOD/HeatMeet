@@ -17,7 +17,7 @@ namespace HeatMeetServer
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)//config code
         { 
             base.OnConfiguring(optionsBuilder);
-            optionsBuilder.UseNpgsql("Host=192.168.111.44;Port=5432;Username=Alumno;Password=AlumnoIFP;Database=HeatMeet");
+            optionsBuilder.UseNpgsql("Host=192.168.1.67;Port=5432;Username=postgres;Password=12345;Database=HeeTMeat");
         }
     }
 
@@ -53,7 +53,7 @@ namespace HeatMeetServer
         public string InviteCode { get; set; }
         public DateTime CreateDate { get; set; }
 
-
+        public string EmojiIcon { get; set; } = "📅";
         public List<Users> Users { get; set; } = new();
         public List<Events> Events { get; set; } = new();//messages and events are separated
         public List<Messages> Messages { get; set; } = new(); //individual messages
