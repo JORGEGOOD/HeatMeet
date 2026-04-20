@@ -519,7 +519,7 @@ namespace HeatMeetServer
 
                                         if (totalMembers > 0 && totalVotes >= totalMembers)
                                         {
-                                            // Todos votaron SI → confirmar evento
+                                            // Todos votaron SI → se confirmar evento
                                             evt.IsDrafT = false;
                                             ormManager.SaveChanges();
                                             response.Data = new { success = true, result = "confirmed" };
