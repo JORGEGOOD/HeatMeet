@@ -435,7 +435,7 @@ namespace HeatMeetServer
                             else response.Data = new { success = false, message = "Invalid data" };
                         }
                         break;
-                    case "GET_LAST_EVENT"://Is this used?
+                    case "GET_LAST_EVENT"://Is this used? In future we could kpi this
                         {
                             if (message.Data is JsonElement evtData)
                             {
@@ -493,6 +493,44 @@ namespace HeatMeetServer
                             }
                             else response.Data = new { success = false, message = "Invalid data" };
                         }
+                        break;
+
+                    case "GET_EVENT_PROPOSALS": //the 3 proposals for the event.
+                        if (message.Data is JsonElement msgData)
+                        {
+                            try
+                            {
+                                int eventId = msgData.GetProperty("eventId").GetInt32();
+
+                                lock (ormLock)
+                                {
+                                    //Get group
+                                    Events? Event = ormManager.Events.Find(eventId);
+                                    if (Event == null) { response.Data = new { success = false, message = "ERROR GET_EVENT_PROPOSALS, no event found " }; break; }
+
+                                    //Get 3 most concurrent disponibility days of this group members
+                                    var topDays = ormManager.Events
+                                        .Where(e => e.GroupId == Event.GroupId && e.IsEvent == false)
+                                        .GroupBy(e => e.Date.Date)
+                                        .Select(g => new
+                                        {
+                                            Fecha = g.Key,
+                                            Count = g.Count()
+                                        })
+                                        .OrderByDescending(x => x.Count)
+                                        .Take(3)
+                                        .ToList();
+
+                                    response.Data = new { success = true, topDays = topDays };
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                string? realError = ex.InnerException?.Message ?? ex.Message;
+                                response.Data = new { success = false, message = "DB Error: " + realError };
+                            }
+                        }
+                        else response.Data = new { success = false, message = "Invalid data" };
                         break;
 
                     case "VOTE_EVENT":

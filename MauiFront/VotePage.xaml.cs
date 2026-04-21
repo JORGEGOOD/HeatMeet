@@ -10,6 +10,11 @@ namespace MauiFront
         private int eventId;
         private int groupId;
         public Dictionary<DateTime, Color> DayColors { get; set; } = new();
+        public class ProposalDto
+        {
+            public DateTime Fecha { get; set; }
+            public int Count { get; set; }
+        }
 
         public VotePage()
         {
@@ -39,12 +44,80 @@ namespace MauiFront
                 NetworkMessage message = new()
                 {
                     Command = "GET_EVENT_PROPOSALS",
-                    Data = new { groupId }
+                    Data = new { eventId }
                 };
+                NetUtils.NetUtils.SendJson(socket, message);
+                NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
+                
+                if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
+                {
+                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                    var topDays = JsonSerializer.Deserialize<List<ProposalDto>>(data.GetProperty("topDays").GetRawText(), options);
+
+                    MainThread.BeginInvokeOnMainThread(() => {
+                        ProposalsContainer.Children.Clear();
+
+                        if (topDays == null || topDays.Count == 0)
+                        {
+                            ProposalsContainer.Children.Add(new Label { Text = "No hay disponibilidades marcadas en el grupo todavía.", HorizontalOptions = LayoutOptions.Center });
+                            return;
+                        }
+
+                        foreach (var prop in topDays)
+                        {
+                            //ProposalsContainer.Children.Add(CreateProposalCard(prop));
+                        }
+                    });
+                }
+                else
+                {
+                    await DisplayAlert("Error", "Error: Ha habido un error ", "OK");
+                    await Navigation.PopAsync();
+                }
             }
             catch (Exception ex) {await DisplayAlert("Error", ex.Message, "OK");}
             finally {if (socket != null) NetUtils.NetUtils.CloseSocket(socket);}
         }
+
+        //private View CreateProposalCard(ProposalDto prop)
+        //{
+        //    var card = new Frame
+        //    {
+        //        BorderColor = Color.FromArgb("#FF6A00"),
+        //        CornerRadius = 15,
+        //        Padding = 15,
+        //        Content = new Grid
+        //        {
+        //            ColumnDefinitions = new ColumnDefinitionCollection {
+        //        new ColumnDefinition { Width = GridLength.Star },
+        //        new ColumnDefinition { Width = GridLength.Auto }
+        //    },
+        //            Children = {
+        //        new VerticalStackLayout {
+        //            Children = {
+        //                new Label { Text = prop.Fecha.ToString("dddd, dd MMMM"), FontAttributes = FontAttributes.Bold },
+        //                new Label { Text = $"{prop.Count} personas disponibles", FontSize = 12, TextColor = Colors.Gray }
+        //            }
+        //        },
+        //        new Button {
+        //            Text = "Votar",
+        //            CommandParameter = prop.Fecha, // Guardamos la fecha elegida
+        //            BackgroundColor = Color.FromArgb("#FF6A00"),
+        //            TextColor = Colors.White,
+        //            HeightRequest = 40,
+        //            CornerRadius = 20
+        //        }.Bind(Button.CommandProperty, nameof(VotarPropuestaCommand)) // Necesitarás un Command o evento Clicked
+        //    }
+        //        }
+        //    };
+
+        //    // Si prefieres usar Clicked en vez de Commands:
+        //    var btn = (Button)((Grid)card.Content).Children[1];
+        //    btn.Clicked += async (s, e) => await EnviarVotoFecha(prop.Fecha);
+
+        //    return card;
+        //}
+
 
         private async Task LoadDraftEvent()
         {
@@ -87,7 +160,7 @@ namespace MauiFront
                 if (socket != null) NetUtils.NetUtils.CloseSocket(socket);
             }
         }
-
+        
         private async void OnAceptar(object sender, EventArgs e)
             => await Votar(true);
 
@@ -116,8 +189,7 @@ namespace MauiFront
                     var list = JsonSerializer.Deserialize<List<AvailabilityDto>>(
                                    data.GetProperty("availabilities").GetRawText(), options);
 
-                    
-                    var countPerDay = new Dictionary<DateTime, int>();
+                    Dictionary<DateTime, int> countPerDay = new();
                     if (list != null)
                     {
                         foreach (var av in list)
@@ -215,11 +287,11 @@ namespace MauiFront
                 return grid;
             });
         }
-        private async Task Votar(bool accepts)
+        private async Task Votar(bool accepts)//This is currently disabled
         {
             int userId = Preferences.Get("userId", 0);
-            AceptarBtn.IsEnabled = false;
-            RechazarBtn.IsEnabled = false;
+            //AceptarBtn.IsEnabled = false;
+            //RechazarBtn.IsEnabled = false;
 
             Socket? socket = null;
             try
@@ -256,16 +328,16 @@ namespace MauiFront
                                  d2.TryGetProperty("message", out JsonElement mp)
                                  ? mp.GetString() : "Error al votar.";
                     await DisplayAlert("Error", msg, "OK");
-                    AceptarBtn.IsEnabled = true;
-                    RechazarBtn.IsEnabled = true;
+                    //AceptarBtn.IsEnabled = true;
+                    //RechazarBtn.IsEnabled = true;
                 }
             }
 
             catch (Exception ex)
             {
                 await DisplayAlert("Error", ex.Message, "OK");
-                AceptarBtn.IsEnabled = true;
-                RechazarBtn.IsEnabled = true;
+                //AceptarBtn.IsEnabled = true;
+                //RechazarBtn.IsEnabled = true;
             }
             finally
             {

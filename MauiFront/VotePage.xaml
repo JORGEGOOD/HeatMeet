@@ -7,6 +7,8 @@
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="20">
 
+            
+            <!-- Title, Subtitle-->
             <VerticalStackLayout Spacing="4">
                 <Label Text="HeatMeet"
                        FontSize="32"
@@ -19,26 +21,7 @@
                        HorizontalOptions="Center"/>
             </VerticalStackLayout>
 
-            <Frame HeightRequest="500" 
-               Margin="15,15,15,5"
-               BackgroundColor="White"
-               CornerRadius="20"
-               BorderColor="Transparent"
-               HasShadow="True"
-               Padding="0">
-
-                <syncfusion:SfScheduler x:Name="SchedulerControl"
-                            View="Month" 
-                            BackgroundColor="White"
-                            DisplayDate="{Binding CurrentDate}">
-
-                    <syncfusion:SfScheduler.MonthView>
-                        <syncfusion:SchedulerMonthView />
-                    </syncfusion:SfScheduler.MonthView>
-
-                </syncfusion:SfScheduler>
-            </Frame>
-            <!-- Detalles del evento -->
+            <!-- Event details -->
             <Frame BackgroundColor="White"
                    BorderColor="Transparent"
                    CornerRadius="14"
@@ -91,34 +74,33 @@
                             </Frame>
                         </VerticalStackLayout>
                     </Grid>
-
-                    <!-- Botones -->
-                    <Button x:Name="AceptarBtn"
-                            Text=" Acepto"
-                            Clicked="OnAceptar"
-                            TextColor="White"
-                            CornerRadius="14"
-                            HeightRequest="52"
-                            FontAttributes="Bold"
-                            FontSize="16"
-                            Margin="0,10,0,0"
-                            BackgroundColor="#FF6A00"/>
-
-                    <Button x:Name="RechazarBtn"
-                            Text=" No puedo"
-                            Clicked="OnRechazar"
-                            TextColor="#FF6A00"
-                            CornerRadius="14"
-                            HeightRequest="52"
-                            FontAttributes="Bold"
-                            FontSize="16"
-                            BackgroundColor="White"
-                            BorderColor="#FF6A00"
-                            BorderWidth="2"/>
-
                 </VerticalStackLayout>
             </Frame>
 
+            <!-- Calendar -->
+            <Frame HeightRequest="500" 
+                Margin="15,15,15,5"
+                BackgroundColor="White"
+                CornerRadius="20"
+                BorderColor="Transparent"
+                HasShadow="True"
+                Padding="0">
+
+                <syncfusion:SfScheduler x:Name="SchedulerControl"
+                View="Month" 
+                BackgroundColor="White"
+                DisplayDate="{Binding CurrentDate}">
+
+                    <syncfusion:SfScheduler.MonthView>
+                        <syncfusion:SchedulerMonthView />
+                    </syncfusion:SfScheduler.MonthView>
+
+                </syncfusion:SfScheduler>
+            </Frame>
+
+            <!-- Proposals container-->
+            <VerticalStackLayout x:Name="ProposalsContainer" Spacing="10" Padding="20" />
+            
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>
