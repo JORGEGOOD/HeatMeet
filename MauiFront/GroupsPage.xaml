@@ -31,17 +31,36 @@
 
                 <!--Calendario-->
                 <Frame HeightRequest="500" 
-                       Margin="15,15,15,5"
-                       BackgroundColor="White"
-                       CornerRadius="20"
-                       BorderColor="Transparent"
-                       HasShadow="True"
-                       Padding="0">
+                   Margin="15,15,15,5"
+                   BackgroundColor="White"
+                   CornerRadius="20"
+                   BorderColor="Transparent"
+                   HasShadow="True"
+                   Padding="0">
 
                     <scheduler:SfScheduler x:Name="SchedulerControl"
-                                           View="Month"
-                                           Tapped="OnSchedulerTapped"
-                                           AppointmentsSource="{Binding EventosAgendados}">
+                       View="Month"
+                       Tapped="OnSchedulerTapped"
+                       AppointmentsSource="{Binding ScheduledEvents}">
+                        <scheduler:SfScheduler.MonthView>
+                            <scheduler:SchedulerMonthView>
+                                <scheduler:SchedulerMonthView.CellTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <BoxView x:Name="CellBg"
+                                             Color="Transparent"
+                                             HorizontalOptions="Fill"
+                                             VerticalOptions="Fill"/>
+                                            <Label Text="{Binding Date.Day}"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center"
+                                               FontSize="13"
+                                               TextColor="#222"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </scheduler:SchedulerMonthView.CellTemplate>
+                            </scheduler:SchedulerMonthView>
+                        </scheduler:SfScheduler.MonthView>
                     </scheduler:SfScheduler>
                 </Frame>
 
