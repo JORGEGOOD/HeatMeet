@@ -326,21 +326,15 @@ namespace MauiFront
             await Navigation.PushAsync(new CreateGroupPage());
         }
 
-       
         private async void IrUnirseGrupo(object sender, EventArgs e)
         {
             await Navigation.PushAsync(new JoinGroups()); 
         }
 
-        
         private void VolverAlMes_Clicked(object sender, EventArgs e)
         {
             
             SchedulerControl.View = SchedulerView.Month;
         }
-
-
-    
     }
-
 }
