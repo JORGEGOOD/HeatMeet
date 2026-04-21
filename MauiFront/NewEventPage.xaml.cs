@@ -32,12 +32,12 @@ namespace MauiFront
             DateTime dateTimeUtc = localDateTime.ToUniversalTime();
             DateTime createDateUtc = DateTime.UtcNow;
            
-            Socket socket = null;
+            Socket? socket = null;
             try
             {
                 socket = NetUtils.NetUtils.ConnectToServer();
 
-                NetworkMessage message = new NetworkMessage
+                NetworkMessage message = new()
                 {
                     Command = "CREATE_EVENT",
                     Data = new
@@ -49,12 +49,11 @@ namespace MauiFront
                         createDate = createDateUtc,
                         groupId = groupId,
                         isEvent = true   
-
                     }
                 };
 
                 NetUtils.NetUtils.SendJson(socket, message);
-                NetworkMessage response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
+                NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
 
                 if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
                 {

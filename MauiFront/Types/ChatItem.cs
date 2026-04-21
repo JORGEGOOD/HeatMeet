@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace MauiFront
 {
-    public class ChatItem //Both message AND event. In future could also contain img, videos, stickers and more
+    //ChatItem includes everything a chat can have. For the moment we have text messages and events, but is expandable
+    public class ChatItem 
     {
         public DateTime CreateDate { get; set; }
 

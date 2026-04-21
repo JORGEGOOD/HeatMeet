@@ -310,7 +310,7 @@ namespace HeatMeetServer
                                             CreateDate = createDate,
                                             GroupId = groupId,
                                             IsEvent = IsEvent,
-                                            IsDrafT = true   
+                                            IsDraft = true   
                                         };
 
                                         ormManager.Events.Add(newEvent);
@@ -347,7 +347,7 @@ namespace HeatMeetServer
                                         //get all events the groups have
                                         var all = ormManager.Events
                                                 .Where(e =>
-                                                    (e.GroupId != null && userGroupsIds.Contains(e.GroupId.Value) && !e.IsDrafT)
+                                                    (e.GroupId != null && userGroupsIds.Contains(e.GroupId.Value) && !e.IsDraft)
                                                     || (e.UserId == userId && !e.IsEvent)
                                                 )
                                                 .Select(e => new
@@ -435,7 +435,7 @@ namespace HeatMeetServer
                             else response.Data = new { success = false, message = "Invalid data" };
                         }
                         break;
-                    case "GET_LAST_EVENT":
+                    case "GET_LAST_EVENT"://Is this used? In future we could kpi this
                         {
                             if (message.Data is JsonElement evtData)
                             {
@@ -443,7 +443,7 @@ namespace HeatMeetServer
                                 lock (ormLock)
                                 {
                                     Events? lastEvent = ormManager.Events
-                                        .Where(e => e.GroupId == groupId && e.IsEvent == true && e.IsDrafT == true)
+                                        .Where(e => e.GroupId == groupId && e.IsEvent == true && e.IsDraft == true)
                                         .OrderByDescending(e => e.Date)
                                         .FirstOrDefault();
 
@@ -464,6 +464,84 @@ namespace HeatMeetServer
                             else response.Data = new { success = false, message = "Invalid data" };
                         }
                         break;
+
+                    case "GET_EVENT":
+                        {
+                            if (message.Data is JsonElement evtData)
+                            {
+                                int groupId = evtData.GetProperty("groupId").GetInt32();
+                                int eventId = evtData.GetProperty("eventId").GetInt32();
+                                lock (ormLock)
+                                {
+                                    //get event by id
+                                    Events? Event = ormManager.Events
+                                                    .Where(e => e.Id == eventId && e.GroupId == groupId)
+                                                    .FirstOrDefault();
+
+                                    if (Event == null) response.Data = new { success = false, message = "No draft events found" };
+                                    else
+                                    response.Data = new
+                                    {
+                                        success = true,
+                                        eventId = Event.Id,
+                                        title = Event.Title,
+                                        fechaHora = Event.Date,
+                                        ubicacion = Event.Location ?? "",
+                                        direccionUrl = Event.AddressUrl ?? ""
+                                    };
+                                }
+                            }
+                            else response.Data = new { success = false, message = "Invalid data" };
+                        }
+                        break;
+
+                    case "GET_EVENT_PROPOSALS":
+                        if (message.Data is JsonElement msgData)
+                        {
+                            try
+                            {
+                                int eventId = msgData.GetProperty("eventId").GetInt32();
+                                lock (ormLock)
+                                {
+                                    //Because
+
+                                    //Get event
+                                    var evtPropuesta = ormManager.Events
+                                        .Include(e => e.Group)
+                                        .ThenInclude(g => g.Users)
+                                        .FirstOrDefault(e => e.Id == eventId);
+
+                                    if (evtPropuesta == null || evtPropuesta.Group == null)
+                                    {
+                                        response.Data = new { success = false, message = "Evento o grupo no encontrado" };
+                                        break;
+                                    }
+
+                                    //Get all users from group
+                                    var memberIds = evtPropuesta.Group.Users.Select(u => u.Id).ToList();
+
+                                    //Get days with most disponibilities
+                                    var topDays = ormManager.Events
+                                        .Where(e => memberIds.Contains(e.UserId) && e.IsEvent == false)
+                                        .GroupBy(e => e.Date.Date)
+                                        .Select(g => new
+                                        {
+                                            Fecha = g.Key,
+                                            Count = g.Count()
+                                        })
+                                        .OrderByDescending(x => x.Count)
+                                        .Take(3) //max 3 by now
+                                        .ToList();
+                                    response.Data = new { success = true, topDays = topDays };
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                response.Data = new { success = false, message = ex.Message };
+                            }
+                        }
+                        break;
+
                     case "VOTE_EVENT":
                         {
                             if (message.Data is JsonElement voteData)
@@ -520,7 +598,7 @@ namespace HeatMeetServer
                                         if (totalMembers > 0 && totalVotes >= totalMembers)
                                         {
                                             // Todos votaron SI → se confirmar evento
-                                            evt.IsDrafT = false;
+                                            evt.IsDraft = false;
                                             ormManager.SaveChanges();
                                             response.Data = new { success = true, result = "confirmed" };
                                         }
@@ -538,7 +616,7 @@ namespace HeatMeetServer
                                         lock (ormLock)
                                         {
                                             Events? draft = ormManager.Events.Find(capturedId);
-                                            if (draft != null && draft.IsDrafT)
+                                            if (draft != null && draft.IsDraft)
                                             {
                                                 ormManager.Events.Remove(draft);
                                                 ormManager.SaveChanges();
@@ -556,7 +634,6 @@ namespace HeatMeetServer
                             else response.Data = new { success = false, message = "Invalid data" };
                         }
                         break;
-
                     case "GET_GROUP_AVAILABILITY":
                         {
                             if (message.Data is JsonElement evtData)

@@ -1,5 +1,6 @@
 ﻿using System.Net.Sockets;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using SharedModels;
 namespace MauiFront;
 
@@ -162,7 +163,13 @@ public partial class GroupsChat : ContentPage
             };
 
             votarBtn.ClassId = ev.Id.ToString();
-            votarBtn.Clicked += OnVotarClicked;
+            votarBtn.Clicked += async (s, e) =>
+            {
+                //Set eventId on preferences
+                Preferences.Set("eventId", ev.Id);
+                //Goto Vote page
+                await Navigation.PushAsync(new VotePage());
+            };
 
             var stack = new VerticalStackLayout { Spacing = 6 };
             stack.Children.Add(header);
@@ -393,7 +400,7 @@ public partial class GroupsChat : ContentPage
 
             if (_isProcessingNetwork) continue;
 
-            Socket socket = null;
+            Socket? socket = null;
             try
             {
                 _isProcessingNetwork = true;
@@ -679,10 +686,5 @@ public partial class GroupsChat : ContentPage
     private async void NewEvent(object sender, EventArgs e)
     {
         await Navigation.PushAsync(new NewEventPage());
-    }
-
-    private async void OnVotarClicked(object? sender, EventArgs e)
-    {
-        await Navigation.PushAsync(new VotePage());
     }
 }

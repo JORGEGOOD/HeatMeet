@@ -1,5 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.Net.Sockets;
+﻿using System.Net.Sockets;
 using System.Text.Json;
 using SharedModels;
 
@@ -7,7 +6,8 @@ namespace MauiFront
 {
     public partial class VotePage : ContentPage
     {
-        private int _eventId;
+        private int eventId;
+        private int groupId;
         public Dictionary<DateTime, Color> DayColors { get; set; } = new();
 
         public VotePage()
@@ -19,41 +19,96 @@ namespace MauiFront
         protected override async void OnAppearing()
         {
             base.OnAppearing();
+            eventId = Preferences.Get("eventId",0);
+            Console.WriteLine($"[VOTE_PAGE] EventID: {eventId}");
+
             await LoadDraftEvent();
             if (SchedulerControl.MonthView != null)
             {
                 SchedulerControl.MonthView.CellTemplate = BuildMonthCellTemplate();
             }
-
+            //Load Aviabilities
             _ = LoadGroupAvailability();
+
+            //Proposals
+            //Request 3 best proposals to server 
+            Socket? socket = null;
+            try
+            {
+                //Send command
+                socket = NetUtils.NetUtils.ConnectToServer();
+                NetworkMessage message = new()
+                {
+                    Command = "GET_EVENT_PROPOSALS",
+                    Data = new { eventId }
+                };
+                NetUtils.NetUtils.SendJson(socket, message);
+                NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
+
+                //Response
+                if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
+                {
+                    //Get proposals
+                    JsonSerializerOptions options = new() { PropertyNameCaseInsensitive = true };
+                    List<ProposalDto>? topDays = JsonSerializer.Deserialize<List<ProposalDto>>(data.GetProperty("topDays").GetRawText(), options);
+
+                    Console.WriteLine($"[VOTE_PAGE] Lista deserializada. Items: {topDays.Count}");
+
+                    Console.WriteLine($"[VOTE_PAGE] JSON Recibido: {data.GetProperty("topDays").GetRawText()}");
+                    
+                    //Add all the proposals
+                    MainThread.BeginInvokeOnMainThread(() => {ProposalsCollection.ItemsSource = topDays;});
+                }
+                else
+                {
+                    await DisplayAlert("Error", "Error: Ha habido un error ", "OK");
+                    await Navigation.PopAsync();
+                }
+            }
+            catch (Exception ex) {await DisplayAlert("Error", ex.Message, "OK");}
+            finally {if (socket != null) NetUtils.NetUtils.CloseSocket(socket);}
+        }
+
+        //When a proposal is voted
+        private async void OnVoteProposalClicked(object sender, EventArgs e)
+        {
+            Button     button            = (Button)sender;
+            ProposalDto selectedProposal = (ProposalDto)button.CommandParameter;
+
+            bool confirm = await DisplayAlert("Confirmar",$"¿Votar por el {selectedProposal.Fecha:dd/MM}?", "Sí", "No");
+
+            if (confirm)
+            {
+                //Send vote
+                //aun queda por hacer esto pero no es lo importante ahora
+            }
         }
 
         private async Task LoadDraftEvent()
         {
-            int groupId = Preferences.Get("groupId", 0);
+            groupId = Preferences.Get("groupId", 0);
             if (groupId == 0) return;
 
-            Socket socket = null;
+            Socket? socket = null;
             try
             {
                 socket = NetUtils.NetUtils.ConnectToServer();
-                NetworkMessage message = new NetworkMessage
+                NetworkMessage message = new()
                 {
-                    Command = "GET_LAST_EVENT",
-                    Data = new { groupId }
+                    Command = "GET_EVENT",
+                    Data = new { groupId, eventId }
                 };
                 NetUtils.NetUtils.SendJson(socket, message);
                 NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
 
                 if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
                 {
-                    _eventId = data.GetProperty("eventId").GetInt32();
-                    TituloLabel.Text = data.GetProperty("title").GetString() ?? "";
-                    UbicacionLabel.Text = data.TryGetProperty("ubicacion", out var u)
-                                         ? (u.GetString() ?? "No especificada") : "No especificada";
-                    DateTime fecha = data.GetProperty("fechaHora").GetDateTime().ToLocalTime();
-                    FechaLabel.Text = fecha.ToString("dd/MM/yyyy");
-                    HoraLabel.Text = fecha.ToString("HH:mm");
+                    eventId             = data.GetProperty("eventId").GetInt32();
+                    TituloLabel.Text    = data.GetProperty("title").GetString() ?? "";
+                    UbicacionLabel.Text = data.TryGetProperty("ubicacion", out var u) ? (u.GetString() ?? "No especificada") : "No especificada";
+                    DateTime fecha      = data.GetProperty("fechaHora").GetDateTime().ToLocalTime();
+                    FechaLabel.Text     = fecha.ToString("dd/MM/yyyy");
+                    HoraLabel.Text      = fecha.ToString("HH:mm");
                 }
                 else
                 {
@@ -70,7 +125,7 @@ namespace MauiFront
                 if (socket != null) NetUtils.NetUtils.CloseSocket(socket);
             }
         }
-
+        
         private async void OnAceptar(object sender, EventArgs e)
             => await Votar(true);
 
@@ -81,7 +136,7 @@ namespace MauiFront
             int groupId = Preferences.Get("groupId", 0);
             if (groupId == 0) return;
 
-            Socket socket = null;
+            Socket? socket = null;
             try
             {
                 socket = NetUtils.NetUtils.ConnectToServer();
@@ -91,7 +146,7 @@ namespace MauiFront
                     Data = new { groupId }
                 };
                 NetUtils.NetUtils.SendJson(socket, message);
-                NetworkMessage response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
+                NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
 
                 if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
                 {
@@ -99,8 +154,7 @@ namespace MauiFront
                     var list = JsonSerializer.Deserialize<List<AvailabilityDto>>(
                                    data.GetProperty("availabilities").GetRawText(), options);
 
-                    
-                    var countPerDay = new Dictionary<DateTime, int>();
+                    Dictionary<DateTime, int> countPerDay = new();
                     if (list != null)
                     {
                         foreach (var av in list)
@@ -112,29 +166,25 @@ namespace MauiFront
                         }
                     }
 
-
                     DayColors.Clear();
                     foreach (var kvp in countPerDay)
                     {
                         DayColors[kvp.Key] = kvp.Value switch
-                        {
+                        {//More people can a day --> more red it paints
                             1 => Color.FromArgb("#FFE0B2"),
-                            2 => Color.FromArgb("#FFB347"),
+                            2 => Color.FromArgb("#FFB347"),//TODO: Swap '1','2','3','4' to '20%','50%','80%'.
                             3 => Color.FromArgb("#FF6A00"),
                             _ => Color.FromArgb("#E63900")
                         };
                     }
 
-
                     MainThread.BeginInvokeOnMainThread(() =>
                     {
-                        
                         if (SchedulerControl.MonthView == null)
                         {
                             SchedulerControl.MonthView = new Syncfusion.Maui.Scheduler.SchedulerMonthView();
                         }
 
-                        
                         SchedulerControl.MonthView.CellTemplate = null;
                         SchedulerControl.MonthView.CellTemplate = BuildMonthCellTemplate();
                     });
@@ -202,11 +252,11 @@ namespace MauiFront
                 return grid;
             });
         }
-        private async Task Votar(bool accepts)
+        private async Task Votar(bool accepts)//This is currently disabled
         {
             int userId = Preferences.Get("userId", 0);
-            AceptarBtn.IsEnabled = false;
-            RechazarBtn.IsEnabled = false;
+            //AceptarBtn.IsEnabled = false;
+            //RechazarBtn.IsEnabled = false;
 
             Socket? socket = null;
             try
@@ -215,7 +265,7 @@ namespace MauiFront
                 NetworkMessage message = new NetworkMessage
                 {
                     Command = "VOTE_EVENT",
-                    Data = new { eventId = _eventId, userId, accepts }
+                    Data = new { eventId = eventId, userId, accepts }
                 };
                 NetUtils.NetUtils.SendJson(socket, message);
                 NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
@@ -243,16 +293,16 @@ namespace MauiFront
                                  d2.TryGetProperty("message", out JsonElement mp)
                                  ? mp.GetString() : "Error al votar.";
                     await DisplayAlert("Error", msg, "OK");
-                    AceptarBtn.IsEnabled = true;
-                    RechazarBtn.IsEnabled = true;
+                    //AceptarBtn.IsEnabled = true;
+                    //RechazarBtn.IsEnabled = true;
                 }
             }
 
             catch (Exception ex)
             {
                 await DisplayAlert("Error", ex.Message, "OK");
-                AceptarBtn.IsEnabled = true;
-                RechazarBtn.IsEnabled = true;
+                //AceptarBtn.IsEnabled = true;
+                //RechazarBtn.IsEnabled = true;
             }
             finally
             {
