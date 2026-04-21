@@ -53,7 +53,7 @@ namespace HeatMeetServer
             //infinite client accept loop
             try
             {
-                Console.WriteLine("=== HEATMEET TCP SERVER ===");
+                Console.WriteLine("=== HEATMEET SERVER ===");
                 Socket serverSocket = NetUtils.NetUtils.CreateServerSocket("0.0.0.0", 8888);
                 Console.WriteLine(new string('-', 60));
 

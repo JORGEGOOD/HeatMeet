@@ -73,7 +73,6 @@ namespace MauiFront
                             }
                         }
                     };
-
                     return grid;
                 })
             };
@@ -90,7 +89,6 @@ namespace MauiFront
                 if (!e.Date.HasValue && e.Element != SchedulerElement.Appointment) return;
                 
                 if (e.Date == null) return;
-
 
                 // Un/Mark the day/hour as disponible
                 //Search if it was marked or unmarked
@@ -121,7 +119,6 @@ namespace MauiFront
                     }
                     catch (Exception ex)
                     {
-
                         await DisplayAlert("Error", "No se pudieron cargar los eventos: " + ex.Message, "OK");
                     }
                     finally
@@ -305,7 +302,7 @@ namespace MauiFront
                             }
                             if (ScheduledEvents.Count > 0)
                             {
-                                // A veces Syncfusion necesita un pequeño empujón si la colección se limpia y llena muy rápido
+                                //Refresh calendar by resetting its values
                                 var temp = ScheduledEvents;
                                 SchedulerControl.AppointmentsSource = null;
                                 SchedulerControl.AppointmentsSource = temp;

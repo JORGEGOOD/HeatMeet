@@ -495,22 +495,34 @@ namespace HeatMeetServer
                         }
                         break;
 
-                    case "GET_EVENT_PROPOSALS": //the 3 proposals for the event.
+                    case "GET_EVENT_PROPOSALS":
                         if (message.Data is JsonElement msgData)
                         {
                             try
                             {
                                 int eventId = msgData.GetProperty("eventId").GetInt32();
-
                                 lock (ormLock)
                                 {
-                                    //Get group
-                                    Events? Event = ormManager.Events.Find(eventId);
-                                    if (Event == null) { response.Data = new { success = false, message = "ERROR GET_EVENT_PROPOSALS, no event found " }; break; }
+                                    //Because
 
-                                    //Get 3 most concurrent disponibility days of this group members
+                                    //Get event
+                                    var evtPropuesta = ormManager.Events
+                                        .Include(e => e.Group)
+                                        .ThenInclude(g => g.Users)
+                                        .FirstOrDefault(e => e.Id == eventId);
+
+                                    if (evtPropuesta == null || evtPropuesta.Group == null)
+                                    {
+                                        response.Data = new { success = false, message = "Evento o grupo no encontrado" };
+                                        break;
+                                    }
+
+                                    //Get all users from group
+                                    var memberIds = evtPropuesta.Group.Users.Select(u => u.Id).ToList();
+
+                                    //Get days with most disponibilities
                                     var topDays = ormManager.Events
-                                        .Where(e => e.GroupId == Event.GroupId && e.IsEvent == false)
+                                        .Where(e => memberIds.Contains(e.UserId) && e.IsEvent == false)
                                         .GroupBy(e => e.Date.Date)
                                         .Select(g => new
                                         {
@@ -518,19 +530,16 @@ namespace HeatMeetServer
                                             Count = g.Count()
                                         })
                                         .OrderByDescending(x => x.Count)
-                                        .Take(3)
+                                        .Take(3) //max 3 by now
                                         .ToList();
-
                                     response.Data = new { success = true, topDays = topDays };
                                 }
                             }
                             catch (Exception ex)
                             {
-                                string? realError = ex.InnerException?.Message ?? ex.Message;
-                                response.Data = new { success = false, message = "DB Error: " + realError };
+                                response.Data = new { success = false, message = ex.Message };
                             }
                         }
-                        else response.Data = new { success = false, message = "Invalid data" };
                         break;
 
                     case "VOTE_EVENT":

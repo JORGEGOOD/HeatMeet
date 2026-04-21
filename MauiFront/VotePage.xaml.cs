@@ -1,5 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.Net.Sockets;
+﻿using System.Net.Sockets;
 using System.Text.Json;
 using SharedModels;
 
@@ -10,11 +9,6 @@ namespace MauiFront
         private int eventId;
         private int groupId;
         public Dictionary<DateTime, Color> DayColors { get; set; } = new();
-        public class ProposalDto
-        {
-            public DateTime Fecha { get; set; }
-            public int Count { get; set; }
-        }
 
         public VotePage()
         {
@@ -26,7 +20,7 @@ namespace MauiFront
         {
             base.OnAppearing();
             eventId = Preferences.Get("eventId",0);
-            if (eventId == 0) { await DisplayAlert("Error", "eventId es 0", "Ok"); }
+            Console.WriteLine($"[VOTE_PAGE] EventID: {eventId}");
 
             await LoadDraftEvent();
             if (SchedulerControl.MonthView != null)
@@ -36,10 +30,12 @@ namespace MauiFront
             //Load Aviabilities
             _ = LoadGroupAvailability();
 
+            //Proposals
             //Request 3 best proposals to server 
             Socket? socket = null;
             try
             {
+                //Send command
                 socket = NetUtils.NetUtils.ConnectToServer();
                 NetworkMessage message = new()
                 {
@@ -48,26 +44,20 @@ namespace MauiFront
                 };
                 NetUtils.NetUtils.SendJson(socket, message);
                 NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
-                
+
+                //Response
                 if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
                 {
-                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                    var topDays = JsonSerializer.Deserialize<List<ProposalDto>>(data.GetProperty("topDays").GetRawText(), options);
+                    //Get proposals
+                    JsonSerializerOptions options = new() { PropertyNameCaseInsensitive = true };
+                    List<ProposalDto>? topDays = JsonSerializer.Deserialize<List<ProposalDto>>(data.GetProperty("topDays").GetRawText(), options);
 
-                    MainThread.BeginInvokeOnMainThread(() => {
-                        ProposalsContainer.Children.Clear();
+                    Console.WriteLine($"[VOTE_PAGE] Lista deserializada. Items: {topDays.Count}");
 
-                        if (topDays == null || topDays.Count == 0)
-                        {
-                            ProposalsContainer.Children.Add(new Label { Text = "No hay disponibilidades marcadas en el grupo todavía.", HorizontalOptions = LayoutOptions.Center });
-                            return;
-                        }
-
-                        foreach (var prop in topDays)
-                        {
-                            //ProposalsContainer.Children.Add(CreateProposalCard(prop));
-                        }
-                    });
+                    Console.WriteLine($"[VOTE_PAGE] JSON Recibido: {data.GetProperty("topDays").GetRawText()}");
+                    
+                    //Add all the proposals
+                    MainThread.BeginInvokeOnMainThread(() => {ProposalsCollection.ItemsSource = topDays;});
                 }
                 else
                 {
@@ -79,45 +69,20 @@ namespace MauiFront
             finally {if (socket != null) NetUtils.NetUtils.CloseSocket(socket);}
         }
 
-        //private View CreateProposalCard(ProposalDto prop)
-        //{
-        //    var card = new Frame
-        //    {
-        //        BorderColor = Color.FromArgb("#FF6A00"),
-        //        CornerRadius = 15,
-        //        Padding = 15,
-        //        Content = new Grid
-        //        {
-        //            ColumnDefinitions = new ColumnDefinitionCollection {
-        //        new ColumnDefinition { Width = GridLength.Star },
-        //        new ColumnDefinition { Width = GridLength.Auto }
-        //    },
-        //            Children = {
-        //        new VerticalStackLayout {
-        //            Children = {
-        //                new Label { Text = prop.Fecha.ToString("dddd, dd MMMM"), FontAttributes = FontAttributes.Bold },
-        //                new Label { Text = $"{prop.Count} personas disponibles", FontSize = 12, TextColor = Colors.Gray }
-        //            }
-        //        },
-        //        new Button {
-        //            Text = "Votar",
-        //            CommandParameter = prop.Fecha, // Guardamos la fecha elegida
-        //            BackgroundColor = Color.FromArgb("#FF6A00"),
-        //            TextColor = Colors.White,
-        //            HeightRequest = 40,
-        //            CornerRadius = 20
-        //        }.Bind(Button.CommandProperty, nameof(VotarPropuestaCommand)) // Necesitarás un Command o evento Clicked
-        //    }
-        //        }
-        //    };
+        //When a proposal is voted
+        private async void OnVoteProposalClicked(object sender, EventArgs e)
+        {
+            Button     button            = (Button)sender;
+            ProposalDto selectedProposal = (ProposalDto)button.CommandParameter;
 
-        //    // Si prefieres usar Clicked en vez de Commands:
-        //    var btn = (Button)((Grid)card.Content).Children[1];
-        //    btn.Clicked += async (s, e) => await EnviarVotoFecha(prop.Fecha);
+            bool confirm = await DisplayAlert("Confirmar",$"¿Votar por el {selectedProposal.Fecha:dd/MM}?", "Sí", "No");
 
-        //    return card;
-        //}
-
+            if (confirm)
+            {
+                //Send vote
+                //aun queda por hacer esto pero no es lo importante ahora
+            }
+        }
 
         private async Task LoadDraftEvent()
         {

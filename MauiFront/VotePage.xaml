@@ -79,7 +79,7 @@
 
             <!-- Calendar -->
             <Frame HeightRequest="500" 
-                Margin="15,15,15,5"
+                Margin="15,10,10,5"
                 BackgroundColor="White"
                 CornerRadius="20"
                 BorderColor="Transparent"
@@ -98,9 +98,55 @@
                 </syncfusion:SfScheduler>
             </Frame>
 
-            <!-- Proposals container-->
-            <VerticalStackLayout x:Name="ProposalsContainer" Spacing="10" Padding="20" />
-            
+            <!-- Proposals template -->
+            <CollectionView x:Name="ProposalsCollection"
+                Margin="15,10"
+                SelectionMode="None">
+                <CollectionView.Header>
+                    <Label Text="Sugerencias basadas en disponibilidad:" 
+               FontAttributes="Bold" Margin="0,10" />
+                </CollectionView.Header>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Margin="0,5"
+                   Padding="12"
+                   CornerRadius="15"
+                   BackgroundColor="White"
+                   BorderColor="#FF6A00"
+                   HasShadow="True">
+                            <Grid ColumnDefinitions="*, Auto">
+                                <VerticalStackLayout Grid.Column="0" Spacing="2" VerticalOptions="Center">
+                                    <Label Text="{Binding Fecha, StringFormat='{0:dddd, dd MMMM}'}"
+                               FontSize="16"
+                               FontAttributes="Bold"
+                               TextColor="#222"/>
+                                    <Label Text="{Binding Count, StringFormat='{0} personas disponibles'}"
+                               FontSize="12"
+                               TextColor="Gray"/>
+                                </VerticalStackLayout>
+
+                                <Button Grid.Column="1"
+                            Text="Quiero esto"
+                            Clicked="OnVoteProposalClicked"
+                            CommandParameter="{Binding .}"
+                            BackgroundColor="#FF6A00"
+                            TextColor="White"
+                            HeightRequest="40"
+                            CornerRadius="20"
+                            Padding="15,0"/>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+
+                <CollectionView.EmptyView>
+                    <Label Text="No hay propuestas disponibles." 
+               HorizontalOptions="Center" 
+               Margin="20" />
+                </CollectionView.EmptyView>
+            </CollectionView>
+
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>
