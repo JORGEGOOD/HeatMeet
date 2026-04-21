@@ -6,7 +6,6 @@
 
     <Grid RowDefinitions="70,*,Auto,50,70">
 
-        <!-- HEADER -->
         <Grid Grid.Row="0"
               BackgroundColor="White"
               Padding="10,0"
@@ -24,7 +23,6 @@
                 </Label.GestureRecognizers>
             </Label>
 
-            <!-- Avatar circular -->
             <Frame Grid.Column="1"
                WidthRequest="40"
                HeightRequest="40"
@@ -35,10 +33,14 @@
                BackgroundColor="Transparent"
                VerticalOptions="Center"
                HorizontalOptions="Center">
-                <Image Source="logo.png" Aspect="AspectFill"/>
+                <Image x:Name="GroupAvatarImage"
+                       Source="group_avatar.svg"
+                       Aspect="AspectFill"/>
+                <Frame.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnAvatarTapped"/>
+                </Frame.GestureRecognizers>
             </Frame>
 
-            <!-- Nombre del grupo -->
             <Label x:Name="GroupNameLabel"
                Grid.Column="2"
                FontSize="18"
@@ -47,7 +49,6 @@
                TextColor="#222"
                Margin="8,0,0,0"/>
 
-            <!-- Tres puntos -->
             <Button Grid.Column="3"
                     Text="⋮"
                     FontSize="22"
@@ -59,16 +60,11 @@
                     Padding="8,4"
                     Margin="0,0,20,0"/>
         </Grid>
-
-        <!-- MENSAJES -->
         <ScrollView x:Name="ChatScrollView" Grid.Row="1" Padding="15,10">
             <VerticalStackLayout x:Name="MessagesContainer" Spacing="10"/>
         </ScrollView>
 
-       
-       
 
-        <!-- BARRA BOTONES -->
         <Frame Grid.Row="3"
                BackgroundColor="#F8F9FA"
                Margin="0"
@@ -78,7 +74,6 @@
                HasShadow="False">
             <HorizontalStackLayout Spacing="6" HorizontalOptions="End" VerticalOptions="Center">
 
-                <!-- Ver todos los eventos -->
                 <Button Text="≡"
                         FontSize="18"
                         FontAttributes="Bold"
@@ -90,7 +85,7 @@
                         Padding="0"
                         Clicked="OnViewAllEventsTapped"/>
 
-                <!-- Crear nuevo evento -->
+          
                 <Button Text="+ Evento"
                         Clicked="NewEvent"
                         BackgroundColor="#FF6A00"
@@ -107,7 +102,7 @@
             </HorizontalStackLayout>
         </Frame>
 
-        <!-- BARRA DE MENSAJES -->
+
         <Grid Grid.Row="4"
               BackgroundColor="White"
               Padding="10,0"

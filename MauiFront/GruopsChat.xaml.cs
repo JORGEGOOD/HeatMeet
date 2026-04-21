@@ -17,21 +17,16 @@ public partial class GroupsChat : ContentPage
     {
         await Navigation.PopAsync();
     }
+
     void AddChatItem(ChatItem item, int currentUserId)
     {
-        if(item.IsMessage && item.Message != null)
-        {
-            //we process this as a message
+        if (item.IsMessage && item.Message != null)
             AddMessage(item.Message, currentUserId);
-        }
-        if(item.IsEvent && item.Event != null)
-        {
-            //we process this as an event
+        if (item.IsEvent && item.Event != null)
             AddEventCard(item.Event);
-        }
     }
 
-    void AddMessage(MessageDto? msg, int currentUserId)//Add individual message
+    void AddMessage(MessageDto? msg, int currentUserId)
     {
         int senderId = msg.UserId != 0 ? msg.UserId : msg.userId;
         bool isMine = senderId == currentUserId;
@@ -97,7 +92,6 @@ public partial class GroupsChat : ContentPage
 
     private void AddEventCard(EventDto ev)
     {
-        // Aseguramos que la UI se actualice en el hilo principal
         MainThread.BeginInvokeOnMainThread(() =>
         {
             string formattedDate = ev.Date.ToLocalTime().ToString("dd/MM/yyyy  HH:mm");
@@ -116,7 +110,7 @@ public partial class GroupsChat : ContentPage
             var header = new HorizontalStackLayout { Spacing = 8 };
             header.Children.Add(new Image
             {
-                Source = "calendar_icon.png", // Asegúrate de que este recurso exista
+                Source = "calendar_icon.png",
                 WidthRequest = 18,
                 HeightRequest = 18,
                 VerticalOptions = LayoutOptions.Center
@@ -177,11 +171,9 @@ public partial class GroupsChat : ContentPage
             stack.Children.Add(votarBtn);
 
             card.Content = stack;
-            MessagesContainer.Children.Add(card);//Insert event into the messages container
+            MessagesContainer.Children.Add(card);
         });
     }
-
-
 
     private async void ScrollToBottom()
     {
@@ -197,14 +189,11 @@ public partial class GroupsChat : ContentPage
     {
         MessagesContainer.Children.Clear();
 
-        //Join messages and events
         List<ChatItem> chatItems = new List<ChatItem>();
-        chatItems.AddRange(messages.Select(m => new ChatItem { CreateDate = m.CreateDate, Message = m }));//add messages to list
-        chatItems.AddRange(events.Select(e => new ChatItem { CreateDate = e.CreateDate, Event = e }));    //add events to list
-        //Sort list
+        chatItems.AddRange(messages.Select(m => new ChatItem { CreateDate = m.CreateDate, Message = m }));
+        chatItems.AddRange(events.Select(e => new ChatItem { CreateDate = e.CreateDate, Event = e }));
         List<ChatItem> sortedChatItems = chatItems.OrderBy(c => c.CreateDate).ToList();
 
-        //Add each individual item
         foreach (ChatItem item in sortedChatItems) AddChatItem(item, currentUserId);
     }
 
@@ -212,7 +201,7 @@ public partial class GroupsChat : ContentPage
     {
         base.OnAppearing();
 
-        MessagesContainer.ChildAdded += OnChildAddedScroll;//Maui trolls bcs it freezes the screen, so this doesnt work when spammed
+        MessagesContainer.ChildAdded += OnChildAddedScroll;
 
         _isChatActive = true;
         Task.Run(async () => await RefreshMessagesLoop());
@@ -223,18 +212,22 @@ public partial class GroupsChat : ContentPage
         int groupId = Preferences.Get("groupId", 0);
         int userId = Preferences.Get("userId", 0);
 
+        string savedAvatar = Preferences.Get($"groupAvatar_{groupId}", "");
+        if (!string.IsNullOrEmpty(savedAvatar) && File.Exists(savedAvatar))
+            GroupAvatarImage.Source = ImageSource.FromFile(savedAvatar);
+        else
+            GroupAvatarImage.Source = "group_avatar.svg";
+
         if (groupId == 0)
         {
-
             await DisplayAlert("Error", "Chat couldn't be loaded: groupId is 0", "OK");
             return;
         }
 
-        try//Load messages and events
+        try
         {
             Socket socket = NetUtils.NetUtils.ConnectToServer();
 
-            //Get messages
             NetworkMessage message = new NetworkMessage
             {
                 Command = "GET_GROUP_MESSAGES_AND_EVENTS",
@@ -246,20 +239,16 @@ public partial class GroupsChat : ContentPage
 
             if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
             {
-                //get messages
                 string messagesJson = data.GetProperty("messages").GetRawText();
                 List<MessageDto>? messages = JsonSerializer.Deserialize<List<MessageDto>>(messagesJson);
 
-                //get events
                 List<EventDto>? events = new();
-                if(data.TryGetProperty("events",out JsonElement eventsJson))
-                {
+                if (data.TryGetProperty("events", out JsonElement eventsJson))
                     events = JsonSerializer.Deserialize<List<EventDto>>(eventsJson.GetRawText()) ?? new();
-                }
-                
+
                 LoadMessages(messages, events, userId);
 
-                NetworkMessage ack = new NetworkMessage //TODO: get rid of this ACK garbage
+                NetworkMessage ack = new NetworkMessage
                 {
                     Command = "ACK",
                     Data = new { success = true }
@@ -275,20 +264,63 @@ public partial class GroupsChat : ContentPage
         }
     }
 
-
-    //This is a failed attempt to trick Maui into killing the screen when we get out instead of the usual 2-3sec
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
         _isChatActive = false;
         MessagesContainer.ChildAdded -= OnChildAddedScroll;
     }
+
     private void OnChildAddedScroll(object? sender, ElementEventArgs e) => ScrollToBottom();
 
+    private async void OnAvatarTapped(object sender, EventArgs e)
+    {
+        try
+        {
+            string action = await DisplayActionSheet(
+                "Foto del grupo",
+                "Cancelar",
+                null,
+                "📷 Hacer foto",
+                "🖼️ Elegir de galería",
+                "🗑️ Quitar imagen");
 
+            FileResult? result = null;
 
+            if (action == "📷 Hacer foto")
+                result = await MediaPicker.Default.CapturePhotoAsync();
+            else if (action == "🖼️ Elegir de galería")
+                result = await MediaPicker.Default.PickPhotoAsync();
+            else if (action == "🗑️ Quitar imagen")
+            {
+                int gId = Preferences.Get("groupId", 0);
+                Preferences.Remove($"groupAvatar_{gId}");
+                GroupAvatarImage.Source = "group_avatar.svg";
+                return;
+            }
 
-    private async void OnSendTapped(object sender, EventArgs e)//Send indivual message
+            if (result != null)
+            {
+                int groupId = Preferences.Get("groupId", 0);
+                string localPath = Path.Combine(
+                    FileSystem.AppDataDirectory,
+                    $"avatar_group_{groupId}.jpg");
+
+                using Stream sourceStream = await result.OpenReadAsync();
+                using FileStream destStream = File.Create(localPath);
+                await sourceStream.CopyToAsync(destStream);
+
+                Preferences.Set($"groupAvatar_{groupId}", localPath);
+                GroupAvatarImage.Source = ImageSource.FromFile(localPath);
+            }
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Error", ex.Message, "OK");
+        }
+    }
+
+    private async void OnSendTapped(object sender, EventArgs e)
     {
         if (string.IsNullOrWhiteSpace(MessageEntry.Text)) return;
 
@@ -301,7 +333,6 @@ public partial class GroupsChat : ContentPage
             int groupId = Preferences.Get("groupId", 0);
             int userId = Preferences.Get("userId", 0);
 
-            //Optimism chat technology --> Send content-only message and refill it when server answers details
             MessageDto messageFront = new MessageDto
             {
                 Id = 0,
@@ -332,7 +363,7 @@ public partial class GroupsChat : ContentPage
                 {
                     string? serverMsg = data.TryGetProperty("message", out JsonElement msgProp)
                                        ? msgProp.GetString()
-                                       : "Without error details. ";
+                                       : "Without error details.";
                     await DisplayAlert("Server error: ", serverMsg, "OK");
                 }
             }
@@ -353,9 +384,8 @@ public partial class GroupsChat : ContentPage
         }
     }
 
-
     private bool _isProcessingNetwork = false;
-    private async Task RefreshMessagesLoop()//infinite thread of new message lookups
+    private async Task RefreshMessagesLoop()
     {
         while (_isChatActive)
         {
@@ -389,7 +419,7 @@ public partial class GroupsChat : ContentPage
 
                     if (newMessages != null && newMessages.Count > 0)
                     {
-                        int maxIdreceived = newMessages.Max(m  => m.Id);
+                        int maxIdreceived = newMessages.Max(m => m.Id);
                         _lastMessageId = maxIdreceived;
                         if (maxIdreceived > _lastMessageId)
                         {
@@ -418,10 +448,6 @@ public partial class GroupsChat : ContentPage
         }
     }
 
-    // =========================================================================
-    // 3 Point menú
-    // =========================================================================
-
     private async void OnMenuTapped(object sender, EventArgs e)
     {
         string action = await DisplayActionSheet(
@@ -433,16 +459,11 @@ public partial class GroupsChat : ContentPage
         );
 
         if (action == "📋 Copiar código del grupo")
-        {
             await OnCopyGroupCode();
-        }
         else if (action != null && action.Contains("Salir"))
-        {
             await OnLeaveGroup();
-        }
     }
 
-    // ─── Copy code group ──────────────────────────────────────────────
     private async Task OnCopyGroupCode()
     {
         int groupId = Preferences.Get("groupId", 0);
@@ -462,7 +483,7 @@ public partial class GroupsChat : ContentPage
 
             if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
             {
-                string code = data.GetProperty("inviteCode").GetString();                     
+                string code = data.GetProperty("inviteCode").GetString();
                 await Clipboard.Default.SetTextAsync(code);
                 await DisplayAlert("✅ Código copiado",
                     $"Código del grupo:\n\n{code}\n\nYa está en tu portapapeles.", "OK");
@@ -485,7 +506,6 @@ public partial class GroupsChat : ContentPage
         }
     }
 
-    // ─── Group info ───────────────────────────────────────────────────────
     private async Task OnGroupInfo()
     {
         int groupId = Preferences.Get("groupId", 0);
@@ -519,7 +539,6 @@ public partial class GroupsChat : ContentPage
             }
             else
             {
-                // Fallback with local data if the server does not yet implement it
                 await DisplayAlert($"ℹ️ {groupName}", $"ID del grupo: {groupId}", "Cerrar");
             }
         }
@@ -533,7 +552,6 @@ public partial class GroupsChat : ContentPage
         }
     }
 
-    // ─── Leave the group ───────────────────────────────────────────────────
     private async Task OnLeaveGroup()
     {
         bool confirm = await DisplayAlert(
@@ -573,7 +591,14 @@ public partial class GroupsChat : ContentPage
 
                 await DisplayAlert("👋", "Has salido del grupo.", "OK");
 
-                await Navigation.PopToRootAsync();
+                var stack = Navigation.NavigationStack.ToList();
+                foreach (var page in stack)
+                {
+                    if (page is CreateGroupPage || page is JoinGroups)
+                        Navigation.RemovePage(page);
+                }
+
+                await Navigation.PopAsync();
             }
             else
             {
@@ -658,11 +683,6 @@ public partial class GroupsChat : ContentPage
 
     private async void OnVotarClicked(object? sender, EventArgs e)
     {
-      
         await Navigation.PushAsync(new VotePage());
-        
     }
-
-
-
 }
