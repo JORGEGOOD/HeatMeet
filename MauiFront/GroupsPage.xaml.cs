@@ -22,8 +22,62 @@ namespace MauiFront
 
             this.BindingContext = this;
             SchedulerControl.AppointmentsSource = ScheduledEvents;
+            SetupMonthCellTemplate();
         }
 
+        private void SetupMonthCellTemplate()
+        {
+            SchedulerControl.MonthView = new Syncfusion.Maui.Scheduler.SchedulerMonthView
+            {
+                CellTemplate = new DataTemplate(() =>
+                {
+                    var grid = new Grid();
+
+                    var bg = new BoxView
+                    {
+                        HorizontalOptions = LayoutOptions.Fill,
+                        VerticalOptions = LayoutOptions.Fill,
+                        Color = Colors.Transparent
+                    };
+
+                    var label = new Label
+                    {
+                        HorizontalOptions = LayoutOptions.Center,
+                        VerticalOptions = LayoutOptions.Center,
+                        FontSize = 13,
+                        TextColor = Color.FromArgb("#222")
+                    };
+
+                    grid.Children.Add(bg);
+                    grid.Children.Add(label);
+
+                    grid.BindingContextChanged += (s, e) =>
+                    {
+                        if (grid.BindingContext is Syncfusion.Maui.Scheduler.SchedulerMonthCellDetails details)
+                        {
+                            label.Text = details.DateTime.Day.ToString();
+
+                            bool hasAvailability = ScheduledEvents
+                                .Any(a => a.StartTime.Date == details.DateTime.Date
+                                       && a.Subject.Contains("Disponible"));
+
+                            if (hasAvailability)
+                            {
+                                bg.Color = Color.FromArgb("E35335"); 
+                                label.TextColor = Colors.White;
+                            }
+                            else
+                            {
+                                bg.Color = Colors.White; 
+                                label.TextColor = Color.FromArgb("#222");
+                            }
+                        }
+                    };
+
+                    return grid;
+                })
+            };
+        }
         private async void OnSchedulerTapped(object sender, SchedulerTappedEventArgs e)
         {
             if (e.Element == SchedulerElement.Appointment || !e.Date.HasValue) return; 
@@ -46,6 +100,7 @@ namespace MauiFront
                 {//If its marked, delete it
                     
                     ScheduledEvents.Remove(marked);
+                    SetupMonthCellTemplate();
 
                     //Send server delete Aviability
                     System.Net.Sockets.Socket? socket = null;
@@ -79,14 +134,17 @@ namespace MauiFront
                     SchedulerAppointment newAviab = new SchedulerAppointment
                     {
                         Id = -1, //This solves a bug
-                        Subject = "🔴 Disponible",
+                        Subject = "Disponible",
                         StartTime = e.Date.Value.Date,
                         EndTime = e.Date.Value.Date.AddDays(1).AddSeconds(-1),
                         IsAllDay = true,
-                        Background = Color.FromArgb("#E57373") 
+                        Background = Colors.Transparent,
+
                     };
                     ScheduledEvents.Add(newAviab);
-
+                    var temp = SchedulerControl.MonthView.CellTemplate;
+                    SchedulerControl.MonthView.CellTemplate = null;
+                    SchedulerControl.MonthView.CellTemplate = temp;
                     //Send server the new aviability
                     var dto = new EventDto//SchedulerAppointment is private so it can't have "IsEvent" so this is a dupe
                     {
@@ -225,21 +283,22 @@ namespace MauiFront
                                             Subject = eventDto.Title,
                                             StartTime = eventDto.Date.ToLocalTime(),
                                             EndTime = eventDto.Date.ToLocalTime().AddHours(1),
-                                            Background = Color.FromArgb("FF6A00")
+                                            Background = Colors.Transparent, 
+                                           
                                         });
                                     }
                                     else
                                     {
                                         ScheduledEvents.Add(new SchedulerAppointment
                                         {
-                                            Id = eventDto.Id,
+                                            Id = -eventDto.Id,
                                             Subject = eventDto.Title,
                                             StartTime = eventDto.Date.ToLocalTime(),
                                             EndTime = eventDto.IsAllDay
                                                 ? eventDto.Date.ToLocalTime().Date.AddDays(1).AddSeconds(-1)
                                                 : eventDto.Date.ToLocalTime().AddHours(1),
                                             IsAllDay = eventDto.IsAllDay,
-                                            Background = Color.FromArgb("#E57373"),
+                                            Background = Colors.Transparent
                                         });
                                     }
                                 }
@@ -251,6 +310,7 @@ namespace MauiFront
                                 SchedulerControl.AppointmentsSource = null;
                                 SchedulerControl.AppointmentsSource = temp;
                             }
+                            SetupMonthCellTemplate();
                         });
                     }
                 }
