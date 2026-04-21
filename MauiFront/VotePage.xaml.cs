@@ -80,7 +80,7 @@ namespace MauiFront
             if (confirm)
             {
                 //Send vote
-                //aun queda por hacer esto pero no es lo importante ahora
+                
             }
         }
 

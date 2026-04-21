@@ -541,89 +541,67 @@ namespace HeatMeetServer
                             }
                         }
                         break;
-
                     case "VOTE_EVENT":
                         {
                             if (message.Data is JsonElement voteData)
                             {
                                 try
                                 {
+                                    int userId  = voteData.GetProperty("userId").GetInt32();
                                     int eventId = voteData.GetProperty("eventId").GetInt32();
-                                    int userId = voteData.GetProperty("userId").GetInt32();
-                                    bool accepts = voteData.GetProperty("accepts").GetBoolean();
+                                    DateTime selectedDate = voteData.GetProperty("selectedDate").GetDateTime().Date;
 
-                                    lock (ormLock)
+                                    lock(ormLock)
                                     {
-                                        Events? evt = ormManager.Events
-                                            .Include(e => e.Group)
-                                            .ThenInclude(g => g.Users)
-                                            .FirstOrDefault(e => e.Id == eventId);
+                                        //get event
+                                        Events? evt = ormManager.Events.Include(e => e.Group).ThenInclude(g => g.Users)
+                                                      .FirstOrDefault(e => e.Id == eventId);
+                                        if (evt != null) { response.Data = new { success = false, message = "Evento no encontrado" }; }
 
-                                        if (evt == null)
-                                        {
-                                            response.Data = new { success = false, message = "Event not found" };
-                                            break;
-                                        }
+                                        //Check if user has already voted
+                                        Votes? existingVote = ormManager.Votes.FirstOrDefault(v => v.EventId == eventId && v.UserId == userId);
 
-                                        // Si vota NO → eliminar directamente
-                                        if (!accepts)
-                                        {
-                                            ormManager.Events.Remove(evt);
-                                            ormManager.SaveChanges();
-                                            response.Data = new { success = true, result = "deleted" };
-                                            break;
-                                        }
-
-                                        // Si vota SI → guardar voto
-                                        bool alreadyVoted = ormManager.Votes
-                                            .Any(v => v.EventId == eventId && v.UserId == userId);
-
-                                        if (!alreadyVoted)
+                                        //if vote already exists, update it
+                                        if(existingVote != null) existingVote.Date = selectedDate;//update vote
+                                        else//if not exists, create vote
                                         {
                                             ormManager.Votes.Add(new Votes
                                             {
                                                 EventId = eventId,
                                                 UserId = userId,
-                                                Date = DateTime.UtcNow,
+                                                Date = selectedDate,
                                                 HourStart = TimeSpan.Zero,
                                                 HourEnd = TimeSpan.Zero
                                             });
-                                            ormManager.SaveChanges();
+
                                         }
+                                        ormManager.SaveChanges();
 
-                                        // Comprobar si todos han votado
-                                        int totalMembers = evt.Group?.Users?.Count ?? 0;
-                                        int totalVotes = ormManager.Votes.Count(v => v.EventId == eventId);
+                                        //Check if everyone has voted
+                                        int totalMembers = evt.Group?.Users?.Count ?? 0;//Get total group members
+                                        
+                                        List<Votes> allVotes = ormManager.Votes.Where(v => v.EventId == eventId).ToList();
 
-                                        if (totalMembers > 0 && totalVotes >= totalMembers)
+                                        if (totalMembers > 0 && allVotes.Count >= totalMembers)
                                         {
-                                            // Todos votaron SI → se confirmar evento
+                                            //everyone has voted
+                                            var winnerDate = allVotes
+                                                .GroupBy(v => v.Date)
+                                                .OrderByDescending(g => g.Count())
+                                                .ThenBy(g => g.Key)
+                                                .First().Key;
+
                                             evt.IsDraft = false;
+                                            evt.Date = winnerDate; //event now has winner date
                                             ormManager.SaveChanges();
-                                            response.Data = new { success = true, result = "confirmed" };
+
+                                            response.Data = new { success = true, result = "confirmed", finalDate = winnerDate };
                                         }
                                         else
                                         {
-                                            response.Data = new { success = true, result = "voted", votes = totalVotes, total = totalMembers };
+                                            response.Data = new { success = true, result = "voted", current = allVotes.Count, total = totalMembers };
                                         }
                                     }
-
-                                    // Timer 2 minutos → eliminar si sigue siendo draft
-                                    int capturedId = voteData.GetProperty("eventId").GetInt32();
-                                    Task.Run(async () =>
-                                    {
-                                        await Task.Delay(TimeSpan.FromMinutes(2));
-                                        lock (ormLock)
-                                        {
-                                            Events? draft = ormManager.Events.Find(capturedId);
-                                            if (draft != null && draft.IsDraft)
-                                            {
-                                                ormManager.Events.Remove(draft);
-                                                ormManager.SaveChanges();
-                                                Console.WriteLine($"Draft event {capturedId} auto-deleted after 2 minutes.");
-                                            }
-                                        }
-                                    });
                                 }
                                 catch (Exception ex)
                                 {
