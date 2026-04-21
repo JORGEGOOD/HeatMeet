@@ -7,7 +7,8 @@ namespace MauiFront
 {
     public partial class VotePage : ContentPage
     {
-        private int _eventId;
+        private int eventId;
+        private int groupId;
         public Dictionary<DateTime, Color> DayColors { get; set; } = new();
 
         public VotePage()
@@ -19,41 +20,57 @@ namespace MauiFront
         protected override async void OnAppearing()
         {
             base.OnAppearing();
+            eventId = Preferences.Get("eventId",0);
+            if (eventId == 0) { await DisplayAlert("Error", "eventId es 0", "Ok"); }
+
             await LoadDraftEvent();
             if (SchedulerControl.MonthView != null)
             {
                 SchedulerControl.MonthView.CellTemplate = BuildMonthCellTemplate();
             }
-
+            //Load Aviabilities
             _ = LoadGroupAvailability();
+
+            //Request 3 best proposals to server 
+            Socket? socket = null;
+            try
+            {
+                socket = NetUtils.NetUtils.ConnectToServer();
+                NetworkMessage message = new()
+                {
+                    Command = "GET_EVENT_PROPOSALS",
+                    Data = new { groupId }
+                };
+            }
+            catch (Exception ex) {await DisplayAlert("Error", ex.Message, "OK");}
+            finally {if (socket != null) NetUtils.NetUtils.CloseSocket(socket);}
         }
 
         private async Task LoadDraftEvent()
         {
-            int groupId = Preferences.Get("groupId", 0);
+            groupId = Preferences.Get("groupId", 0);
             if (groupId == 0) return;
 
-            Socket socket = null;
+            Socket? socket = null;
             try
             {
                 socket = NetUtils.NetUtils.ConnectToServer();
-                NetworkMessage message = new NetworkMessage
+                NetworkMessage message = new()
                 {
-                    Command = "GET_LAST_EVENT",
-                    Data = new { groupId }
+                    Command = "GET_EVENT",
+                    Data = new { groupId, eventId }
                 };
                 NetUtils.NetUtils.SendJson(socket, message);
                 NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
 
                 if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
                 {
-                    _eventId = data.GetProperty("eventId").GetInt32();
-                    TituloLabel.Text = data.GetProperty("title").GetString() ?? "";
-                    UbicacionLabel.Text = data.TryGetProperty("ubicacion", out var u)
-                                         ? (u.GetString() ?? "No especificada") : "No especificada";
-                    DateTime fecha = data.GetProperty("fechaHora").GetDateTime().ToLocalTime();
-                    FechaLabel.Text = fecha.ToString("dd/MM/yyyy");
-                    HoraLabel.Text = fecha.ToString("HH:mm");
+                    eventId             = data.GetProperty("eventId").GetInt32();
+                    TituloLabel.Text    = data.GetProperty("title").GetString() ?? "";
+                    UbicacionLabel.Text = data.TryGetProperty("ubicacion", out var u) ? (u.GetString() ?? "No especificada") : "No especificada";
+                    DateTime fecha      = data.GetProperty("fechaHora").GetDateTime().ToLocalTime();
+                    FechaLabel.Text     = fecha.ToString("dd/MM/yyyy");
+                    HoraLabel.Text      = fecha.ToString("HH:mm");
                 }
                 else
                 {
@@ -81,7 +98,7 @@ namespace MauiFront
             int groupId = Preferences.Get("groupId", 0);
             if (groupId == 0) return;
 
-            Socket socket = null;
+            Socket? socket = null;
             try
             {
                 socket = NetUtils.NetUtils.ConnectToServer();
@@ -91,7 +108,7 @@ namespace MauiFront
                     Data = new { groupId }
                 };
                 NetUtils.NetUtils.SendJson(socket, message);
-                NetworkMessage response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
+                NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
 
                 if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
                 {
@@ -112,29 +129,25 @@ namespace MauiFront
                         }
                     }
 
-
                     DayColors.Clear();
                     foreach (var kvp in countPerDay)
                     {
                         DayColors[kvp.Key] = kvp.Value switch
-                        {
+                        {//More people can a day --> more red it paints
                             1 => Color.FromArgb("#FFE0B2"),
-                            2 => Color.FromArgb("#FFB347"),
+                            2 => Color.FromArgb("#FFB347"),//TODO: Swap '1','2','3','4' to '20%','50%','80%'.
                             3 => Color.FromArgb("#FF6A00"),
                             _ => Color.FromArgb("#E63900")
                         };
                     }
 
-
                     MainThread.BeginInvokeOnMainThread(() =>
                     {
-                        
                         if (SchedulerControl.MonthView == null)
                         {
                             SchedulerControl.MonthView = new Syncfusion.Maui.Scheduler.SchedulerMonthView();
                         }
 
-                        
                         SchedulerControl.MonthView.CellTemplate = null;
                         SchedulerControl.MonthView.CellTemplate = BuildMonthCellTemplate();
                     });
@@ -215,7 +228,7 @@ namespace MauiFront
                 NetworkMessage message = new NetworkMessage
                 {
                     Command = "VOTE_EVENT",
-                    Data = new { eventId = _eventId, userId, accepts }
+                    Data = new { eventId = eventId, userId, accepts }
                 };
                 NetUtils.NetUtils.SendJson(socket, message);
                 NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
