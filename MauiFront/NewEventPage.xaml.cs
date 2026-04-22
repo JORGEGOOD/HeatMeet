@@ -57,6 +57,8 @@ namespace MauiFront
 
                 if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
                 {
+                    int newEventId = data.GetProperty("eventId").GetInt32();
+                    Preferences.Set("eventId", newEventId);
                     await DisplayAlert("¡Listo!", "Evento creado correctamente.", "OK");
                     //clear form
                     NombreEvento.Text = string.Empty;
@@ -64,6 +66,7 @@ namespace MauiFront
                     Direccion.Text = string.Empty;
                     FechaPicker.Date = DateTime.Today;
                     HoraPicker.Time = TimeSpan.Zero;
+                    await Navigation.PopAsync();
                 }
                 else
                 {

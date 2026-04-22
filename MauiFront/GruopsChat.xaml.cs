@@ -653,6 +653,9 @@ public partial class GroupsChat : ContentPage
 
             if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
             {
+                int loadedEventId = data.GetProperty("eventId").GetInt32();
+                Preferences.Set("eventId", loadedEventId);
+
                 var ev = new EventDto
                 {
                     Title = data.GetProperty("title").GetString() ?? "",
