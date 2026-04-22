@@ -58,8 +58,8 @@ namespace MauiFront
                             label.Text = details.DateTime.Day.ToString();
 
                             bool hasAvailability = ScheduledEvents
-                                .Any(a => a.StartTime.Date == details.DateTime.Date
-                                       && a.Subject.Contains("Disponible"));
+                            .Any(a => a.StartTime.Date == details.DateTime.Date
+                                   && (int)a.Id <= -1);
 
                             if (hasAvailability)
                             {
@@ -92,8 +92,9 @@ namespace MauiFront
 
                 // Un/Mark the day/hour as disponible
                 //Search if it was marked or unmarked
-                SchedulerAppointment? marked = ScheduledEvents.Cast<SchedulerAppointment>()                    
-                           .FirstOrDefault(x => x.StartTime.Date == dateSelected.ToUniversalTime() && x.Subject.Contains("Disponible"));
+                SchedulerAppointment? marked = ScheduledEvents.Cast<SchedulerAppointment>()
+                .FirstOrDefault(x => x.StartTime.Date == dateSelected.ToUniversalTime()
+                 && (int)x.Id == -1);
                 if (marked != null)
                 {//If its marked, delete it
                     
@@ -130,13 +131,12 @@ namespace MauiFront
                 {//If its unmarked, create it
                     SchedulerAppointment newAviab = new SchedulerAppointment
                     {
-                        Id = -1, //This solves a bug
-                        Subject = "Disponible",
+                        Id = -1,
+                        Subject = "", // <-- vacío
                         StartTime = e.Date.Value.Date,
                         EndTime = e.Date.Value.Date.AddDays(1).AddSeconds(-1),
                         IsAllDay = true,
-                        Background = Colors.Transparent,
-
+                        Background = Colors.Transparent
                     };
                     ScheduledEvents.Add(newAviab);
                     var temp = SchedulerControl.MonthView.CellTemplate;
@@ -276,12 +276,14 @@ namespace MauiFront
                                     {
                                         ScheduledEvents.Add(new SchedulerAppointment
                                         {
-                                            Id = eventDto.Id,
-                                            Subject = eventDto.Title,
+                                            Id = -eventDto.Id, 
+                                            Subject = "", 
                                             StartTime = eventDto.Date.ToLocalTime(),
-                                            EndTime = eventDto.Date.ToLocalTime().AddHours(1),
-                                            Background = Colors.Transparent, 
-                                           
+                                            EndTime = eventDto.IsAllDay
+                                            ? eventDto.Date.ToLocalTime().Date.AddDays(1).AddSeconds(-1)
+                                            : eventDto.Date.ToLocalTime().AddHours(1),
+                                            IsAllDay = eventDto.IsAllDay,
+                                            Background = Colors.Transparent
                                         });
                                     }
                                     else
@@ -292,8 +294,8 @@ namespace MauiFront
                                             Subject = eventDto.Title,
                                             StartTime = eventDto.Date.ToLocalTime(),
                                             EndTime = eventDto.IsAllDay
-                                                ? eventDto.Date.ToLocalTime().Date.AddDays(1).AddSeconds(-1)
-                                                : eventDto.Date.ToLocalTime().AddHours(1),
+                                            ? eventDto.Date.ToLocalTime().Date.AddDays(1).AddSeconds(-1)
+                                            : eventDto.Date.ToLocalTime().AddHours(1),
                                             IsAllDay = eventDto.IsAllDay,
                                             Background = Colors.Transparent
                                         });
