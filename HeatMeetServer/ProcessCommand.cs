@@ -503,10 +503,8 @@ namespace HeatMeetServer
                                 int eventId = msgData.GetProperty("eventId").GetInt32();
                                 lock (ormLock)
                                 {
-                                    //Because
-
                                     //Get event
-                                    var evtPropuesta = ormManager.Events
+                                    Events? evtPropuesta = ormManager.Events
                                         .Include(e => e.Group)
                                         .ThenInclude(g => g.Users)
                                         .FirstOrDefault(e => e.Id == eventId);
@@ -518,7 +516,7 @@ namespace HeatMeetServer
                                     }
 
                                     //Get all users from group
-                                    var memberIds = evtPropuesta.Group.Users.Select(u => u.Id).ToList();
+                                    List<int> memberIds = evtPropuesta.Group.Users.Select(u => u.Id).ToList();
 
                                     //Get days with most disponibilities
                                     var topDays = ormManager.Events
@@ -556,14 +554,14 @@ namespace HeatMeetServer
                                         //get event
                                         Events? evt = ormManager.Events.Include(e => e.Group).ThenInclude(g => g.Users)
                                                       .FirstOrDefault(e => e.Id == eventId);
-                                        if (evt != null) { response.Data = new { success = false, message = "Evento no encontrado" }; }
+                                        if (evt == null) { response.Data = new { success = false, message = "Evento no encontrado" }; break; }
 
                                         //Check if user has already voted
                                         Votes? existingVote = ormManager.Votes.FirstOrDefault(v => v.EventId == eventId && v.UserId == userId);
 
-                                        //if vote already exists, update it
-                                        if(existingVote != null) existingVote.Date = selectedDate;//update vote
-                                        else//if not exists, create vote
+                                        //if vote already exists, update
+                                        if(existingVote != null) existingVote.Date = selectedDate;
+                                        else//if vote not exists, create vote
                                         {
                                             ormManager.Votes.Add(new Votes
                                             {
@@ -578,29 +576,32 @@ namespace HeatMeetServer
                                         ormManager.SaveChanges();
 
                                         //Check if everyone has voted
-                                        int totalMembers = evt.Group?.Users?.Count ?? 0;//Get total group members
-                                        
+                                        //get total group members
+                                        int totalMembers = evt.Group?.Users?.Count ?? 0;
+                                        //get all votes
                                         List<Votes> allVotes = ormManager.Votes.Where(v => v.EventId == eventId).ToList();
 
+                                        //if theres more votes than members (everyone voted)
                                         if (totalMembers > 0 && allVotes.Count >= totalMembers)
                                         {
-                                            //everyone has voted
-                                            var winnerDate = allVotes
+                                            //get the day with most votes
+                                            DateTime winnerDate = allVotes
                                                 .GroupBy(v => v.Date)
                                                 .OrderByDescending(g => g.Count())
                                                 .ThenBy(g => g.Key)
                                                 .First().Key;
 
-                                            evt.IsDraft = false;
-                                            evt.Date = winnerDate; //event now has winner date
+                                            evt.IsDraft = false;//remove draft from event (it will now show up)
+                                            evt.Date = winnerDate; //event has winner date
                                             ormManager.SaveChanges();
 
-                                            response.Data = new { success = true, result = "confirmed", finalDate = winnerDate };
+                                            //DISABLED for now, this requires more time to be done good and testing
+                                            //return to all users the event has been created
+                                            //response.Data = new { success = true, result = "confirmed", finalDate = winnerDate };
                                         }
-                                        else
-                                        {
-                                            response.Data = new { success = true, result = "voted", current = allVotes.Count, total = totalMembers };
-                                        }
+                                        
+                                        //return user he voted correctly
+                                        response.Data = new { success = true, result = "voted", current = allVotes.Count, total = totalMembers };
                                     }
                                 }
                                 catch (Exception ex)
@@ -612,20 +613,20 @@ namespace HeatMeetServer
                             else response.Data = new { success = false, message = "Invalid data" };
                         }
                         break;
-                    case "GET_GROUP_AVAILABILITY":
+                    case "GET_GROUP_AVAILABILITY"://Get all aviabilities from a group
                         {
                             if (message.Data is JsonElement evtData)
                             {
                                 int groupId = evtData.GetProperty("groupId").GetInt32();
                                 lock (ormLock)
                                 {
-                                    
+                                    //get all members from the group
                                     List<int> memberIds = ormManager.Groups
                                         .Include(g => g.Users)
                                         .FirstOrDefault(g => g.Id == groupId)
                                         ?.Users.Select(u => u.Id).ToList() ?? new List<int>();
 
-                                   
+                                   //get all avuabilities from the group in a list
                                     var availabilities = ormManager.Events
                                         .Where(e => memberIds.Contains(e.UserId) && !e.IsEvent)
                                         .Select(e => new
@@ -690,4 +691,3 @@ namespace HeatMeetServer
         }
     }
 }
-

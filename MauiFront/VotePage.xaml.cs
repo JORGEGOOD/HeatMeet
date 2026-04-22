@@ -8,6 +8,7 @@ namespace MauiFront
     {
         private int eventId;
         private int groupId;
+        private int userId;
         public Dictionary<DateTime, Color> DayColors { get; set; } = new();
 
         public VotePage()
@@ -20,6 +21,9 @@ namespace MauiFront
         {
             base.OnAppearing();
             eventId = Preferences.Get("eventId",0);
+            groupId = Preferences.Get("groupId", 0);
+            userId  = Preferences.Get("userId", 0);
+
             Console.WriteLine($"[VOTE_PAGE] EventID: {eventId}");
 
             await LoadDraftEvent();
@@ -72,15 +76,164 @@ namespace MauiFront
         //When a proposal is voted
         private async void OnVoteProposalClicked(object sender, EventArgs e)
         {
-            Button     button            = (Button)sender;
-            ProposalDto selectedProposal = (ProposalDto)button.CommandParameter;
+            Console.WriteLine("---- CLICK VOTE START ----");
 
-            bool confirm = await DisplayAlert("Confirmar",$"¿Votar por el {selectedProposal.Fecha:dd/MM}?", "Sí", "No");
-
-            if (confirm)
+            if (sender is not Button button)
             {
-                //Send vote
-                
+                Console.WriteLine("Sender no es Button");
+                return;
+            }
+
+            if (button.CommandParameter is not ProposalDto selectedDate)
+            {
+                Console.WriteLine("CommandParameter no es ProposalDto");
+                return;
+            }
+
+            Console.WriteLine($"SelectedDate: {selectedDate.Fecha}");
+
+            bool confirm = await DisplayAlert("Confirmar", $"¿Votar por el {selectedDate.Fecha:dd/MM}?", "Sí", "No");
+
+            Console.WriteLine($"Confirm result: {confirm}");
+
+            if (!confirm)
+            {
+                Console.WriteLine("Usuario canceló");
+                return;
+            }
+
+            Socket? socket = null;
+
+            try
+            {
+                Console.WriteLine("Conectando al servidor...");
+                socket = NetUtils.NetUtils.ConnectToServer();
+                Console.WriteLine("Conectado");
+
+                var payload = new
+                {
+                    userId,
+                    eventId,
+                    selectedDate = selectedDate.Fecha
+                };
+
+                Console.WriteLine($"Payload:");
+                Console.WriteLine($"userId: {userId}");
+                Console.WriteLine($"eventId: {eventId}");
+                Console.WriteLine($"selectedDate: {selectedDate.Fecha}");
+
+                NetworkMessage message = new()
+                {
+                    Command = "VOTE_EVENT",
+                    Data = payload
+                };
+
+                Console.WriteLine("Enviando mensaje...");
+                NetUtils.NetUtils.SendJson(socket, message);
+                Console.WriteLine("Mensaje enviado");
+
+                Console.WriteLine("Esperando respuesta...");
+                NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
+
+                if (response == null)
+                {
+                    Console.WriteLine("Response es NULL");
+                    await DisplayAlert("Error", "Respuesta nula del servidor", "OK");
+                    return;
+                }
+
+                Console.WriteLine($"Response recibida. Command: {response.Command}");
+
+                if (response.Data == null)
+                {
+                    Console.WriteLine("Response.Data es NULL");
+                    await DisplayAlert("Error", "Data nula en la respuesta", "OK");
+                    return;
+                }
+
+                Console.WriteLine($"Tipo de Data: {response.Data.GetType()}");
+
+                if (response.Data is not JsonElement data)
+                {
+                    Console.WriteLine("Data no es JsonElement");
+                    await DisplayAlert("Error", "Formato de respuesta inválido", "OK");
+                    return;
+                }
+
+                Console.WriteLine("JSON recibido:");
+                Console.WriteLine(data.ToString());
+
+                if (!data.TryGetProperty("success", out JsonElement successProp))
+                {
+                    Console.WriteLine("No existe 'success'");
+                    await DisplayAlert("Error", "Respuesta sin campo success", "OK");
+                    return;
+                }
+
+                bool success = successProp.GetBoolean();
+                Console.WriteLine($"Success: {success}");
+
+                if (!success)
+                {
+                    string errorMsg = data.TryGetProperty("message", out var msgProp)
+                        ? msgProp.GetString() ?? "Error desconocido"
+                        : "Error sin mensaje";
+
+                    Console.WriteLine($"Error del server: {errorMsg}");
+                    await DisplayAlert("Error", errorMsg, "OK");
+                    return;
+                }
+
+                // 🔹 Extraer datos con seguridad
+                string result = data.TryGetProperty("result", out var resultProp)
+                    ? resultProp.GetString() ?? ""
+                    : "";
+
+                int current = data.TryGetProperty("current", out var currentProp)
+                    ? currentProp.GetInt32()
+                    : -1;
+
+                int total = data.TryGetProperty("total", out var totalProp)
+                    ? totalProp.GetInt32()
+                    : -1;
+
+                Console.WriteLine($"Result: {result}");
+                Console.WriteLine($"Current: {current}");
+                Console.WriteLine($"Total: {total}");
+
+                if (result == "confirmed")
+                {
+                    await DisplayAlert("Evento creado", "Todos han votado, el evento se ha creado con éxito.", "Ok");
+                }
+                else if (result == "voted")
+                {
+                    await DisplayAlert("Voto Registrado", $"Has votado correctamente. Van {current} de {total} votos.", "Ok");
+                }
+                else
+                {
+                    Console.WriteLine("Result desconocido");
+                    await DisplayAlert("Aviso", "Respuesta inesperada del servidor", "OK");
+                }
+
+                await Navigation.PopAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("EXCEPCIÓN:");
+                Console.WriteLine(ex.ToString());
+
+                await DisplayAlert("Error", ex.Message, "OK");
+            }
+            finally
+            {
+                Console.WriteLine("Cerrando socket...");
+                if (socket != null)
+                {
+                    NetUtils.NetUtils.CloseSocket(socket);
+                    Console.WriteLine("Socket cerrado");
+                }
+
+                Console.WriteLine("---- CLICK VOTE END ----");
             }
         }
 
