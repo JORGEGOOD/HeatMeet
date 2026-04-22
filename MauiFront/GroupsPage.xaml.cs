@@ -276,7 +276,7 @@ namespace MauiFront
                                     {
                                         ScheduledEvents.Add(new SchedulerAppointment
                                         {
-                                            Id = -eventDto.Id, 
+                                            Id = eventDto.Id, 
                                             Subject = "", 
                                             StartTime = eventDto.Date.ToLocalTime(),
                                             EndTime = eventDto.IsAllDay
@@ -291,7 +291,7 @@ namespace MauiFront
                                         ScheduledEvents.Add(new SchedulerAppointment
                                         {
                                             Id = -eventDto.Id,
-                                            Subject = eventDto.Title,
+                                            Subject = "",
                                             StartTime = eventDto.Date.ToLocalTime(),
                                             EndTime = eventDto.IsAllDay
                                             ? eventDto.Date.ToLocalTime().Date.AddDays(1).AddSeconds(-1)

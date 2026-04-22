@@ -417,8 +417,9 @@ namespace HeatMeetServer
                                                 Date = date,
                                                 IsEvent = false,
                                                 IsAllDay = isAllDay, 
-                                                Title = isAllDay ? "🔴 Disponible" : "🔴 Disponible (Hora)",
-                                                GroupId = null
+                                                Title = isAllDay ? " Disponible" : " Disponible (Hora)",
+                                                GroupId = null,
+                                                
                                             };
                                             ormManager.Events.Add(newEvent);
                                         }
