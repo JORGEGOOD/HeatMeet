@@ -595,13 +595,16 @@ namespace HeatMeetServer
                                             evt.Date = winnerDate; //event has winner date
                                             ormManager.SaveChanges();
 
-                                            //DISABLED for now, this requires more time to be done good and testing
-                                            //return to all users the event has been created
-                                            //response.Data = new { success = true, result = "confirmed", finalDate = winnerDate };
+
+                                            //return to user the event has been created
+                                            //If we have time we should add that this warns everyone, but too time consuming for 2 month project
+                                            response.Data = new { success = true, result = "confirmed", finalDate = winnerDate };
+                                            break;
                                         }
                                         
                                         //return user he voted correctly
                                         response.Data = new { success = true, result = "voted", current = allVotes.Count, total = totalMembers };
+                                        
                                     }
                                 }
                                 catch (Exception ex)
