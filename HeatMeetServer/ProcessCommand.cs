@@ -501,6 +501,15 @@ namespace HeatMeetServer
                         {
                             try
                             {
+                                /*-- FUNCTIONALITY -- 
+                                We get the date creator put as the main proposal.
+                                
+                                Then we offer 3 more disponible days according to
+                                the group's aviability.
+                                 -------------------*/
+
+
+
                                 int eventId = msgData.GetProperty("eventId").GetInt32();
                                 lock (ormLock)
                                 {
@@ -519,19 +528,30 @@ namespace HeatMeetServer
                                     //Get all users from group
                                     List<int> memberIds = evtPropuesta.Group.Users.Select(u => u.Id).ToList();
 
-                                    //Get days with most disponibilities
-                                    var topDays = ormManager.Events
-                                        .Where(e => memberIds.Contains(e.UserId) && e.IsEvent == false)
-                                        .GroupBy(e => e.Date.Date)
+
+                                    //HUGE dateTime errors were here, new readers won't understand the pain this caused
+                                    DateTime today = DateTime.UtcNow.Date;
+                                    var topDays = ormManager.Events  //get days with most disponibility from the future
+                                        .Where(e => memberIds.Contains(e.UserId) &&
+                                                    e.IsEvent == false &&
+                                                    e.Date >= today)
+                                        .GroupBy(e => e.Date)
                                         .Select(g => new
                                         {
                                             Fecha = g.Key,
                                             Count = g.Count()
                                         })
                                         .OrderByDescending(x => x.Count)
-                                        .Take(3) //max 3 by now
+                                        .Take(3)
                                         .ToList();
-                                    response.Data = new { success = true, topDays = topDays };
+
+                                    //Add the creator proposal
+                                    var creatorDate  = evtPropuesta.Date.Date;
+                                    int creatorCount = ormManager.Events.Count(e => memberIds.Contains
+                                                                              (e.UserId) && !e.IsEvent && e.Date.Date == creatorDate);
+
+                                    //if creatorProposal and one of the 3 proposals are the same, logic is manager in front
+                                    response.Data = new { success = true, topDays = topDays /*, creatorProposal = new { creatorDate, creatorCount } */};
                                 }
                             }
                             catch (Exception ex)
@@ -643,6 +663,36 @@ namespace HeatMeetServer
                                         .ToList();
 
                                     response.Data = new { success = true, availabilities };
+                                }
+                            }
+                            else response.Data = new { success = false, message = "Invalid data" };
+                        }
+                        break;
+
+                    case "RENAME_GROUP":
+                        {
+                            if (message.Data is JsonElement renameData)
+                            {
+                                int groupId = renameData.GetProperty("groupId").GetInt32();
+                                string newName = renameData.GetProperty("newName").GetString() ?? "";
+
+                                if (string.IsNullOrWhiteSpace(newName))
+                                {
+                                    response.Data = new { success = false, message = "El nombre no puede estar vacío" };
+                                    break;
+                                }
+
+                                lock (ormLock)
+                                {
+                                    Groups? group = ormManager.Groups.Find(groupId);
+                                    if (group == null)
+                                    {
+                                        response.Data = new { success = false, message = "Grupo no encontrado" };
+                                        break;
+                                    }
+                                    group.Name = newName;
+                                    ormManager.SaveChanges();
+                                    response.Data = new { success = true, newName };
                                 }
                             }
                             else response.Data = new { success = false, message = "Invalid data" };
