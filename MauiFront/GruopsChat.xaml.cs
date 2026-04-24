@@ -253,12 +253,6 @@ public partial class GroupsChat : ContentPage
 
                 LoadMessages(messages, events, userId);
 
-                NetworkMessage ack = new NetworkMessage
-                {
-                    Command = "ACK",
-                    Data = new { success = true }
-                };
-                NetUtils.NetUtils.SendJson(socket, ack);
             }
 
             NetUtils.NetUtils.CloseSocket(socket);
@@ -406,9 +400,10 @@ public partial class GroupsChat : ContentPage
             {
                 _isProcessingNetwork = true;
                 socket = NetUtils.NetUtils.ConnectToServer();
-                if (socket == null) continue;
-
-                var message = new NetworkMessage
+                
+                if (socket == null) continue;//Is probable that this func errors due to its frecuency, so --> continue
+                
+                NetworkMessage? message = new()
                 {
                     Command = "RELOAD_CHAT_MESSAGES",
                     Data = new
@@ -417,21 +412,35 @@ public partial class GroupsChat : ContentPage
                         lastId = _lastMessageId
                     }
                 };
+                //send command
+                NetUtils.NetUtils.SendJson(socket, message);
 
+                //response
                 NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
-
                 if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
                 {
-                    string messagesJson = data.GetProperty("messages").GetRawText();
-                    List<MessageDto>? newMessages = JsonSerializer.Deserialize<List<MessageDto>>(messagesJson);
+                    //Get messages
+                    List<MessageDto>? newMessages = JsonSerializer.Deserialize<List<MessageDto>>(data.GetProperty("messages").GetRawText());
+                    //Get events
+                    List<EventDto>?   newEvents   = JsonSerializer.Deserialize<List<EventDto>>(data.GetProperty("events").GetRawText());
 
-                    if (newMessages != null && newMessages.Count > 0)
+                    if (newMessages?.Count > 0 || newEvents?.Count > 0)
                     {
+                        //Unify both into chatItems
+                        List<ChatItem> newItems = new();
+                        if(newMessages!=null) newItems.AddRange(newMessages.Select(m=>new ChatItem { CreateDate = m.CreateDate, Message = m }));
+                        if(newEvents!=null)   newItems.AddRange(newEvents  .Select(e=>new ChatItem { CreateDate = e.CreateDate, Event   = e }));
+
+                        //Sort list by date
+                        List<ChatItem> sortedItems = newItems.OrderBy(i => i.CreateDate).ToList();
+                        
+                        
+                        //QUEDA POR HACER ESTO
                         int maxIdreceived = newMessages.Max(m => m.Id);
                         _lastMessageId = maxIdreceived;
                         if (maxIdreceived > _lastMessageId)
                         {
-                            int currentUserId = Preferences.Get("userId", 0);
+                            int currentUserId = Preferences.Get("userId", 0); 
                             MainThread.BeginInvokeOnMainThread(() =>
                             {
                                 foreach (var msg in newMessages.OrderBy(m => m.Id))
@@ -455,6 +464,12 @@ public partial class GroupsChat : ContentPage
             }
         }
     }
+
+
+
+
+    //-- Less important functions --//
+
 
     private async void OnMenuTapped(object sender, EventArgs e)
     {
@@ -587,52 +602,6 @@ public partial class GroupsChat : ContentPage
         }
     }
 
-    private async Task OnGroupInfo()
-    {
-        int groupId = Preferences.Get("groupId", 0);
-        string groupName = Preferences.Get("groupName", "(Grupo)");
-        Socket? socket = null;
-        try
-        {
-            socket = NetUtils.NetUtils.ConnectToServer();
-
-            var message = new NetworkMessage
-            {
-                Command = "GET_GROUP_INFO",
-                Data = new { groupId }
-            };
-            NetUtils.NetUtils.SendJson(socket, message);
-
-            var response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
-
-            if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
-            {
-                int memberCount = data.GetProperty("memberCount").GetInt32();
-                string? createdBy = data.GetProperty("createdBy").GetString();
-                string? createdAt = data.GetProperty("createdAt").GetString();
-
-                await DisplayAlert(
-                    $"ℹ️ {groupName}",
-                    $"👥 Miembros: {memberCount}\n" +
-                    $"👤 Creado por: {createdBy}\n" +
-                    $"📅 Fecha: {createdAt}",
-                    "Cerrar");
-            }
-            else
-            {
-                await DisplayAlert($"ℹ️ {groupName}", $"ID del grupo: {groupId}", "Cerrar");
-            }
-        }
-        catch (Exception)
-        {
-            await DisplayAlert($"ℹ️ {groupName}", $"ID del grupo: {groupId}", "Cerrar");
-        }
-        finally
-        {
-            if (socket != null) NetUtils.NetUtils.CloseSocket(socket);
-        }
-    }
-
     private async Task OnLeaveGroup()
     {
         bool confirm = await DisplayAlert(
@@ -701,10 +670,7 @@ public partial class GroupsChat : ContentPage
         }
     }
 
-    private void VotarBtn_Clicked(object? sender, EventArgs e)
-    {
-        throw new NotImplementedException();
-    }
+
 
     private async void OnLastEventTapped(object sender, EventArgs e)
     {

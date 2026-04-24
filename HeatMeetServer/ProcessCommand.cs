@@ -185,7 +185,6 @@ namespace HeatMeetServer
                                         messages = messages, //.ToList() always returns a list even if null
                                         events   = events  
                                     };
-                                    
                                 }
                             }
                             else response.Data = new { success = false, message = "Invalid data"};
@@ -232,18 +231,23 @@ namespace HeatMeetServer
                             else response.Data = new { success = false, message = "Invalid data" };
                         }
                         break;
-                    case "RELOAD_CHAT_MESSAGES"://This returns the last message the server has track of
+                    case "RELOAD_CHAT_MESSAGES":
                         {
-                            Console.WriteLine("RELOAD CHAT MESSAGES FUNCTION LLAMADO");
                             if (message.Data is JsonElement syncData)
                             {
-                                int gId = syncData.GetProperty("groupId").GetInt32();
+                                //-- LOGIC --//
+                                //Gets the last message user has track of,
+                                //server compares, and returns only new messages
+                                //(and events)
+                                //-----------//
+
+                                int gId    = syncData.GetProperty("groupId").GetInt32();
                                 int lastId = syncData.GetProperty("lastId").GetInt32();
 
                                 lock (ormLock)
                                 {
-                                    //Search messages the user DOESN'T have
-                                    var nuevosMensajes = ormManager.Messages
+                                    //Search new messages
+                                    var newMessages = ormManager.Messages
                                     .Where(m => m.GroupId == gId && m.Id > lastId)
                                     .OrderBy(m => m.CreateDate)
                                     .Select(m => new
@@ -255,7 +259,21 @@ namespace HeatMeetServer
                                         UserName = m.User.Name
                                     })
                                     .ToList();
-                                    response.Data = new { success = true, messages = nuevosMensajes };
+
+                                    //Search new events
+                                    var newEvents = ormManager.Events
+                                                    .Where(e => e.GroupId == gId && e.IsEvent && e.Id > lastId)
+                                                    .Select(e => new
+                                                    {
+                                                        e.Id,
+                                                        e.Title,
+                                                        e.Date,
+                                                        e.Location,
+                                                        e.UserId,
+                                                        e.CreateDate
+                                                    }).ToList();
+
+                                    response.Data = new { success = true, messages = newMessages, events = newEvents };
                                 }
                             }
                         }

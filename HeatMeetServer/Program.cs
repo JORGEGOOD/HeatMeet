@@ -59,6 +59,7 @@ namespace HeatMeetServer
 
                 while (serverSocket.IsBound)
                 {
+                    Console.WriteLine("¡Nueva petición!");
                     Socket clientSocket = serverSocket.Accept();
                     Thread clientThread = new Thread(HandleClient);
                     clientThread.Start(clientSocket);
