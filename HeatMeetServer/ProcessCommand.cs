@@ -649,6 +649,36 @@ namespace HeatMeetServer
                         }
                         break;
 
+                    case "RENAME_GROUP":
+                        {
+                            if (message.Data is JsonElement renameData)
+                            {
+                                int groupId = renameData.GetProperty("groupId").GetInt32();
+                                string newName = renameData.GetProperty("newName").GetString() ?? "";
+
+                                if (string.IsNullOrWhiteSpace(newName))
+                                {
+                                    response.Data = new { success = false, message = "El nombre no puede estar vacío" };
+                                    break;
+                                }
+
+                                lock (ormLock)
+                                {
+                                    Groups? group = ormManager.Groups.Find(groupId);
+                                    if (group == null)
+                                    {
+                                        response.Data = new { success = false, message = "Grupo no encontrado" };
+                                        break;
+                                    }
+                                    group.Name = newName;
+                                    ormManager.SaveChanges();
+                                    response.Data = new { success = true, newName };
+                                }
+                            }
+                            else response.Data = new { success = false, message = "Invalid data" };
+                        }
+                        break;
+
                     case "LEAVE_GROUP":
                         {
                             if (message.Data is JsonElement leaveData)

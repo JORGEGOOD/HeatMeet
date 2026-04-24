@@ -165,9 +165,7 @@ public partial class GroupsChat : ContentPage
             votarBtn.ClassId = ev.Id.ToString();
             votarBtn.Clicked += async (s, e) =>
             {
-                //Set eventId on preferences
                 Preferences.Set("eventId", ev.Id);
-                //Goto Vote page
                 await Navigation.PushAsync(new VotePage());
             };
 
@@ -461,14 +459,88 @@ public partial class GroupsChat : ContentPage
             "Opciones del grupo",
             "Cancelar",
             null,
+            "✏️ Renombrar grupo",
             "📋 Copiar código del grupo",
             "🚪 Salir del grupo"
         );
 
-        if (action == "📋 Copiar código del grupo")
+        if (action == "✏️ Renombrar grupo")
+            await OnRenameGroup();
+        else if (action == "📋 Copiar código del grupo")
             await OnCopyGroupCode();
         else if (action != null && action.Contains("Salir"))
             await OnLeaveGroup();
+    }
+
+    private async Task OnRenameGroup()
+    {
+        string currentName = Preferences.Get("groupName", "");
+
+        string? newName = await DisplayPromptAsync(
+            "Renombrar grupo",
+            "Escribe el nuevo nombre:",
+            initialValue: currentName,
+            maxLength: 50,
+            placeholder: "Nombre del grupo");
+
+        if (string.IsNullOrWhiteSpace(newName) || newName == currentName)
+            return;
+
+        int groupId = Preferences.Get("groupId", 0);
+        Socket? socket = null;
+
+        try
+        {
+            socket = NetUtils.NetUtils.ConnectToServer();
+
+            var message = new NetworkMessage
+            {
+                Command = "RENAME_GROUP",
+                Data = new { groupId, newName = newName.Trim() }
+            };
+
+            NetUtils.NetUtils.SendJson(socket, message);
+            var response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
+
+            // Mejor manejo de la respuesta
+            if (response?.Data != null)
+            {
+                // Convertir a JsonElement para inspeccionar
+                JsonElement data = (JsonElement)response.Data;
+
+                if (data.TryGetProperty("success", out JsonElement successElem) && successElem.GetBoolean())
+                {
+                    string saved = data.TryGetProperty("newName", out JsonElement nameElem)
+                        ? nameElem.GetString() ?? newName.Trim()
+                        : newName.Trim();
+
+                    Preferences.Set("groupName", saved);
+                    GroupNameLabel.Text = saved;
+                    await DisplayAlert("✅ Éxito", $"Grupo renombrado a \"{saved}\".", "OK");
+                }
+                else
+                {
+                    string errorMsg = data.TryGetProperty("message", out JsonElement errorElem)
+                        ? errorElem.GetString() ?? "Error desconocido"
+                        : "No se pudo renombrar el grupo.";
+
+                    await DisplayAlert("❌ Error", errorMsg, "OK");
+                }
+            }
+            else
+            {
+                await DisplayAlert("❌ Error", "No se recibió respuesta del servidor", "OK");
+            }
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("❌ Error de conexión", ex.Message, "OK");
+        }
+        finally
+        {
+            if (socket != null && socket.Connected)
+                NetUtils.NetUtils.CloseSocket(socket);
+        }
     }
 
     private async Task OnCopyGroupCode()
@@ -563,7 +635,7 @@ public partial class GroupsChat : ContentPage
     {
         bool confirm = await DisplayAlert(
             "🚪 Salir del grupo",
-            "¿Seguro que quieres salir? Se te elimara del grupo.",
+            "¿Seguro que quieres salir? Se te eliminará del grupo.",
             "Salir",
             "Cancelar");
 
@@ -668,7 +740,7 @@ public partial class GroupsChat : ContentPage
             }
             else
             {
-                await DisplayAlert("Sin eventos", "Este grupo aun no tiene eventos.", "OK");
+                await DisplayAlert("Sin eventos", "Este grupo aún no tiene eventos.", "OK");
             }
         }
         catch (Exception ex)
