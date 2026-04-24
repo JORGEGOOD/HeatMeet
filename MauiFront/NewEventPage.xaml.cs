@@ -15,7 +15,7 @@ namespace MauiFront
         {
             InitializeComponent();
             
-            MapaWebView.Navigated += OnMapaNavigated; // <-- añade esto
+            MapaWebView.Navigated += OnMapaNavigated; 
         }
 
         private async void OnBuscarClicked(object sender, EventArgs e)
@@ -66,7 +66,7 @@ namespace MauiFront
                 http.DefaultRequestHeaders.UserAgent.ParseAdd("HeatMeetApp/1.0");
                 http.Timeout = TimeSpan.FromSeconds(10);
 
-                // 1. Primero intenta Photon (mejor para negocios)
+                
                 string photonUrl = $"https://photon.komoot.io/api/?q={Uri.EscapeDataString(query)}&limit=5";
                 http.DefaultRequestHeaders.Accept.ParseAdd("application/json");
                 var photonResponse = await http.GetAsync(photonUrl, token);
@@ -107,7 +107,7 @@ namespace MauiFront
                     return;
                 }
 
-                // 2. Fallback Nominatim
+                
                 string nomUrl = $"https://nominatim.openstreetmap.org/search?q={Uri.EscapeDataString(query)}&format=json&limit=5&accept-language=es";
                 string nomJson = await http.GetStringAsync(nomUrl, token);
                 var resultados = JsonSerializer.Deserialize<List<NominatimResult>>(nomJson);
