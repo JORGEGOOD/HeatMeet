@@ -65,7 +65,7 @@ namespace MauiFront
                 }
                 else
                 {
-                    await DisplayAlert("Error", "Error: Ha habido un error ", "OK");
+                    await DisplayAlert("Error", $"Error: {response.Data}  ", "OK");
                     await Navigation.PopAsync();
                 }
             }
@@ -141,9 +141,9 @@ namespace MauiFront
                 }
 
                 //Get response data
-                string result = data.TryGetProperty("result", out var resultProp) ? resultProp.GetString() ?? "" : "";
-                int current = data.TryGetProperty("current", out var currentProp) ? currentProp.GetInt32() : -1;
-                int total = data.TryGetProperty("total", out var totalProp) ? totalProp.GetInt32() : -1;
+                string result = data.TryGetProperty("result", out var resultProp)   ? resultProp.GetString() ?? "" : "";
+                int current   = data.TryGetProperty("current", out var currentProp) ? currentProp.GetInt32() : -1;
+                int total     = data.TryGetProperty("total", out var totalProp)     ? totalProp.GetInt32() : -1;
 
                 if (result == "confirmed") await DisplayAlert("Evento creado", "Todos han votado, el evento se ha creado con éxito.", "Ok");
                 else if(result == "voted") await DisplayAlert("Voto Registrado", $"Has votado correctamente. Van {current} de {total} votos.", "Ok");
@@ -163,7 +163,7 @@ namespace MauiFront
 
         private async Task LoadDraftEvent()
         {
-            groupId = Preferences.Get("groupId", 0);
+            groupId         = Preferences.Get("groupId", 0);
             if (groupId == 0) return;
 
             Socket? socket = null;
