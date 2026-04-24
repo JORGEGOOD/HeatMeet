@@ -29,6 +29,7 @@ namespace MauiFront
         {
             SchedulerControl.MonthView = new Syncfusion.Maui.Scheduler.SchedulerMonthView
             {
+                AppointmentDisplayMode = Syncfusion.Maui.Scheduler.SchedulerMonthAppointmentDisplayMode.Text,
                 CellTemplate = new DataTemplate(() =>
                 {
                     var grid = new Grid();
@@ -58,17 +59,20 @@ namespace MauiFront
                             label.Text = details.DateTime.Day.ToString();
 
                             bool hasAvailability = ScheduledEvents
-                            .Any(a => a.StartTime.Date == details.DateTime.Date
-                                   && (int)a.Id <= -1);
+                                .Any(a => a.StartTime.Date == details.DateTime.Date && (int)a.Id <= -1);
 
-                            if (hasAvailability)
+                            bool hasEvent = ScheduledEvents
+                                .Any(a => a.StartTime.Date == details.DateTime.Date && (int)a.Id > 0);
+
+                            // Si hay evento confirmado ese día, no pintar el fondo
+                            if (hasAvailability && !hasEvent)
                             {
-                                bg.Color = Color.FromArgb("E35335"); 
+                                bg.Color = Color.FromArgb("#E35335");
                                 label.TextColor = Colors.White;
                             }
                             else
                             {
-                                bg.Color = Colors.White; 
+                                bg.Color = Colors.White;
                                 label.TextColor = Color.FromArgb("#222");
                             }
                         }
@@ -276,14 +280,11 @@ namespace MauiFront
                                     {
                                         ScheduledEvents.Add(new SchedulerAppointment
                                         {
-                                            Id = eventDto.Id, 
-                                            Subject = "", 
+                                            Id = eventDto.Id,
+                                            Subject = eventDto.Title,  
                                             StartTime = eventDto.Date.ToLocalTime(),
-                                            EndTime = eventDto.IsAllDay
-                                            ? eventDto.Date.ToLocalTime().Date.AddDays(1).AddSeconds(-1)
-                                            : eventDto.Date.ToLocalTime().AddHours(1),
-                                            IsAllDay = eventDto.IsAllDay,
-                                            Background = Colors.Transparent
+                                            EndTime = eventDto.Date.ToLocalTime().AddHours(1),
+                                            Background = Color.FromArgb("#000047")  
                                         });
                                     }
                                     else
