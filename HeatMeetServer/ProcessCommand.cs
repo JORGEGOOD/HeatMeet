@@ -234,6 +234,7 @@ namespace HeatMeetServer
                         break;
                     case "RELOAD_CHAT_MESSAGES"://This returns the last message the server has track of
                         {
+                            Console.WriteLine("RELOAD CHAT MESSAGES FUNCTION LLAMADO");
                             if (message.Data is JsonElement syncData)
                             {
                                 int gId = syncData.GetProperty("groupId").GetInt32();

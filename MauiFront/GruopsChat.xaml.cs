@@ -389,6 +389,9 @@ public partial class GroupsChat : ContentPage
         }
     }
 
+
+
+    //-- RELOAD MESSAGES --//
     private bool _isProcessingNetwork = false;
     private async Task RefreshMessagesLoop()
     {
@@ -443,7 +446,7 @@ public partial class GroupsChat : ContentPage
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Refresh Error: {ex.Message}");
+                await DisplayAlert("Error",$"Refresh Error: {ex.Message}","Ok");
             }
             finally
             {
@@ -493,19 +496,18 @@ public partial class GroupsChat : ContentPage
         {
             socket = NetUtils.NetUtils.ConnectToServer();
 
-            var message = new NetworkMessage
+            NetworkMessage message = new NetworkMessage
             {
                 Command = "RENAME_GROUP",
                 Data = new { groupId, newName = newName.Trim() }
             };
 
             NetUtils.NetUtils.SendJson(socket, message);
-            var response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
+            NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
 
-            // Mejor manejo de la respuesta
             if (response?.Data != null)
             {
-                // Convertir a JsonElement para inspeccionar
+
                 JsonElement data = (JsonElement)response.Data;
 
                 if (data.TryGetProperty("success", out JsonElement successElem) && successElem.GetBoolean())

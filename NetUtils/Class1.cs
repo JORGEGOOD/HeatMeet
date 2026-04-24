@@ -83,13 +83,11 @@ namespace NetUtils
                 if (r <= 0) break; 
                 received += r;
             }
-           
+            
             if (received < length) return default;
 
             string json = Encoding.UTF8.GetString(buffer);
             return JsonSerializer.Deserialize<T>(json);
-
-            
         }
 
         public static Socket CreateClientSocket(string addressText, int port)
