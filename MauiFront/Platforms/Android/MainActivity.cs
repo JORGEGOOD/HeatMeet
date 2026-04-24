@@ -8,4 +8,5 @@ namespace MauiFront
     public class MainActivity : MauiAppCompatActivity
     {
     }
+    // En MauiProgram.cs dentro de CreateMauiApp()
 }
