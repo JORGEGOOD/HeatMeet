@@ -82,12 +82,6 @@
                     </Grid>
 
                     <!-- Enlaces -->
-                    <Label Text="¿Olvidaste tu contraseña?"
-                           FontSize="12"
-                           TextColor="#0A2A43"
-                           HorizontalOptions="Center"
-                           Opacity="0.7"/>
-
                     <Button Text="¿No tienes cuenta? Regístrate"
                             Clicked="BotonRegistrar"
                             BackgroundColor="Transparent"
