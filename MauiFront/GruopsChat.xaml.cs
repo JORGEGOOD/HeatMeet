@@ -1,6 +1,6 @@
-﻿using System.Net.Sockets;
+﻿using System.Globalization;
+using System.Net.Sockets;
 using System.Text.Json;
-using Microsoft.Extensions.Logging;
 using SharedModels;
 namespace MauiFront;
 
@@ -8,6 +8,8 @@ public partial class GroupsChat : ContentPage
 {
     private bool _isChatActive;
     private int _lastMessageId;
+    private bool _isInitialLoadComplete;
+
 
     public GroupsChat()
     {
@@ -21,10 +23,14 @@ public partial class GroupsChat : ContentPage
 
     void AddChatItem(ChatItem item, int currentUserId)
     {
-        if (item.IsMessage && item.Message != null)
-            AddMessage(item.Message, currentUserId);
-        if (item.IsEvent && item.Event != null)
-            AddEventCard(item.Event);
+        int itemId = item.IsMessage ? item.Message.Id : item.Event.Id;
+        if (itemId <= _lastMessageId && _lastMessageId != 0) return;
+
+        if (item.IsMessage && item.Message != null) AddMessage(item.Message, currentUserId);
+        if (item.IsEvent   && item.Event   != null) AddEventCard(item.Event);
+
+        //update AGAIN lastMessageId
+        if (itemId > _lastMessageId) _lastMessageId = itemId;
     }
 
     void AddMessage(MessageDto? msg, int currentUserId)
@@ -86,9 +92,6 @@ public partial class GroupsChat : ContentPage
         };
 
         MessagesContainer.Children.Add(frame);
-
-        if (msg.Id > _lastMessageId)
-            _lastMessageId = msg.Id;
     }
 
     private void AddEventCard(EventDto ev)
@@ -108,7 +111,7 @@ public partial class GroupsChat : ContentPage
                 HorizontalOptions = LayoutOptions.Fill
             };
 
-            var header = new HorizontalStackLayout { Spacing = 8 };
+            HorizontalStackLayout header = new() { Spacing = 8 };
             header.Children.Add(new Image
             {
                 Source = "calendar_icon.png",
@@ -133,7 +136,7 @@ public partial class GroupsChat : ContentPage
                 TextColor = Color.FromArgb("#222")
             };
 
-            var detailsRow = new HorizontalStackLayout { Spacing = 10 };
+            HorizontalStackLayout detailsRow = new(){ Spacing = 10 };
             detailsRow.Children.Add(new Label
             {
                 Text = "📅 " + formattedDate,
@@ -169,7 +172,7 @@ public partial class GroupsChat : ContentPage
                 await Navigation.PushAsync(new VotePage());
             };
 
-            var stack = new VerticalStackLayout { Spacing = 6 };
+            VerticalStackLayout stack = new(){ Spacing = 6 };
             stack.Children.Add(header);
             stack.Children.Add(titleLabel);
             stack.Children.Add(detailsRow);
@@ -192,31 +195,47 @@ public partial class GroupsChat : ContentPage
 
     void LoadMessages(List<MessageDto> messages, List<EventDto> events, int currentUserId)
     {
+        //Clear chat
         MessagesContainer.Children.Clear();
 
+        //Get messages and events into a list
         List<ChatItem> chatItems = new List<ChatItem>();
-        chatItems.AddRange(messages.Select(m => new ChatItem { CreateDate = m.CreateDate, Message = m }));
-        chatItems.AddRange(events.Select(e => new ChatItem { CreateDate = e.CreateDate, Event = e }));
-        List<ChatItem> sortedChatItems = chatItems.OrderBy(c => c.CreateDate).ToList();
+        chatItems.AddRange(messages.Select(m => new ChatItem { CreateDate = m.CreateDate, Message = m }));//Put in messages
+        chatItems.AddRange(events.Select(e => new ChatItem { CreateDate = e.CreateDate, Event = e }));//Put in events
+        List<ChatItem> sortedChatItems = chatItems.OrderBy(c => c.CreateDate).ToList();//Sort list
 
-        foreach (ChatItem item in sortedChatItems) AddChatItem(item, currentUserId);
+        //Print each item and update lastMessageId, because Android doesn't know better
+        int maxId = 0;
+        foreach (var item in sortedChatItems)
+        {
+            //put message
+            AddChatItem(item, currentUserId);
+
+            //update maxId
+            int itemId = item.IsMessage ? item.Message.Id : item.Event.Id;
+            if (itemId > maxId) maxId = itemId;
+        }
+
+        // ACTUALIZACIÓN CRUCIAL
+        _lastMessageId = maxId;
     }
 
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-
+        //Subscribe chat variable to XAML container
         MessagesContainer.ChildAdded += OnChildAddedScroll;
 
         _isChatActive = true;
-        Task.Run(async () => await RefreshMessagesLoop());
+        _isInitialLoadComplete = false;
 
+        //Get info from user and group
         string groupName = Preferences.Get("groupName", "(Grupo)");
         GroupNameLabel.Text = groupName;
-
         int groupId = Preferences.Get("groupId", 0);
         int userId = Preferences.Get("userId", 0);
 
+        //Load image
         string savedAvatar = Preferences.Get($"groupAvatar_{groupId}", "");
         if (!string.IsNullOrEmpty(savedAvatar) && File.Exists(savedAvatar))
             GroupAvatarImage.Source = ImageSource.FromFile(savedAvatar);
@@ -229,37 +248,46 @@ public partial class GroupsChat : ContentPage
             return;
         }
 
+        //Get messages
+        await LoadInitialChat();
+        _isInitialLoadComplete = true;
+        _ = RefreshMessagesLoop();// "_" is for the compiler to shut up and ignore warnings, else gives multiple warnings
+    }
+
+    private async Task LoadInitialChat()//Separate thread because stupid Android cannot hold networking and ui in the same place
+    {
+        Socket? socket = null;
         try
         {
-            Socket socket = NetUtils.NetUtils.ConnectToServer();
-
-            NetworkMessage message = new NetworkMessage
+            socket = NetUtils.NetUtils.ConnectToServer();
+            //Send command
+            NetworkMessage message = new()
             {
                 Command = "GET_GROUP_MESSAGES_AND_EVENTS",
-                Data = new { groupId }
+                Data    = new { groupId = Preferences.Get("groupId", 0) }
             };
-
             NetUtils.NetUtils.SendJson(socket, message);
+            //Answer
             NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
-
             if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
             {
-                string messagesJson = data.GetProperty("messages").GetRawText();
-                List<MessageDto>? messages = JsonSerializer.Deserialize<List<MessageDto>>(messagesJson);
+                //get messages and events
+                List<MessageDto>? messages = JsonSerializer.Deserialize<List<MessageDto>>(data.GetProperty("messages").GetRawText());
+                List<EventDto>?   events   = data.TryGetProperty("events", out var evJson)
+                    ? JsonSerializer.Deserialize<List<EventDto>>(evJson.GetRawText())
+                    : new List<EventDto>();
 
-                List<EventDto>? events = new();
-                if (data.TryGetProperty("events", out JsonElement eventsJson))
-                    events = JsonSerializer.Deserialize<List<EventDto>>(eventsJson.GetRawText()) ?? new();
-
-                LoadMessages(messages, events, userId);
-
+                //Load everything
+                //Await because android trolls with networking
+                await MainThread.InvokeOnMainThreadAsync(() => 
+                {
+                    LoadMessages(messages, events, Preferences.Get("userId", 0));
+                });
             }
-
-            NetUtils.NetUtils.CloseSocket(socket);
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Error", ex.Message, "OK");
+            Console.WriteLine($"Error inicial: {ex.Message}");
         }
     }
 
@@ -267,9 +295,10 @@ public partial class GroupsChat : ContentPage
     {
         base.OnDisappearing();
         _isChatActive = false;
-        MessagesContainer.ChildAdded -= OnChildAddedScroll;
+        MessagesContainer.ChildAdded -= OnChildAddedScroll;//<--Clears chat, but android still screws it up
     }
 
+    //Subscribe on added something to scroll bottom, but android do what he wants and this doesn't work
     private void OnChildAddedScroll(object? sender, ElementEventArgs e) => ScrollToBottom();
 
     private async void OnAvatarTapped(object sender, EventArgs e)
@@ -383,8 +412,6 @@ public partial class GroupsChat : ContentPage
         }
     }
 
-
-
     //-- RELOAD MESSAGES --//
     private bool _isProcessingNetwork = false;
     private async Task RefreshMessagesLoop()
@@ -393,7 +420,8 @@ public partial class GroupsChat : ContentPage
         {
             await Task.Delay(2000);
 
-            if (_isProcessingNetwork) continue;
+            //if nothing rare or obscure is happening
+            if (!_isInitialLoadComplete || _isProcessingNetwork) continue;
 
             Socket? socket = null;
             try
@@ -433,23 +461,22 @@ public partial class GroupsChat : ContentPage
 
                         //Sort list by date
                         List<ChatItem> sortedItems = newItems.OrderBy(i => i.CreateDate).ToList();
-                        
-                        
-                        //QUEDA POR HACER ESTO
-                        int maxIdreceived = newMessages.Max(m => m.Id);
-                        _lastMessageId = maxIdreceived;
-                        if (maxIdreceived > _lastMessageId)
+
+
+                        MainThread.BeginInvokeOnMainThread(() =>
                         {
-                            int currentUserId = Preferences.Get("userId", 0); 
-                            MainThread.BeginInvokeOnMainThread(() =>
+                            foreach (var item in sortedItems)
                             {
-                                foreach (var msg in newMessages.OrderBy(m => m.Id))
+                                //check duplicates
+                                int currentId = item.IsMessage ? item.Message.Id : item.Event.Id;
+                                //add only if newer than local last
+                                if (currentId > _lastMessageId)
                                 {
-                                    if (msg.Id > _lastMessageId)
-                                        AddMessage(msg, currentUserId);
+                                    AddChatItem(item, Preferences.Get("userId", 0));
+                                    _lastMessageId = currentId;
                                 }
-                            });
-                        }
+                            }
+                        });
                     }
                 }
             }

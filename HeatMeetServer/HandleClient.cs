@@ -17,7 +17,7 @@ namespace HeatMeetServer
             if (obj is not Socket client){ Console.WriteLine("FATAL ERROR: HandleClient didn't received a Socket"); return; }
             try
             {
-                Console.WriteLine($"[DEBUG] Nueva conexión entrante desde: {client.RemoteEndPoint}");
+                Console.WriteLine($"- New connection: {client.RemoteEndPoint} -");
 
 
                 //every "client" is an individual command
@@ -25,12 +25,12 @@ namespace HeatMeetServer
 
                 if (message == null) return;
                 
-                Console.WriteLine($" Command received: {message.Command}");
+                Console.WriteLine($"{message.Command}");
                 
                 NetworkMessage response = ProcessCommand(message);
 
                 NetUtils.NetUtils.SendJson(client, response);
-
+                Console.WriteLine($"--------------------------------------");
             }
             catch (Exception ex)
             {

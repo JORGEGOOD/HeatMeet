@@ -220,10 +220,11 @@ namespace MauiFront
             base.OnAppearing();
             Shell.SetNavBarIsVisible(this, true);
 
+            GroupsCollection.ItemsSource = null;//<--This solves a bug
+
             int userId = Preferences.Get("userId", 0);
             if (userId == 0) return;
-            System.Net.Sockets.Socket socket = null;
-
+            System.Net.Sockets.Socket? socket = null;
             //--GET GROUPS FROM SERVER--
             try
             {
