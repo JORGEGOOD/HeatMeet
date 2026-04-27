@@ -31,46 +31,24 @@
 
                 <!--Calendar-->
                 <Frame HeightRequest="500" 
-                   Margin="15,15,15,5"
-                   BackgroundColor="White"
-                   CornerRadius="20"
-                   BorderColor="Transparent"
-                   HasShadow="True"
-                   Padding="0">
-
+                       Margin="15,15,15,5"
+                       BackgroundColor="White"
+                       CornerRadius="20"
+                       BorderColor="Transparent"
+                       HasShadow="True"
+                       Padding="0">
                     <scheduler:SfScheduler x:Name="SchedulerControl"
-                       View="Month"
-                       Tapped="OnSchedulerTapped"
-                       AppointmentsSource="{Binding ScheduledEvents}">
-                        <scheduler:SfScheduler.MonthView>
-                            <scheduler:SchedulerMonthView>
-                                <scheduler:SchedulerMonthView.CellTemplate>
-                                    <DataTemplate>
-                                        <Grid>
-                                            <BoxView x:Name="CellBg"
-                                             Color="Transparent"
-                                             HorizontalOptions="Fill"
-                                             VerticalOptions="Fill"/>
-                                            <Label Text="{Binding Date.Day}"
-                                               HorizontalOptions="Center"
-                                               VerticalOptions="Center"
-                                               FontSize="13"
-                                               TextColor="#222"/>
-                                        </Grid>
-                                    </DataTemplate>
-                                </scheduler:SchedulerMonthView.CellTemplate>
-                            </scheduler:SchedulerMonthView>
-                        </scheduler:SfScheduler.MonthView>
-                    </scheduler:SfScheduler>
+                                           View="Month"
+                                           Tapped="OnSchedulerTapped"
+                                           BackgroundColor="White"
+                                           AppointmentsSource="{Binding ScheduledEvents}"/>
                 </Frame>
 
                 <!-- Toggle Modo disponibility -->
                 <HorizontalStackLayout HorizontalOptions="Center" Margin="0,10" Spacing="10">
                     <Label Text="Modo Disponibilidad" VerticalOptions="Center" FontAttributes="Bold" TextColor="#0A2A43"/>
                     <Switch x:Name="DisponibilidadSwitch" 
-                     
-                    ThumbColor="#0A2A43"
-                    IsToggled="{Binding IsVotandoDisponibilidad}"/>
+                            ThumbColor="#0A2A43"/>
                 </HorizontalStackLayout>
 
                 <!-- Groups -->

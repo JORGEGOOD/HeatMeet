@@ -12,7 +12,7 @@ namespace MauiFront
         //Disponibility button Toggle switch
         public bool IsVotingDisponibility { get; set; } = false;
 
-
+        private Dictionary<DateTime, string> _eventosPorDia = new();
         public GroupsPage()
         {
             InitializeComponent();
@@ -29,7 +29,7 @@ namespace MauiFront
         {
             SchedulerControl.MonthView = new Syncfusion.Maui.Scheduler.SchedulerMonthView
             {
-                AppointmentDisplayMode = Syncfusion.Maui.Scheduler.SchedulerMonthAppointmentDisplayMode.Text,
+                AppointmentDisplayMode = Syncfusion.Maui.Scheduler.SchedulerMonthAppointmentDisplayMode.None,
                 CellTemplate = new DataTemplate(() =>
                 {
                     var grid = new Grid();
@@ -38,15 +38,16 @@ namespace MauiFront
                     {
                         HorizontalOptions = LayoutOptions.Fill,
                         VerticalOptions = LayoutOptions.Fill,
-                        Color = Colors.Transparent
+                        Color = Colors.White
                     };
 
                     var label = new Label
                     {
                         HorizontalOptions = LayoutOptions.Center,
                         VerticalOptions = LayoutOptions.Center,
-                        FontSize = 13,
-                        TextColor = Color.FromArgb("#222")
+                        FontSize = 12,
+                        TextColor = Color.FromArgb("#222"),
+                        HorizontalTextAlignment = TextAlignment.Center
                     };
 
                     grid.Children.Add(bg);
@@ -56,27 +57,39 @@ namespace MauiFront
                     {
                         if (grid.BindingContext is Syncfusion.Maui.Scheduler.SchedulerMonthCellDetails details)
                         {
-                            label.Text = details.DateTime.Day.ToString();
+                            DateTime day = details.DateTime.Date;
 
+                            bool hasEvent = _eventosPorDia.ContainsKey(day);
                             bool hasAvailability = ScheduledEvents
-                                .Any(a => a.StartTime.Date == details.DateTime.Date && (int)a.Id <= -1);
+                                .Any(a => a.StartTime.Date == day && (int)a.Id <= -1);
 
-                            bool hasEvent = ScheduledEvents
-                                .Any(a => a.StartTime.Date == details.DateTime.Date && (int)a.Id > 0);
-
-                            // Si hay evento confirmado ese día, no pintar el fondo
-                            if (hasAvailability && !hasEvent)
+                            if (hasEvent)
                             {
-                                bg.Color = Color.FromArgb("#E35335");
+                                // Azul con nombre del evento
+                                bg.Color = Color.FromArgb("#1A3A6B");
+                                label.Text = $"{details.DateTime.Day}\n{_eventosPorDia[day]}";
                                 label.TextColor = Colors.White;
+                                label.FontSize = 10;
+                            }
+                            else if (hasAvailability)
+                            {
+                                // Rojo con número del día
+                                bg.Color = Color.FromArgb("#E35335");
+                                label.Text = details.DateTime.Day.ToString();
+                                label.TextColor = Colors.White;
+                                label.FontSize = 12;
                             }
                             else
                             {
+                                // Blanco normal
                                 bg.Color = Colors.White;
+                                label.Text = details.DateTime.Day.ToString();
                                 label.TextColor = Color.FromArgb("#222");
+                                label.FontSize = 12;
                             }
                         }
                     };
+
                     return grid;
                 })
             };
@@ -94,11 +107,14 @@ namespace MauiFront
                 
                 if (e.Date == null) return;
 
+                bool hayEvento = ScheduledEvents.Any(a => a.StartTime.Date == dateSelected && (int)a.Id > 0);
+                if (hayEvento) return;
+
                 // Un/Mark the day/hour as disponible
                 //Search if it was marked or unmarked
                 SchedulerAppointment? marked = ScheduledEvents.Cast<SchedulerAppointment>()
                 .FirstOrDefault(x => x.StartTime.Date == dateSelected.ToUniversalTime()
-                 && (int)x.Id == -1);
+                && (int)x.Id <= -1);
                 if (marked != null)
                 {//If its marked, delete it
                     
@@ -207,6 +223,7 @@ namespace MauiFront
             int userId = Preferences.Get("userId", 0);
             if (userId == 0) return;
             System.Net.Sockets.Socket socket = null;
+
             //--GET GROUPS FROM SERVER--
             try
             {
@@ -216,19 +233,16 @@ namespace MauiFront
                     Command = "GET_USER_GROUPS",
                     Data = new { userId }
                 };
-
                 NetUtils.NetUtils.SendJson(socket, message);
                 SharedModels.NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<SharedModels.NetworkMessage>(socket);
-                
+
                 if (response.Data is JsonElement data)
                 {
                     bool ok = data.GetProperty("success").GetBoolean();
-
                     if (ok)
                     {
                         JsonElement groupsJson = data.GetProperty("groups");
-                        List<GroupDto>? grupos = JsonSerializer
-                            .Deserialize<List<GroupDto>>(groupsJson.GetRawText());
+                        List<GroupDto>? grupos = JsonSerializer.Deserialize<List<GroupDto>>(groupsJson.GetRawText());
                         GroupsCollection.ItemsSource = grupos;
                     }
                 }
@@ -239,52 +253,49 @@ namespace MauiFront
             }
             finally
             {
-                if(socket != null) NetUtils.NetUtils.CloseSocket(socket);
+                if (socket != null) NetUtils.NetUtils.CloseSocket(socket);
             }
 
             //--GET USER EVENTS AND AVIABILITY--
             try
             {
                 socket = NetUtils.NetUtils.ConnectToServer();
-                //new command
                 SharedModels.NetworkMessage message = new SharedModels.NetworkMessage
                 {
                     Command = "GET_USER_EVENTS_AND_AVIABILITY",
                     Data = new { userId }
                 };
-
                 NetUtils.NetUtils.SendJson(socket, message);
                 SharedModels.NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<SharedModels.NetworkMessage>(socket);
 
-                //response
                 if (response?.Data is JsonElement data)
-                {   
+                {
                     bool ok = data.GetProperty("success").GetBoolean();
                     if (ok)
                     {
-                        //Separate thread because this can start huge lag spikes
-                        MainThread.BeginInvokeOnMainThread(async () =>
+                        await MainThread.InvokeOnMainThreadAsync(async () =>
                         {
                             ScheduledEvents.Clear();
+                            _eventosPorDia.Clear(); 
 
                             if (data.TryGetProperty("events", out JsonElement listJson))
                             {
-                                //                                              VVV Ignore case sensitive
                                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-
-                                List<EventDto>? mixedList = JsonSerializer.Deserialize<List<EventDto>>(listJson.GetRawText(),options);
+                                List<EventDto>? mixedList = JsonSerializer.Deserialize<List<EventDto>>(listJson.GetRawText(), options);
 
                                 foreach (EventDto eventDto in mixedList)
                                 {
                                     if (eventDto.IsEvent)
                                     {
+                                        
+                                        _eventosPorDia[eventDto.Date.ToLocalTime().Date] = eventDto.Title;
                                         ScheduledEvents.Add(new SchedulerAppointment
                                         {
                                             Id = eventDto.Id,
-                                            Subject = eventDto.Title,  
+                                            Subject = eventDto.Title,
                                             StartTime = eventDto.Date.ToLocalTime(),
                                             EndTime = eventDto.Date.ToLocalTime().AddHours(1),
-                                            Background = Color.FromArgb("#000047")  
+                                            Background = Color.FromArgb("#1A3A6B")
                                         });
                                     }
                                     else
@@ -295,21 +306,21 @@ namespace MauiFront
                                             Subject = "",
                                             StartTime = eventDto.Date.ToLocalTime(),
                                             EndTime = eventDto.IsAllDay
-                                            ? eventDto.Date.ToLocalTime().Date.AddDays(1).AddSeconds(-1)
-                                            : eventDto.Date.ToLocalTime().AddHours(1),
+                                                ? eventDto.Date.ToLocalTime().Date.AddDays(1).AddSeconds(-1)
+                                                : eventDto.Date.ToLocalTime().AddHours(1),
                                             IsAllDay = eventDto.IsAllDay,
                                             Background = Colors.Transparent
                                         });
                                     }
                                 }
                             }
-                            if (ScheduledEvents.Count > 0)
-                            {
-                                //Refresh calendar by resetting its values
-                                var temp = ScheduledEvents;
-                                SchedulerControl.AppointmentsSource = null;
-                                SchedulerControl.AppointmentsSource = temp;
-                            }
+
+                            
+                            var temp = ScheduledEvents;
+                            SchedulerControl.AppointmentsSource = null;
+                            SchedulerControl.AppointmentsSource = temp;
+
+                            await Task.Delay(300);
                             SetupMonthCellTemplate();
                         });
                     }
