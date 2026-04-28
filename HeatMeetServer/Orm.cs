@@ -17,7 +17,7 @@ namespace HeatMeetServer
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)//config code
         { 
             base.OnConfiguring(optionsBuilder);
-            optionsBuilder.UseNpgsql("Host=192.168.111.34;Port=5432;Username=Alumno;Password=AlumnoIFP;Database=HeatMeet");
+            optionsBuilder.UseNpgsql("Host=192.168.111.40;Port=5432;Username=Alumno;Password=AlumnoIFP;Database=HeatMeet");
         }
     }
 

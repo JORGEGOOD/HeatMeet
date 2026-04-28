@@ -215,7 +215,7 @@ namespace HeatMeetServer
                                         //save to orm
                                         ormManager.Messages.Add(newMessage);
                                         ormManager.SaveChanges();
-                                        Console.WriteLine($@"New message saved to Orm from {userId}: {content}");
+                                        Log.Add_Log($@"New message saved to Orm from {userId}: {content}");
                                         //send success to client AND message Id
                                         response.Data = new { success = true, newId = newMessage.Id };
                                     }
@@ -223,7 +223,7 @@ namespace HeatMeetServer
                                 catch (Exception ex)
                                 {
                                     string? realError = ex.InnerException?.Message ?? ex.Message;
-                                    Console.WriteLine($"DATABASE ERROR: {realError}");
+                                    Log.Add_Log($"DATABASE ERROR: {realError}");
 
                                     response.Data = new { success = false, message = "DB Error: " + realError };
                                 }
@@ -335,14 +335,14 @@ namespace HeatMeetServer
                                         ormManager.Events.Add(newEvent);
                                         ormManager.SaveChanges();
 
-                                        Console.WriteLine($"Event '{title}' created (id={newEvent.Id}) in group {groupId}");
+                                        Log.Add_Log($"Event '{title}' created (id={newEvent.Id}) in group {groupId}");
                                         response.Data = new { success = true, eventId = newEvent.Id };
                                     }
                                 }
                                 catch (Exception ex)
                                 {
                                     string? realError = ex.InnerException?.Message ?? ex.Message;
-                                    Console.WriteLine($"DATABASE ERROR CREATE_EVENT: {realError}");
+                                    Log.Add_Log($"DATABASE ERROR CREATE_EVENT: {realError}");
                                     response.Data = new { success = false, message = "DB Error: " + realError };
                                 }
                             }
@@ -387,7 +387,7 @@ namespace HeatMeetServer
                                 catch (Exception ex)
                                 {
                                     string? realError = ex.InnerException?.Message ?? ex.Message;
-                                    Console.WriteLine($"DATABASE ERROR GET USER EVENTS: {realError}");
+                                    Log.Add_Log($"DATABASE ERROR GET USER EVENTS: {realError}");
                                     response.Data = new { success = false, message = "DB Error: " + realError };
                                 }
                             }
@@ -413,23 +413,23 @@ namespace HeatMeetServer
 
                                         if (exists != null)
                                         {//if disponibility exists, we delete it
-                                            Console.WriteLine("---- DELETE AVAILABILITY ----");
-                                            Console.WriteLine($"Found existing event:");
-                                            Console.WriteLine($"Id: {exists.Id}");
-                                            Console.WriteLine($"UserId: {exists.UserId}");
-                                            Console.WriteLine($"Date (DB): {exists.Date:O}");
-                                            Console.WriteLine($"Date (Incoming): {date:O}");
-                                            Console.WriteLine($"IsAllDay: {exists.IsAllDay}");
-                                            Console.WriteLine($"IsEvent: {exists.IsEvent}");
+                                            Log.Add_Log("---- DELETE AVAILABILITY ----");
+                                            Log.Add_Log($"Found existing event:");
+                                            Log.Add_Log($"Id: {exists.Id}");
+                                            Log.Add_Log($"UserId: {exists.UserId}");
+                                            Log.Add_Log($"Date (DB): {exists.Date:O}");
+                                            Log.Add_Log($"Date (Incoming): {date:O}");
+                                            Log.Add_Log($"IsAllDay: {exists.IsAllDay}");
+                                            Log.Add_Log($"IsEvent: {exists.IsEvent}");
                                             ormManager.Events .Remove(exists);
                                         }
                                         else
                                         {//if disponibility doesn't exists, we create it
-                                            Console.WriteLine("---- CREATE AVAILABILITY ----");
-                                            Console.WriteLine($"Creating new event with:");
-                                            Console.WriteLine($"UserId: {userId}");
-                                            Console.WriteLine($"Date: {date:O}");
-                                            Console.WriteLine($"IsAllDay: {isAllDay}");
+                                            Log.Add_Log("---- CREATE AVAILABILITY ----");
+                                            Log.Add_Log($"Creating new event with:");
+                                            Log.Add_Log($"UserId: {userId}");
+                                            Log.Add_Log($"Date: {date:O}");
+                                            Log.Add_Log($"IsAllDay: {isAllDay}");
                                             Events newEvent = new Events
                                             {
                                                 UserId = userId,
@@ -448,7 +448,7 @@ namespace HeatMeetServer
                                 catch (Exception ex)
                                 {
                                     string? realError = ex.InnerException?.Message ?? ex.Message;
-                                    Console.WriteLine($"DATABASE ERROR SAVE AVIABILITY: {realError}");
+                                    Log.Add_Log($"DATABASE ERROR SAVE AVIABILITY: {realError}");
                                     response.Data = new { success = false, message = "DB Error: " + realError };
                                 }
                             }
@@ -749,7 +749,7 @@ namespace HeatMeetServer
 
                     default:
                         {
-                            Console.WriteLine(@$"Unkown command {response.Command}");
+                            Log.Add_Log(@$"Unkown command {response.Command}");
                             response.Data = new { success = false, message = "Unknown command" };
                         }
                         break;

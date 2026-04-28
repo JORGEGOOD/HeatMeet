@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Sockets;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using System.Net.Sockets;
 using SharedModels;
 
 namespace HeatMeetServer
@@ -14,27 +7,27 @@ namespace HeatMeetServer
     {
         static void HandleClient(object? obj)
         {
-            if (obj is not Socket client){ Console.WriteLine("FATAL ERROR: HandleClient didn't received a Socket"); return; }
+            if (obj is not Socket client){ Log.Add_Log("FATAL ERROR: HandleClient didn't received a Socket"); return; }
             try
             {
-                Console.WriteLine($"- New connection: {client.RemoteEndPoint} -");
+                Log.Add_Log($"- New connection: {client.RemoteEndPoint} -");
 
 
                 //every "client" is an individual command
-                NetworkMessage message = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(client);
+                NetworkMessage? message = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(client);
 
                 if (message == null) return;
-                
-                Console.WriteLine($"{message.Command}");
+
+                Log.Add_Log($"{message.Command}");
                 
                 NetworkMessage response = ProcessCommand(message);
 
                 NetUtils.NetUtils.SendJson(client, response);
-                Console.WriteLine($"--------------------------------------");
+                Log.Add_Log($"--------------------------------------");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($" Error client: {ex.Message}");
+                Log.Add_Log($" Error client: {ex.Message}");
             }
             finally
             {

@@ -37,7 +37,7 @@ namespace HeatMeetServer
 
         private static void OnProcessExit(object? sender, EventArgs e)//to dispose the app on exit
         {
-            Console.WriteLine("Cerrando ORM...");
+            Log.Add_Log("Cerrando ORM...");
             lock (ormLock)
             {
                 ormManager?.Dispose();
@@ -53,9 +53,9 @@ namespace HeatMeetServer
             //infinite client accept loop
             try
             {
-                Console.WriteLine("=== HEATMEET SERVER ===");
+                Log.Add_Log("=== HEATMEET SERVER ===");
                 Socket serverSocket = NetUtils.NetUtils.CreateServerSocket("0.0.0.0", 8888);
-                Console.WriteLine(new string('-', 60));
+                Log.Add_Log(new string('-', 60));
 
                 while (serverSocket.IsBound)
                 {
@@ -66,7 +66,7 @@ namespace HeatMeetServer
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error: {ex.Message}");
+                Log.Add_Log($"Error: {ex.Message}");
             }
         } 
     }
