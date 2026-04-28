@@ -31,7 +31,7 @@ namespace MauiFront
                 };
 
                 NetUtils.NetUtils.SendJson(socket, message);
-                SharedModels.NetworkMessage response = NetUtils.NetUtils.ReceiveJson<SharedModels.NetworkMessage>(socket);
+                NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<SharedModels.NetworkMessage>(socket);
                 NetUtils.NetUtils.CloseSocket(socket);
 
                 if (response.Data is not JsonElement data)
@@ -40,7 +40,7 @@ namespace MauiFront
                     return;
                 }
 
-                bool ok = data.GetProperty("success").GetBoolean();
+                bool   ok  = data.GetProperty("success").GetBoolean();
                 string msg = data.GetProperty("message").GetString();
 
                 if (ok)
@@ -81,7 +81,7 @@ namespace MauiFront
                     Data = new { name, email, password }
                 };
                 NetUtils.NetUtils.SendJson(socket, message);
-                SharedModels.NetworkMessage response = NetUtils.NetUtils.ReceiveJson<SharedModels.NetworkMessage>(socket);
+                NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<SharedModels.NetworkMessage>(socket);
                 NetUtils.NetUtils.CloseSocket(socket);
 
                 if (response.Data is not JsonElement data)

@@ -2,7 +2,7 @@
 {
     internal class Storage
     {
-        //Probably there's not enoughg time for this
+        //Probably there's not enough time for this
 
         //### FOLDERS ###
         //
