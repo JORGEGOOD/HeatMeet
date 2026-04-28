@@ -83,6 +83,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <MauiFont Update="Resources\Fonts\MaterialIcons-Regular.ttf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </MauiFont>
+  </ItemGroup>
+
+  <ItemGroup>
     <MauiXaml Update="CreateGroupPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
