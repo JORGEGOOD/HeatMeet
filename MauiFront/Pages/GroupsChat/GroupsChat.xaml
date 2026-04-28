@@ -1,9 +1,14 @@
+<<<<<<< Updated upstream
 <?xml version="1.0" encoding="utf-8" ?>
+=======
+﻿<?xml version="1.0" encoding="utf-8" ?>
+>>>>>>> Stashed changes
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MauiFront.GroupsChat"
              BackgroundColor="#F5F0E8">
 
+<<<<<<< Updated upstream
     <ContentPage.Resources>
         <!-- Estilo para botón de menú (3 puntos) -->
         <Style TargetType="Button" x:Key="MenuButtonStyle">
@@ -118,6 +123,37 @@
                    BackgroundColor="Transparent"
                    VerticalOptions="Center"
                    HorizontalOptions="Start">
+=======
+    <Grid RowDefinitions="70,*,Auto,50,70">
+
+        <Grid Grid.Row="0"
+              BackgroundColor="White"
+              Padding="10,0"
+              ColumnDefinitions="40,50,*,40">
+
+            <Label Grid.Column="0"
+               Text="←"
+               FontSize="32"
+               FontAttributes="Bold"
+               TextColor="#222"
+               VerticalOptions="Center"
+               HorizontalOptions="Center">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnBackTapped"/>
+                </Label.GestureRecognizers>
+            </Label>
+
+            <Frame Grid.Column="1"
+               WidthRequest="40"
+               HeightRequest="40"
+               CornerRadius="15"
+               Padding="0"
+               IsClippedToBounds="True"
+               HasShadow="False"
+               BackgroundColor="Transparent"
+               VerticalOptions="Center"
+               HorizontalOptions="Center">
+>>>>>>> Stashed changes
                 <Image x:Name="GroupAvatarImage"
                        Source="group_avatar.svg"
                        Aspect="AspectFill"/>
@@ -126,6 +162,7 @@
                 </Frame.GestureRecognizers>
             </Frame>
 
+<<<<<<< Updated upstream
             <!-- Nombre del grupo -->
             <Label x:Name="GroupNameLabel"
                    Grid.Column="2"
@@ -147,11 +184,36 @@
         </Grid>
 
         <!-- Chat messages -->
+=======
+            <Label x:Name="GroupNameLabel"
+               Grid.Column="2"
+               FontSize="18"
+               FontAttributes="Bold"
+               VerticalOptions="Center"
+               TextColor="#222"
+               Margin="8,0,0,0"/>
+
+            <Button Grid.Column="3"
+                    Text="⋮"
+                    FontSize="22"
+                    BackgroundColor="Transparent"
+                    TextColor="Black"
+                    HorizontalOptions="End"
+                    VerticalOptions="Center"
+                    Clicked="OnMenuTapped"
+                    Padding="8,4"
+                    Margin="0,0,20,0"/>
+        </Grid>
+>>>>>>> Stashed changes
         <ScrollView x:Name="ChatScrollView" Grid.Row="1" Padding="15,10">
             <VerticalStackLayout x:Name="MessagesContainer" Spacing="10"/>
         </ScrollView>
 
+<<<<<<< Updated upstream
         <!-- Eventos bar -->
+=======
+
+>>>>>>> Stashed changes
         <Frame Grid.Row="3"
                BackgroundColor="#F8F9FA"
                Margin="0"
@@ -172,6 +234,10 @@
                         Padding="0"
                         Clicked="OnViewAllEventsTapped"/>
 
+<<<<<<< Updated upstream
+=======
+          
+>>>>>>> Stashed changes
                 <Button Text="+ Evento"
                         Clicked="NewEvent"
                         BackgroundColor="#FF6A00"
@@ -188,7 +254,11 @@
             </HorizontalStackLayout>
         </Frame>
 
+<<<<<<< Updated upstream
         <!-- Input de mensaje -->
+=======
+
+>>>>>>> Stashed changes
         <Grid Grid.Row="4"
               BackgroundColor="White"
               Padding="10,0"

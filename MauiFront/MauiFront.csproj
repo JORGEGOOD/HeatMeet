@@ -83,6 +83,7 @@
   </ItemGroup>
 
   <ItemGroup>
+<<<<<<< Updated upstream
     <MauiFont Update="Resources\Fonts\MaterialIcons-Regular.ttf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </MauiFont>
@@ -90,6 +91,9 @@
 
   <ItemGroup>
     <MauiXaml Update="CreateGroupPage.xaml">
+=======
+    <MauiXaml Update="Pages\CreateGroup\CreateGroupPage.xaml">
+>>>>>>> Stashed changes
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
     <MauiXaml Update="Pages\Event\EventPage.xaml">

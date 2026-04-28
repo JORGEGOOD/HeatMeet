@@ -2,7 +2,11 @@
 {
     internal class Storage
     {
+<<<<<<< Updated upstream
         //Probably there's not enough time for this
+=======
+        //Probably there's not enoughg time for this
+>>>>>>> Stashed changes
 
         //### FOLDERS ###
         //
