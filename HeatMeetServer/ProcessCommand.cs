@@ -520,19 +520,10 @@ namespace HeatMeetServer
                         {
                             try
                             {
-                                /*-- FUNCTIONALITY -- 
-                                We get the date creator put as the main proposal.
-                                
-                                Then we offer 3 more disponible days according to
-                                the group's aviability.
-                                 -------------------*/
-
-
-
                                 int eventId = msgData.GetProperty("eventId").GetInt32();
                                 lock (ormLock)
                                 {
-                                    //Get event
+                                    // Get event
                                     Events? evtPropuesta = ormManager.Events
                                         .Include(e => e.Group)
                                         .ThenInclude(g => g.Users)
@@ -544,13 +535,12 @@ namespace HeatMeetServer
                                         break;
                                     }
 
-                                    //Get all users from group
+                                    // Get all users from group
                                     List<int> memberIds = evtPropuesta.Group.Users.Select(u => u.Id).ToList();
 
-
-                                    //HUGE dateTime errors were here, new readers won't understand the pain this caused
+                                    // Get days with most disponibility from the future
                                     DateTime today = DateTime.UtcNow.Date;
-                                    var topDays = ormManager.Events  //get days with most disponibility from the future
+                                    var topDays = ormManager.Events
                                         .Where(e => memberIds.Contains(e.UserId) &&
                                                     e.IsEvent == false &&
                                                     e.Date >= today)
@@ -564,13 +554,19 @@ namespace HeatMeetServer
                                         .Take(3)
                                         .ToList();
 
-                                    //Add the creator proposal
-                                    var creatorDate  = evtPropuesta.Date.Date;
-                                    int creatorCount = ormManager.Events.Count(e => memberIds.Contains
-                                                                              (e.UserId) && !e.IsEvent && e.Date.Date == creatorDate);
+                                    // Creator proposal — fecha del evento original
+                                    DateTime creatorDate = evtPropuesta.Date;
+                                    int creatorCount = ormManager.Events
+                                        .Count(e => memberIds.Contains(e.UserId)
+                                                 && !e.IsEvent
+                                                 && e.Date.Date == creatorDate.Date);
 
-                                    //if creatorProposal and one of the 3 proposals are the same, logic is manager in front
-                                    response.Data = new { success = true, topDays = topDays /*, creatorProposal = new { creatorDate, creatorCount } */};
+                                    response.Data = new
+                                    {
+                                        success = true,
+                                        topDays = topDays,
+                                        creatorProposal = new { Fecha = creatorDate, Count = creatorCount }
+                                    };
                                 }
                             }
                             catch (Exception ex)
@@ -579,6 +575,7 @@ namespace HeatMeetServer
                             }
                         }
                         break;
+                        
                     case "VOTE_EVENT":
                         {
                             if (message.Data is JsonElement voteData)

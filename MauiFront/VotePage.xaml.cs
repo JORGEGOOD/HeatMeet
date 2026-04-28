@@ -54,8 +54,20 @@ namespace MauiFront
                 {
                     //Get proposals
                     JsonSerializerOptions options = new() { PropertyNameCaseInsensitive = true };
-                    List<ProposalDto>? topDays = JsonSerializer.Deserialize<List<ProposalDto>>(data.GetProperty("topDays").GetRawText(), options);
+                    List<ProposalDto>? topDays = JsonSerializer.Deserialize<List<ProposalDto>>(
+                        data.GetProperty("topDays").GetRawText(), options);
 
+                    if (data.TryGetProperty("creatorProposal", out var cp))
+                    {
+                        ProposalDto? creatorProposal = JsonSerializer.Deserialize<ProposalDto>(cp.GetRawText(), options);
+                        if (creatorProposal != null)
+                        {
+                            bool yaEsta = topDays?.Any(d => d.Fecha.Date == creatorProposal.Fecha.Date) ?? false;
+                            if (!yaEsta)
+                                topDays?.Insert(0, creatorProposal);
+                        }
+                    }
+                    Console.WriteLine($"[VOTE_PAGE] CreatorProposal JSON: {cp.GetRawText()}");
                     Console.WriteLine($"[VOTE_PAGE] Lista deserializada. Items: {topDays.Count}");
 
                     Console.WriteLine($"[VOTE_PAGE] JSON Recibido: {data.GetProperty("topDays").GetRawText()}");
