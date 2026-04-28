@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
 	<TargetFrameworks>net8.0-android</TargetFrameworks>
@@ -83,7 +83,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <MauiXaml Update="Pages\CreateGroup\CreateGroupPage.xaml">
+    <MauiFont Update="Resources\Fonts\MaterialIcons-Regular.ttf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </MauiFont>
+  </ItemGroup>
+
+  <ItemGroup>
+    <MauiXaml Update="CreateGroupPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
     <MauiXaml Update="Pages\Event\EventPage.xaml">
