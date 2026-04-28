@@ -42,12 +42,16 @@
             </Frame>
 
             <Label x:Name="GroupNameLabel"
-               Grid.Column="2"
-               FontSize="18"
-               FontAttributes="Bold"
-               VerticalOptions="Center"
-               TextColor="#222"
-               Margin="8,0,0,0"/>
+                   Grid.Column="2"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   VerticalOptions="Center"
+                   TextColor="#222"
+                   Margin="8,0,0,0">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnGroupNameTapped" />
+                </Label.GestureRecognizers>
+            </Label>
 
             <Button Grid.Column="3"
                     Text="⋮"

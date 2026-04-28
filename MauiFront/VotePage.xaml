@@ -98,45 +98,77 @@
                 </syncfusion:SfScheduler>
             </Frame>
 
+           
+
             <!-- Proposals template -->
             <CollectionView x:Name="ProposalsCollection"
                 Margin="15,10"
                 SelectionMode="None">
+
                 <CollectionView.Header>
-                    <Label Text="Sugerencias basadas en disponibilidad:" 
-               FontAttributes="Bold" Margin="0,10" />
+                    <Label Text="Propuesta y sugerencias:" 
+               FontAttributes="Bold"
+               FontSize="15"
+               TextColor="#1E2A4A"
+               Margin="0,10" />
                 </CollectionView.Header>
 
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Frame Margin="0,5"
-                   Padding="12"
-                   CornerRadius="15"
-                   BackgroundColor="White"
-                   BorderColor="#FF6A00"
-                   HasShadow="True">
-                            <Grid ColumnDefinitions="*, Auto">
-                                <VerticalStackLayout Grid.Column="0" Spacing="2" VerticalOptions="Center">
-                                    <Label Text="{Binding Fecha, StringFormat='{0:dddd, dd MMMM}'}"
-                               FontSize="16"
-                               FontAttributes="Bold"
-                               TextColor="#222"/>
-                                    <Label Text="{Binding Count, StringFormat='{0} personas disponibles'}"
-                               FontSize="12"
-                               TextColor="Gray"/>
-                                </VerticalStackLayout>
+                        <VerticalStackLayout Spacing="0">
 
-                                <Button Grid.Column="1"
-                            Text="Quiero esto"
-                            Clicked="OnVoteProposalClicked"
-                            CommandParameter="{Binding .}"
-                            BackgroundColor="#FF6A00"
-                            TextColor="White"
-                            HeightRequest="40"
-                            CornerRadius="20"
-                            Padding="15,0"/>
-                            </Grid>
-                        </Frame>
+                            <!-- Tarjeta -->
+                            <Frame Margin="0,5"
+                               Padding="12"
+                               CornerRadius="15"
+                               BackgroundColor="White"
+                               BorderColor="#FF6A00"
+                               HasShadow="True">
+                                <VerticalStackLayout Spacing="6">
+
+
+                                    <Label Text=" Propuesta original"
+                                       FontSize="11"
+                                       FontAttributes="Bold"
+                                       TextColor="#FF6A00"
+                                       IsVisible="{Binding EsCreador}"/>
+
+                                    <Grid ColumnDefinitions="*, Auto">
+                                        <VerticalStackLayout Grid.Column="0" Spacing="2" VerticalOptions="Center">
+                                            <Label Text="{Binding Fecha, StringFormat='{0:dddd, dd MMMM}'}"
+                                       FontSize="16"
+                                       FontAttributes="Bold"
+                                       TextColor="#222"/>
+                                            <Label Text="{Binding Count, StringFormat='{0} personas disponibles'}"
+                                       FontSize="12"
+                                       TextColor="Gray"/>
+                                        </VerticalStackLayout>
+
+                                        <Button Grid.Column="1"
+                                    Text="Quiero esto"
+                                    Clicked="OnVoteProposalClicked"
+                                    CommandParameter="{Binding .}"
+                                    BackgroundColor="#FF6A00"
+                                    TextColor="White"
+                                    HeightRequest="40"
+                                    CornerRadius="20"
+                                    Padding="15,0"/>
+                                    </Grid>
+
+                                </VerticalStackLayout>
+                            </Frame>
+
+                            
+                            <VerticalStackLayout IsVisible="{Binding EsCreador}" Margin="0,10,0,5">
+                                <BoxView HeightRequest="1" Color="#DDDDDD"/>
+                                <Label Text="Sugerencias por disponibilidad:"
+                           FontSize="13"
+                           FontAttributes="Bold"
+                           TextColor="#1E2A4A"
+                           Margin="0,8,0,0"/>
+                            </VerticalStackLayout>
+
+                        </VerticalStackLayout>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
 
@@ -145,6 +177,7 @@
                HorizontalOptions="Center" 
                Margin="20" />
                 </CollectionView.EmptyView>
+
             </CollectionView>
 
         </VerticalStackLayout>

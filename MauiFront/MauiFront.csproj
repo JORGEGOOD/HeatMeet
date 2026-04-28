@@ -68,6 +68,9 @@
     <Compile Update="EventDetailPage.xaml.cs">
       <DependentUpon>EventDetailPage.xaml</DependentUpon>
     </Compile>
+    <Compile Update="UserGroups.xaml.cs">
+      <DependentUpon>UserGroups.xaml</DependentUpon>
+    </Compile>
     <Compile Update="VotePage.xaml.cs">
       <DependentUpon>VotePage.xaml</DependentUpon>
     </Compile>
@@ -90,6 +93,9 @@
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
     <MauiXaml Update="EventDetailPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+    <MauiXaml Update="UserGroups.xaml">
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
     <MauiXaml Update="VotePage.xaml">
