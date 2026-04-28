@@ -62,6 +62,7 @@ namespace MauiFront
                         ProposalDto? creatorProposal = JsonSerializer.Deserialize<ProposalDto>(cp.GetRawText(), options);
                         if (creatorProposal != null)
                         {
+                            creatorProposal.EsCreador = true;
                             bool yaEsta = topDays?.Any(d => d.Fecha.Date == creatorProposal.Fecha.Date) ?? false;
                             if (!yaEsta)
                                 topDays?.Insert(0, creatorProposal);

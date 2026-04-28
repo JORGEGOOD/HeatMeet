@@ -46,9 +46,13 @@ namespace HeatMeetServer
         
         static void Main(string[] args)
         {
+            //Subscribe custom exit
             AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
 
-            ormManager.Database.EnsureCreated();
+            //ensure created functions
+            ormManager.Database.EnsureCreated(); //<-- Database
+            Log    .startLog();                 //<--- Log
+            Storage.Initialize();              //<---- Initialize
 
             //infinite client accept loop
             try

@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System.Net.Sockets;
 using System.Text.Json;
+using System.Threading.Tasks;
 using SharedModels;
 namespace MauiFront;
 
@@ -19,6 +20,12 @@ public partial class GroupsChat : ContentPage
     private async void OnBackTapped(object sender, EventArgs e)
     {
         await Navigation.PopAsync();
+    }
+
+    private async Task OnGroupNameTapped(object sender, EventArgs e)
+    {
+        
+        await Navigation.PushAsync(new UserGroups());
     }
 
     void AddChatItem(ChatItem item, int currentUserId)

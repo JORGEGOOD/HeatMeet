@@ -10,5 +10,6 @@ namespace MauiFront
     {
         public DateTime Fecha { get; set; }
         public int Count { get; set; }
+        public bool EsCreador { get; set; } = false;
     }
 }

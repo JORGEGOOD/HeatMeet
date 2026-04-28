@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
 	<TargetFrameworks>net8.0-android</TargetFrameworks>
@@ -59,26 +59,26 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="CreateGroupPage.xaml.cs">
+    <Compile Update="Pages\CreateGroup\CreateGroupPage.xaml.cs">
       <DependentUpon>CreateGroupPage.xaml</DependentUpon>
     </Compile>
-    <Compile Update="EventPage.xaml.cs">
+    <Compile Update="Pages\Event\EventPage.xaml.cs">
       <DependentUpon>EventPage.xaml</DependentUpon>
     </Compile>
-    <Compile Update="EventDetailPage.xaml.cs">
+    <Compile Update="Pages\EventDetail\EventDetailPage.xaml.cs">
       <DependentUpon>EventDetailPage.xaml</DependentUpon>
     </Compile>
-    <Compile Update="VotePage.xaml.cs">
+    <Compile Update="Pages\VotePage\VotePage.xaml.cs">
       <DependentUpon>VotePage.xaml</DependentUpon>
     </Compile>
-    <Compile Update="NewEventPage.xaml.cs">
+    <Compile Update="Pages\NewEvent\NewEventPage.xaml.cs">
       <DependentUpon>VotePage.xaml</DependentUpon>
     </Compile>
-    <Compile Update="JoinGroups.xaml.cs">
+    <Compile Update="Pages\JoinGroups\JoinGroups.xaml.cs">
       <DependentUpon>JoinGroups.xaml</DependentUpon>
     </Compile>
-    <Compile Update="GruopsChat.xaml.cs">
-      <DependentUpon>GruopsChat.xaml</DependentUpon>
+    <Compile Update="Pages\GroupsChat\GroupsChat.xaml.cs">
+      <DependentUpon>GroupsChat.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
 
@@ -92,22 +92,22 @@
     <MauiXaml Update="CreateGroupPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
-    <MauiXaml Update="EventPage.xaml">
+    <MauiXaml Update="Pages\Event\EventPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
-    <MauiXaml Update="EventDetailPage.xaml">
+    <MauiXaml Update="Pages\EventDetail\EventDetailPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
-    <MauiXaml Update="VotePage.xaml">
+    <MauiXaml Update="Pages\VotePage\VotePage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
-    <MauiXaml Update="NewEventPage.xaml">
+    <MauiXaml Update="Pages\NewEvent\NewEventPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
-    <MauiXaml Update="JoinGroups.xaml">
+    <MauiXaml Update="Pages\JoinGroups\JoinGroups.xaml">
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
-    <MauiXaml Update="GruopsChat.xaml">
+    <MauiXaml Update="Pages\GroupsChat\GroupsChat.xaml">
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
   </ItemGroup>
