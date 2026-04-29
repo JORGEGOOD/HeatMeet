@@ -742,6 +742,36 @@ namespace HeatMeetServer
                             else response.Data = new { success = false, message = "Invalid data" };
                         }
                         break;
+                    case "GET_GROUP_MEMBERS":
+                        {
+                            if (message.Data is JsonElement membersData)
+                            {
+                                int groupId = membersData.GetProperty("groupId").GetInt32();
+                                lock (ormLock)
+                                {
+                                    Groups? group = ormManager.Groups
+                                        .Include(g => g.Users)
+                                        .FirstOrDefault(g => g.Id == groupId);
+
+                                    if (group == null)
+                                    {
+                                        response.Data = new { success = false, message = "Group not found" };
+                                        break;
+                                    }
+
+                                    var members = group.Users.Select(u => new
+                                    {
+                                        u.Id,
+                                        u.Name,
+                                        u.Email
+                                    }).ToList();
+
+                                    response.Data = new { success = true, members };
+                                }
+                            }
+                            else response.Data = new { success = false, message = "Invalid data" };
+                        }
+                        break;
 
 
                     default:
