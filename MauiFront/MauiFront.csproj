@@ -82,38 +82,33 @@
     </Compile>
   </ItemGroup>
 
-  <ItemGroup>
-<<<<<<< Updated upstream
-    <MauiFont Update="Resources\Fonts\MaterialIcons-Regular.ttf">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </MauiFont>
-  </ItemGroup>
+<ItemGroup>
+  <MauiFont Update="Resources\Fonts\MaterialIcons-Regular.ttf">
+    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+  </MauiFont>
+</ItemGroup>
 
-  <ItemGroup>
-    <MauiXaml Update="CreateGroupPage.xaml">
-=======
-    <MauiXaml Update="Pages\CreateGroup\CreateGroupPage.xaml">
->>>>>>> Stashed changes
-      <Generator>MSBuild:Compile</Generator>
-    </MauiXaml>
-    <MauiXaml Update="Pages\Event\EventPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </MauiXaml>
-    <MauiXaml Update="Pages\EventDetail\EventDetailPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </MauiXaml>
-    <MauiXaml Update="Pages\VotePage\VotePage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </MauiXaml>
-    <MauiXaml Update="Pages\NewEvent\NewEventPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </MauiXaml>
-    <MauiXaml Update="Pages\JoinGroups\JoinGroups.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </MauiXaml>
-    <MauiXaml Update="Pages\GroupsChat\GroupsChat.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </MauiXaml>
-  </ItemGroup>
-
+<ItemGroup>
+  <MauiXaml Update="Pages\CreateGroup\CreateGroupPage.xaml">
+    <Generator>MSBuild:Compile</Generator>
+  </MauiXaml>
+  <MauiXaml Update="Pages\Event\EventPage.xaml">
+    <Generator>MSBuild:Compile</Generator>
+  </MauiXaml>
+  <MauiXaml Update="Pages\EventDetail\EventDetailPage.xaml">
+    <Generator>MSBuild:Compile</Generator>
+  </MauiXaml>
+  <MauiXaml Update="Pages\VotePage\VotePage.xaml">
+    <Generator>MSBuild:Compile</Generator>
+  </MauiXaml>
+  <MauiXaml Update="Pages\NewEvent\NewEventPage.xaml">
+    <Generator>MSBuild:Compile</Generator>
+  </MauiXaml>
+  <MauiXaml Update="Pages\JoinGroups\JoinGroups.xaml">
+    <Generator>MSBuild:Compile</Generator>
+  </MauiXaml>
+  <MauiXaml Update="Pages\GroupsChat\GroupsChat.xaml">
+    <Generator>MSBuild:Compile</Generator>
+  </MauiXaml>
+</ItemGroup>
 </Project>
