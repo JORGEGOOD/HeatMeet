@@ -28,6 +28,60 @@ public partial class GroupsChat : ContentPage
         await Navigation.PushAsync(new UserGroups());
     }
 
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        _isChatActive = false;
+        MessagesContainer.ChildAdded -= OnChildAddedScroll;//<--Clears chat, but android still screws it up
+    }
+
+    #region CHAT_STUFF
+
+
+    private async Task LoadInitialChat()//Separate thread because stupid Android cannot hold networking and ui in the same place
+    {
+        Socket? socket = null;
+        try
+        {
+            socket = NetUtils.NetUtils.ConnectToServer();
+            //Send command
+            NetworkMessage message = new()
+            {
+                Command = "GET_GROUP_MESSAGES_AND_EVENTS",
+                Data = new { groupId = Preferences.Get("groupId", 0) }
+            };
+            NetUtils.NetUtils.SendJson(socket, message);
+            //Answer
+            NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
+            if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
+            {
+                //get messages and events
+                List<MessageDto>? messages = JsonSerializer.Deserialize<List<MessageDto>>(data.GetProperty("messages").GetRawText());
+                List<EventDto>? events = data.TryGetProperty("events", out var evJson)
+                    ? JsonSerializer.Deserialize<List<EventDto>>(evJson.GetRawText())
+                    : new List<EventDto>();
+
+                //Load everything
+                //Await because android trolls with networking
+                await MainThread.InvokeOnMainThreadAsync(() =>
+                {
+                    LoadMessages(messages, events, Preferences.Get("userId", 0));
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error inicial: {ex.Message}");
+        }
+    }
+
+
+
+
+    //Subscribe on added something to scroll bottom, but android do what he wants and this doesn't work
+    private void OnChildAddedScroll(object? sender, ElementEventArgs e) => ScrollToBottom();
+
+
     void AddChatItem(ChatItem item, int currentUserId)
     {
         int itemId = item.IsMessage ? item.Message.Id : item.Event.Id;
@@ -226,6 +280,7 @@ public partial class GroupsChat : ContentPage
         // ACTUALIZACIÓN CRUCIAL
         _lastMessageId = maxId;
     }
+    #endregion
 
     protected override async void OnAppearing()
     {
@@ -255,104 +310,12 @@ public partial class GroupsChat : ContentPage
             return;
         }
 
-        //Get messages
-        await LoadInitialChat();
+        //Get initial messages
+        //await LoadInitialChat();// DISABLED FOR GOOD AND NO TIME. NO MORE RACE CONDITION BUGS, NO MORE DIFF ORIGINS BUGS
+        //await Task.Delay(1000);
+
         _isInitialLoadComplete = true;
         _ = RefreshMessagesLoop();// "_" is for the compiler to shut up and ignore warnings, else gives multiple warnings
-    }
-
-    private async Task LoadInitialChat()//Separate thread because stupid Android cannot hold networking and ui in the same place
-    {
-        Socket? socket = null;
-        try
-        {
-            socket = NetUtils.NetUtils.ConnectToServer();
-            //Send command
-            NetworkMessage message = new()
-            {
-                Command = "GET_GROUP_MESSAGES_AND_EVENTS",
-                Data    = new { groupId = Preferences.Get("groupId", 0) }
-            };
-            NetUtils.NetUtils.SendJson(socket, message);
-            //Answer
-            NetworkMessage? response = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(socket);
-            if (response?.Data is JsonElement data && data.GetProperty("success").GetBoolean())
-            {
-                //get messages and events
-                List<MessageDto>? messages = JsonSerializer.Deserialize<List<MessageDto>>(data.GetProperty("messages").GetRawText());
-                List<EventDto>?   events   = data.TryGetProperty("events", out var evJson)
-                    ? JsonSerializer.Deserialize<List<EventDto>>(evJson.GetRawText())
-                    : new List<EventDto>();
-
-                //Load everything
-                //Await because android trolls with networking
-                await MainThread.InvokeOnMainThreadAsync(() => 
-                {
-                    LoadMessages(messages, events, Preferences.Get("userId", 0));
-                });
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error inicial: {ex.Message}");
-        }
-    }
-
-    protected override void OnDisappearing()
-    {
-        base.OnDisappearing();
-        _isChatActive = false;
-        MessagesContainer.ChildAdded -= OnChildAddedScroll;//<--Clears chat, but android still screws it up
-    }
-
-    //Subscribe on added something to scroll bottom, but android do what he wants and this doesn't work
-    private void OnChildAddedScroll(object? sender, ElementEventArgs e) => ScrollToBottom();
-
-    private async void OnAvatarTapped(object sender, EventArgs e)
-    {
-        try
-        {
-            string action = await DisplayActionSheet(
-                "Foto del grupo",
-                "Cancelar",
-                null,
-                "📷 Hacer foto",
-                "🖼️ Elegir de galería",
-                "🗑️ Quitar imagen");
-
-            FileResult? result = null;
-
-            if (action == "📷 Hacer foto")
-                result = await MediaPicker.Default.CapturePhotoAsync();
-            else if (action == "🖼️ Elegir de galería")
-                result = await MediaPicker.Default.PickPhotoAsync();
-            else if (action == "🗑️ Quitar imagen")
-            {
-                int gId = Preferences.Get("groupId", 0);
-                Preferences.Remove($"groupAvatar_{gId}");
-                GroupAvatarImage.Source = "group_avatar.svg";
-                return;
-            }
-
-            if (result != null)
-            {
-                int groupId = Preferences.Get("groupId", 0);
-                string localPath = Path.Combine(
-                    FileSystem.AppDataDirectory,
-                    $"avatar_group_{groupId}.jpg");
-
-                using Stream sourceStream = await result.OpenReadAsync();
-                using FileStream destStream = File.Create(localPath);
-                await sourceStream.CopyToAsync(destStream);
-
-                Preferences.Set($"groupAvatar_{groupId}", localPath);
-                GroupAvatarImage.Source = ImageSource.FromFile(localPath);
-            }
-        }
-        catch (Exception ex)
-        {
-            await DisplayAlert("Error", ex.Message, "OK");
-        }
     }
 
     private async void OnSendTapped(object sender, EventArgs e)
@@ -419,13 +382,15 @@ public partial class GroupsChat : ContentPage
         }
     }
 
+    #region RELOAD_MESSAGES
     //-- RELOAD MESSAGES --//
     private bool _isProcessingNetwork = false;
     private async Task RefreshMessagesLoop()
     {
         while (_isChatActive)
         {
-            await Task.Delay(2000);
+            //moved sleep to end of func, to avoid waiting too much at the beggining
+
 
             //if nothing rare or obscure is happening
             if (!_isInitialLoadComplete || _isProcessingNetwork) continue;
@@ -464,23 +429,23 @@ public partial class GroupsChat : ContentPage
                         //Unify both into chatItems
                         List<ChatItem> newItems = new();
                         if(newMessages!=null) newItems.AddRange(newMessages.Select(m=>new ChatItem { CreateDate = m.CreateDate, Message = m }));
-                        if(newEvents!=null)   newItems.AddRange(newEvents  .Select(e=>new ChatItem { CreateDate = e.CreateDate, Event   = e }));
+                        if(newEvents  !=null) newItems.AddRange(newEvents  .Select(e=>new ChatItem { CreateDate = e.CreateDate, Event   = e }));
 
                         //Sort list by date
                         List<ChatItem> sortedItems = newItems.OrderBy(i => i.CreateDate).ToList();
 
-
                         MainThread.BeginInvokeOnMainThread(() =>
                         {
-                            foreach (var item in sortedItems)
+                            //Id OrderBy
+                            foreach (ChatItem item in sortedItems.OrderBy(x => x.IsMessage ? x.Message.Id : x.Event.Id))
                             {
-                                //check duplicates
-                                int currentId = item.IsMessage ? item.Message.Id : item.Event.Id;
-                                //add only if newer than local last
-                                if (currentId > _lastMessageId)
+                                int itemId = item.IsMessage ? item.Message.Id : item.Event.Id;
+
+                                //Another check of id
+                                if (itemId > _lastMessageId)
                                 {
                                     AddChatItem(item, Preferences.Get("userId", 0));
-                                    _lastMessageId = currentId;
+                                    _lastMessageId = itemId;
                                 }
                             }
                         });
@@ -496,13 +461,61 @@ public partial class GroupsChat : ContentPage
                 if (socket != null) NetUtils.NetUtils.CloseSocket(socket);
                 _isProcessingNetwork = false;
             }
+            await Task.Delay(1000);
+        }
+    }
+    #endregion
+
+    #region LESS_IMPORTANT_FUNCTIONS
+
+    private async void OnAvatarTapped(object sender, EventArgs e)
+    {
+        try
+        {
+            string action = await DisplayActionSheet(
+                "Foto del grupo",
+                "Cancelar",
+                null,
+                "📷 Hacer foto",
+                "🖼️ Elegir de galería",
+                "🗑️ Quitar imagen");
+
+            FileResult? result = null;
+
+            if (action == "📷 Hacer foto")
+                result = await MediaPicker.Default.CapturePhotoAsync();
+            else if (action == "🖼️ Elegir de galería")
+                result = await MediaPicker.Default.PickPhotoAsync();
+            else if (action == "🗑️ Quitar imagen")
+            {
+                int gId = Preferences.Get("groupId", 0);
+                Preferences.Remove($"groupAvatar_{gId}");
+                GroupAvatarImage.Source = "group_avatar.svg";
+                return;
+            }
+
+            if (result != null)
+            {
+                int groupId = Preferences.Get("groupId", 0);
+                string localPath = Path.Combine(
+                    FileSystem.AppDataDirectory,
+                    $"avatar_group_{groupId}.jpg");
+
+                using Stream sourceStream = await result.OpenReadAsync();
+                using FileStream destStream = File.Create(localPath);
+                await sourceStream.CopyToAsync(destStream);
+
+                Preferences.Set($"groupAvatar_{groupId}", localPath);
+                GroupAvatarImage.Source = ImageSource.FromFile(localPath);
+            }
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Error", ex.Message, "OK");
         }
     }
 
 
-
-
-    //-- Less important functions --//
 
 
     private async void OnMenuTapped(object sender, EventArgs e)
@@ -764,4 +777,5 @@ public partial class GroupsChat : ContentPage
     {
         await Navigation.PushAsync(new NewEventPage());
     }
+    #endregion
 }
