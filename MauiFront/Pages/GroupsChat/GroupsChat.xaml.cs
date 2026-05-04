@@ -22,7 +22,7 @@ public partial class GroupsChat : ContentPage
         await Navigation.PopAsync();
     }
 
-    private async Task OnGroupNameTapped(object sender, EventArgs e)
+    private async void OnGroupNameTapped(object sender, EventArgs e)
     {
         
         await Navigation.PushAsync(new UserGroups());

@@ -1,16 +1,10 @@
-<<<<<<< Updated upstream
 <?xml version="1.0" encoding="utf-8" ?>
-=======
-﻿<?xml version="1.0" encoding="utf-8" ?>
->>>>>>> Stashed changes
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MauiFront.GroupsChat"
              BackgroundColor="#F5F0E8">
 
-<<<<<<< Updated upstream
     <ContentPage.Resources>
-        <!-- Estilo para botón de menú (3 puntos) -->
         <Style TargetType="Button" x:Key="MenuButtonStyle">
             <Setter Property="BackgroundColor" Value="Transparent" />
             <Setter Property="TextColor" Value="Black" />
@@ -24,69 +18,15 @@
             <Setter Property="Text" Value="⋮" />
             <Setter Property="FontSize" Value="24" />
             <Setter Property="FontAttributes" Value="Bold" />
-            <Setter Property="VisualStateManager.VisualStateGroups">
-                <VisualStateGroupList>
-                    <VisualStateGroup x:Name="CommonStates">
-                        <VisualState x:Name="Normal">
-                            <VisualState.Setters>
-                                <Setter Property="Scale" Value="1" />
-                                <Setter Property="BackgroundColor" Value="Transparent" />
-                                <Setter Property="TextColor" Value="Black" />
-                            </VisualState.Setters>
-                        </VisualState>
-                        <VisualState x:Name="PointerOver">
-                            <VisualState.Setters>
-                                <Setter Property="Scale" Value="1.05" />
-                                <Setter Property="BackgroundColor" Value="#E8E8E8" />
-                                <Setter Property="TextColor" Value="#FF6A00" />
-                            </VisualState.Setters>
-                        </VisualState>
-                        <VisualState x:Name="Pressed">
-                            <VisualState.Setters>
-                                <Setter Property="Scale" Value="0.92" />
-                                <Setter Property="BackgroundColor" Value="#D3D3D3" />
-                                <Setter Property="TextColor" Value="#FF6A00" />
-                            </VisualState.Setters>
-                        </VisualState>
-                    </VisualStateGroup>
-                </VisualStateGroupList>
-            </Setter>
         </Style>
 
-        <!-- Estilo para botón de retroceso con Material Icon -->
         <Style TargetType="Button" x:Key="BackButtonStyle">
             <Setter Property="BackgroundColor" Value="Transparent" />
-            <Setter Property="Padding" Value="0" />
-            <Setter Property="Margin" Value="0,0,0,0" />
             <Setter Property="HeightRequest" Value="40" />
             <Setter Property="WidthRequest" Value="40" />
             <Setter Property="CornerRadius" Value="20" />
             <Setter Property="VerticalOptions" Value="Center" />
             <Setter Property="HorizontalOptions" Value="Center" />
-            <Setter Property="VisualStateManager.VisualStateGroups">
-                <VisualStateGroupList>
-                    <VisualStateGroup x:Name="CommonStates">
-                        <VisualState x:Name="Normal">
-                            <VisualState.Setters>
-                                <Setter Property="Scale" Value="1" />
-                                <Setter Property="BackgroundColor" Value="Transparent" />
-                            </VisualState.Setters>
-                        </VisualState>
-                        <VisualState x:Name="PointerOver">
-                            <VisualState.Setters>
-                                <Setter Property="Scale" Value="1.05" />
-                                <Setter Property="BackgroundColor" Value="#E8E8E8" />
-                            </VisualState.Setters>
-                        </VisualState>
-                        <VisualState x:Name="Pressed">
-                            <VisualState.Setters>
-                                <Setter Property="Scale" Value="0.92" />
-                                <Setter Property="BackgroundColor" Value="#D3D3D3" />
-                            </VisualState.Setters>
-                        </VisualState>
-                    </VisualStateGroup>
-                </VisualStateGroupList>
-            </Setter>
         </Style>
     </ContentPage.Resources>
 
@@ -96,11 +36,8 @@
         <Grid Grid.Row="0"
               BackgroundColor="White"
               Padding="10,0"
-              ColumnDefinitions="Auto,50,*,Auto"
-              RowDefinitions="*"
-              ColumnSpacing="0">
+              ColumnDefinitions="Auto,50,*,Auto">
 
-            <!-- Botón de retroceso con Material Icon "arrow_back" -->
             <Button Grid.Column="0"
                     Style="{StaticResource BackButtonStyle}"
                     Clicked="OnBackTapped">
@@ -112,48 +49,13 @@
                 </Button.ImageSource>
             </Button>
 
-            <!-- Imagen del grupo -->
             <Frame Grid.Column="1"
                    WidthRequest="40"
                    HeightRequest="40"
                    CornerRadius="15"
                    Padding="0"
                    IsClippedToBounds="True"
-                   HasShadow="False"
-                   BackgroundColor="Transparent"
-                   VerticalOptions="Center"
-                   HorizontalOptions="Start">
-=======
-    <Grid RowDefinitions="70,*,Auto,50,70">
-
-        <Grid Grid.Row="0"
-              BackgroundColor="White"
-              Padding="10,0"
-              ColumnDefinitions="40,50,*,40">
-
-            <Label Grid.Column="0"
-               Text="←"
-               FontSize="32"
-               FontAttributes="Bold"
-               TextColor="#222"
-               VerticalOptions="Center"
-               HorizontalOptions="Center">
-                <Label.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="OnBackTapped"/>
-                </Label.GestureRecognizers>
-            </Label>
-
-            <Frame Grid.Column="1"
-               WidthRequest="40"
-               HeightRequest="40"
-               CornerRadius="15"
-               Padding="0"
-               IsClippedToBounds="True"
-               HasShadow="False"
-               BackgroundColor="Transparent"
-               VerticalOptions="Center"
-               HorizontalOptions="Center">
->>>>>>> Stashed changes
+                   HasShadow="False">
                 <Image x:Name="GroupAvatarImage"
                        Source="group_avatar.svg"
                        Aspect="AspectFill"/>
@@ -162,8 +64,6 @@
                 </Frame.GestureRecognizers>
             </Frame>
 
-<<<<<<< Updated upstream
-            <!-- Nombre del grupo -->
             <Label x:Name="GroupNameLabel"
                    Grid.Column="2"
                    FontSize="18"
@@ -172,72 +72,39 @@
                    TextColor="#222"
                    Margin="8,0,0,0">
                 <Label.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="OnGroupNameTapped" />
+                    <TapGestureRecognizer Tapped="OnGroupNameTapped"/>
                 </Label.GestureRecognizers>
             </Label>
 
-            <!-- Botón de menú (3 puntos) con animación circular -->
             <Button Grid.Column="3"
                     Style="{StaticResource MenuButtonStyle}"
                     Clicked="OnMenuTapped" />
 
         </Grid>
 
-        <!-- Chat messages -->
-=======
-            <Label x:Name="GroupNameLabel"
-               Grid.Column="2"
-               FontSize="18"
-               FontAttributes="Bold"
-               VerticalOptions="Center"
-               TextColor="#222"
-               Margin="8,0,0,0"/>
-
-            <Button Grid.Column="3"
-                    Text="⋮"
-                    FontSize="22"
-                    BackgroundColor="Transparent"
-                    TextColor="Black"
-                    HorizontalOptions="End"
-                    VerticalOptions="Center"
-                    Clicked="OnMenuTapped"
-                    Padding="8,4"
-                    Margin="0,0,20,0"/>
-        </Grid>
->>>>>>> Stashed changes
+        <!-- Chat -->
         <ScrollView x:Name="ChatScrollView" Grid.Row="1" Padding="15,10">
             <VerticalStackLayout x:Name="MessagesContainer" Spacing="10"/>
         </ScrollView>
 
-<<<<<<< Updated upstream
-        <!-- Eventos bar -->
-=======
-
->>>>>>> Stashed changes
+        <!-- Events -->
         <Frame Grid.Row="3"
                BackgroundColor="#F8F9FA"
-               Margin="0"
                Padding="10,5"
                BorderColor="#E0E0E0"
                CornerRadius="0"
                HasShadow="False">
-            <HorizontalStackLayout Spacing="6" HorizontalOptions="End" VerticalOptions="Center">
+            <HorizontalStackLayout Spacing="6" HorizontalOptions="End">
 
                 <Button Text="≡"
                         FontSize="18"
-                        FontAttributes="Bold"
                         BackgroundColor="#0A2A43"
                         TextColor="White"
                         WidthRequest="38"
                         HeightRequest="35"
                         CornerRadius="10"
-                        Padding="0"
                         Clicked="OnViewAllEventsTapped"/>
 
-<<<<<<< Updated upstream
-=======
-          
->>>>>>> Stashed changes
                 <Button Text="+ Evento"
                         Clicked="NewEvent"
                         BackgroundColor="#FF6A00"
@@ -245,20 +112,11 @@
                         FontSize="12"
                         HeightRequest="35"
                         Padding="12,0"
-                        CornerRadius="18">
-                    <Button.Shadow>
-                        <Shadow Brush="Black" Offset="0,2" Opacity="0.1" Radius="5"/>
-                    </Button.Shadow>
-                </Button>
-
+                        CornerRadius="18"/>
             </HorizontalStackLayout>
         </Frame>
 
-<<<<<<< Updated upstream
-        <!-- Input de mensaje -->
-=======
-
->>>>>>> Stashed changes
+        <!-- Input -->
         <Grid Grid.Row="4"
               BackgroundColor="White"
               Padding="10,0"
@@ -268,28 +126,19 @@
                    BorderColor="#DDDDDD"
                    CornerRadius="20"
                    Padding="15,0"
-                   HeightRequest="42"
-                   VerticalOptions="Center">
+                   HeightRequest="42">
                 <Entry x:Name="MessageEntry"
                        Placeholder="Escribe un mensaje..."
-                       PlaceholderColor="#AAAAAA"
-                       FontSize="14"
-                       VerticalOptions="Center"/>
+                       FontSize="14"/>
             </Frame>
 
             <Frame Grid.Column="1"
                    WidthRequest="40"
                    HeightRequest="40"
                    CornerRadius="20"
-                   BackgroundColor="#F07030"
-                   BorderColor="Transparent"
-                   Padding="0"
-                   IsClippedToBounds="True"
-                   VerticalOptions="Center"
-                   HorizontalOptions="Center">
+                   BackgroundColor="#F07030">
                 <Label Text="➤"
                        TextColor="White"
-                       FontSize="16"
                        HorizontalOptions="Center"
                        VerticalOptions="Center">
                     <Label.GestureRecognizers>

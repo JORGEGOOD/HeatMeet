@@ -24,61 +24,77 @@ namespace NetUtils
 
         public static Socket ConnectToServer()
         {
-            Socket socket = CreateClientSocket("192.168.111.40", 8888);
+            Socket socket = CreateClientSocket("192.168.111.50", 8888);
             return socket;
         }
 
+        // Opciones de JSON compartidas para evitar ciclos del ORM y mejorar velocidad
+        private static readonly JsonSerializerOptions JsonOptions = new()
+        {
+            ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            WriteIndented = false
+        };
+
+        // --- ENVIAR JSON CON SYNC (ACK) ---
         public static void SendJson(Socket socket, object data)
         {
+            if (socket == null) return;
             socket.SendTimeout = 10000;
 
-            JsonSerializerOptions options = new()
-            { 
-                ReferenceHandler = ReferenceHandler.IgnoreCycles,//<-- Ignore theoretically possible Orm infinites
-                WriteIndented = false//<-- Ignore pretty printing. Faster, should be default tho
-            };
-
-            string json = JsonSerializer.Serialize(data,options);
+            string json = JsonSerializer.Serialize(data, JsonOptions);
             byte[] jsonBytes = Encoding.UTF8.GetBytes(json);
             byte[] lengthBytes = BitConverter.GetBytes(jsonBytes.Length);
 
-            socket.Send(lengthBytes);//Length first
-            //send json by pieces
+            // 1. Enviar longitud
+            socket.Send(lengthBytes);
+
+            // 2. ESPERAR ACK (Confirmación del receptor)
+            // Esto garantiza que el receptor leyó la longitud y está listo para el cuerpo
+            byte[] ack = new byte[1];
+            int ackReceived = socket.Receive(ack);
+            if (ackReceived <= 0) throw new Exception("Conexión perdida esperando ACK");
+
+            // 3. Enviar JSON por partes
             int sent = 0;
-            while(sent<jsonBytes.Length)
+            while (sent < jsonBytes.Length)
             {
                 int r = socket.Send(jsonBytes, sent, jsonBytes.Length - sent, SocketFlags.None);
-                if (r == 0) throw new Exception("Could not sent data");
+                if (r == 0) throw new Exception("Error al enviar el cuerpo de los datos");
                 sent += r;
             }
         }
 
-        public static T? ReceiveJson<T>(Socket socket)//HUGE functions to check Network errors, obviously they failed
+        // --- RECIBIR JSON CON SYNC (ACK) ---
+        public static T? ReceiveJson<T>(Socket socket)
         {
+            if (socket == null) return default;
             socket.ReceiveTimeout = 10000;
 
-            //Receive length
+            // 1. Recibir longitud (4 bytes)
             byte[] lengthBuffer = new byte[4];
-            int received = 0;
-            while (received < 4)
+            int receivedLength = 0;
+            while (receivedLength < 4)
             {
-                int r = socket.Receive(lengthBuffer, received, 4 - received, SocketFlags.None);
-                if (r <= 0) return default; 
-                received += r;
+                int r = socket.Receive(lengthBuffer, receivedLength, 4 - receivedLength, SocketFlags.None);
+                if (r <= 0) return default;
+                receivedLength += r;
             }
             int length = BitConverter.ToInt32(lengthBuffer, 0);
-            
-            //Receive Json
+
+            // 2.Send  ACK 
+            socket.Send(new byte[] { 1 });
+
+            // 3. Recibir el cuerpo del JSON
             byte[] buffer = new byte[length];
-            received = 0;
-            while (received < length)
+            int receivedBody = 0;
+            while (receivedBody < length)
             {
-                int r = socket.Receive(buffer, received, length - received, SocketFlags.None);
-                if (r <= 0) break; 
-                received += r;
+                int r = socket.Receive(buffer, receivedBody, length - receivedBody, SocketFlags.None);
+                if (r <= 0) break;
+                receivedBody += r;
             }
-            
-            if (received < length) return default;
+
+            if (receivedBody < length) return default;
 
             string json = Encoding.UTF8.GetString(buffer);
             return JsonSerializer.Deserialize<T>(json);
