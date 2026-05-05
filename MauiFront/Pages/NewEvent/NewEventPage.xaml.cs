@@ -22,8 +22,7 @@ namespace MauiFront
         {
             string query = NombreLugar.Text?.Trim() ?? "";
             if (string.IsNullOrWhiteSpace(query))
-            {
-                await DisplayAlert("", "Escribe un lugar para buscar.", "");
+            {  
                 return;
             }
             await BuscarUbicacion(query, CancellationToken.None);

@@ -177,7 +177,7 @@ namespace HeatMeetServer
                                     var messages = ormManager.Messages.Where(m => m.GroupId == groupId).Select(m => new { m.Content, m.CreateDate, m.UserId, UserName = m.User.Name }).ToList();
                                     //EVENTS
                                     var events = ormManager.Events.Where(e => e.GroupId == groupId && e.IsEvent == true)
-                                                .Select(e => new{ e.Id, e.Title, e.Location, e.Date, e.CreateDate, e.IsEvent, e.IsAllDay,e.UserId}).ToList();
+                                                .Select(e => new{ e.Id, e.Title, e.Location, e.Date, e.CreateDate, e.IsEvent, e.IsAllDay,e.UserId, e.IsDraft}).ToList();
                                     //send
                                     response.Data = new
                                     {

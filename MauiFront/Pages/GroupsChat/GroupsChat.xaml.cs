@@ -217,22 +217,27 @@ public partial class GroupsChat : ContentPage
 
             Button votarBtn = new()
             {
-                Text = "Votar",
-                BackgroundColor = Color.FromArgb("#FF6A00"),
+                Text = ev.IsDraft ? "Votar" : "Evento confirmado",
+                BackgroundColor = ev.IsDraft
+                ? Color.FromArgb("#FF6A00")
+                : Color.FromArgb("#1A3A6B"),
                 TextColor = Colors.White,
                 CornerRadius = 20,
                 HeightRequest = 38,
                 HorizontalOptions = LayoutOptions.Fill,
-                FontSize = 13
+                FontSize = 13,
+                IsEnabled = ev.IsDraft
             };
 
-            votarBtn.ClassId = ev.Id.ToString();
-            votarBtn.Clicked += async (s, e) =>
+            if (ev.IsDraft)
             {
-                Preferences.Set("eventId", ev.Id);
-                await Navigation.PushAsync(new VotePage());
-            };
-
+                votarBtn.ClassId = ev.Id.ToString();
+                votarBtn.Clicked += async (s, e) =>
+                {
+                    Preferences.Set("eventId", ev.Id);
+                    await Navigation.PushAsync(new VotePage());
+                };
+            }
             VerticalStackLayout stack = new(){ Spacing = 6 };
             stack.Children.Add(header);
             stack.Children.Add(titleLabel);

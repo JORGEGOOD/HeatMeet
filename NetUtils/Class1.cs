@@ -24,18 +24,18 @@ namespace NetUtils
 
         public static Socket ConnectToServer()
         {
-            Socket socket = CreateClientSocket("192.168.111.50", 8888);
+            Socket socket = CreateClientSocket("192.168.111.41", 8888);
             return socket;
         }
 
-        // Opciones de JSON compartidas para evitar ciclos del ORM y mejorar velocidad
+        // Shared JSON options to avoid ORM cycles and improve speed
         private static readonly JsonSerializerOptions JsonOptions = new()
         {
             ReferenceHandler = ReferenceHandler.IgnoreCycles,
             WriteIndented = false
         };
 
-        // --- ENVIAR JSON CON SYNC (ACK) ---
+        // --- SEND JSON WITH (ACK) ---
         public static void SendJson(Socket socket, object data)
         {
             if (socket == null) return;
@@ -45,11 +45,11 @@ namespace NetUtils
             byte[] jsonBytes = Encoding.UTF8.GetBytes(json);
             byte[] lengthBytes = BitConverter.GetBytes(jsonBytes.Length);
 
-            // 1. Enviar longitud
+            // 1. Send Lengt
             socket.Send(lengthBytes);
 
-            // 2. ESPERAR ACK (Confirmación del receptor)
-            // Esto garantiza que el receptor leyó la longitud y está listo para el cuerpo
+            // 2. WAIT FOR ACK (Receiver Confirmation)
+            //This ensures the receiver has read the length and is ready for the body
             byte[] ack = new byte[1];
             int ackReceived = socket.Receive(ack);
             if (ackReceived <= 0) throw new Exception("Conexión perdida esperando ACK");
