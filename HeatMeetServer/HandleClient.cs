@@ -10,20 +10,27 @@ namespace HeatMeetServer
             if (obj is not Socket client){ Log.Add_Log("FATAL ERROR: HandleClient didn't received a Socket"); return; }
             try
             {
-                Log.Add_Log($"- New connection: {client.RemoteEndPoint} -");
-
-
-                //every "client" is an individual command
+                //every client is in reality an individual command
                 NetworkMessage? message = NetUtils.NetUtils.ReceiveJson<NetworkMessage>(client);
 
                 if (message == null) return;
 
-                Log.Add_Log($"{message.Command}");
-                
+                bool isReload = message.Command == "RELOAD_CHAT_MESSAGES";//All of theese conditionals are for preventing "RELOAD" messages invading the log
+
+                if (!isReload)
+                {
+                    Log.Add_Log($"- New connection: {client.RemoteEndPoint} -");
+                    Log.Add_Log($"{message.Command}");
+                }
+
                 NetworkMessage response = ProcessCommand(message);
 
                 NetUtils.NetUtils.SendJson(client, response);
-                Log.Add_Log($"--------------------------------------");
+
+                if (!isReload)
+                {
+                    Log.Add_Log($"--------------------------------------");
+                }
             }
             catch (Exception ex)
             {
