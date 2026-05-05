@@ -46,7 +46,7 @@
 
                 <!-- Toggle Modo disponibility -->
                 <HorizontalStackLayout HorizontalOptions="Center" Margin="0,10" Spacing="10">
-                    <Label Text="Modo Disponibilidad" VerticalOptions="Center" FontAttributes="Bold" TextColor="#0A2A43"/>
+                    <Label Text="Añadir disponibilidad" VerticalOptions="Center" FontAttributes="Bold" TextColor="#0A2A43"/>
                     <Switch x:Name="DisponibilidadSwitch" 
                             ThumbColor="#0A2A43"/>
                 </HorizontalStackLayout>
