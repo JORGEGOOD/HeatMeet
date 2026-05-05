@@ -272,6 +272,7 @@ namespace HeatMeetServer
                                                         e.UserId,
                                                         e.CreateDate,
                                                         e.IsDraft
+
                                                     }).ToList();
 
                                     response.Data = new { success = true, messages = newMessages, events = newEvents };
