@@ -37,7 +37,7 @@ public partial class GroupsChat : ContentPage
 
     #region CHAT_STUFF
 
-
+    //Not in use but for everyone to see
     private async Task LoadInitialChat()//Separate thread because stupid Android cannot hold networking and ui in the same place
     {
         Socket? socket = null;
@@ -75,31 +75,30 @@ public partial class GroupsChat : ContentPage
         }
     }
 
-
-
-
     //Subscribe on added something to scroll bottom, but android do what he wants and this doesn't work
     private void OnChildAddedScroll(object? sender, ElementEventArgs e) => ScrollToBottom();
 
-
+    //Add individual chat item, expansible for adding more and more things in the chat
     void AddChatItem(ChatItem item, int currentUserId)
     {
-        int itemId = item.IsMessage ? item.Message.Id : item.Event.Id;
+        int itemId = item.IsMessage ? item.Message.Id : item.Event.Id;//Get itemId, super important for the refresh loops
         if (itemId <= _lastMessageId && _lastMessageId != 0) return;
 
-        if (item.IsMessage && item.Message != null) AddMessage(item.Message, currentUserId);
+        //If item is message, add message logic, if event, add event logic
+        if (item.IsMessage && item.Message != null) AddMessage  (item.Message, currentUserId);
         if (item.IsEvent   && item.Event   != null) AddEventCard(item.Event);
 
         //update AGAIN lastMessageId
         if (itemId > _lastMessageId) _lastMessageId = itemId;
     }
 
-    void AddMessage(MessageDto? msg, int currentUserId)
+    //Add individual message
+    void AddMessage(MessageDto msg, int currentUserId)
     {
         int senderId = msg.UserId != 0 ? msg.UserId : msg.userId;
-        bool isMine = senderId == currentUserId;
+        bool isMine  = senderId == currentUserId;
 
-        Grid? headerGrid = new Grid
+        Grid headerGrid = new()
         {
             ColumnDefinitions =
             {
@@ -109,7 +108,7 @@ public partial class GroupsChat : ContentPage
             Margin = new Thickness(2, 0, 2, 3)
         };
 
-        Label? nameLabel = new Label
+        Label nameLabel = new()
         {
             Text = isMine ? "Tú " : (msg.UserName ?? "Usuario"),
             FontSize = 11,
@@ -118,7 +117,7 @@ public partial class GroupsChat : ContentPage
             HorizontalOptions = LayoutOptions.Start
         };
 
-        Label? dateLabel = new Label
+        Label dateLabel = new()
         {
             Text = msg.CreateDate.ToLocalTime().ToString("dd/MM  HH:mm"),
             FontSize = 11,
@@ -129,20 +128,20 @@ public partial class GroupsChat : ContentPage
         headerGrid.Add(nameLabel, 0, 0);
         headerGrid.Add(dateLabel, 1, 0);
 
-        Label? contentLabel = new Label
+        Label contentLabel = new()
         {
             Text = msg.Content,
             FontSize = 14,
             TextColor = isMine ? Colors.White : Color.FromArgb("#222")
         };
 
-        VerticalStackLayout? bubble = new VerticalStackLayout
+        VerticalStackLayout bubble = new()
         {
             Spacing = 0,
             Children = { headerGrid, contentLabel }
         };
 
-        Frame? frame = new Frame
+        Frame frame = new()
         {
             BackgroundColor = isMine ? Color.FromArgb("#2C3E6B") : Colors.White,
             CornerRadius = 16,
@@ -155,53 +154,56 @@ public partial class GroupsChat : ContentPage
         MessagesContainer.Children.Add(frame);
     }
 
+    //Add individual Event Card
     private void AddEventCard(EventDto ev)
     {
+        //New thread because it might cause lag due to huge info in ui
         MainThread.BeginInvokeOnMainThread(() =>
         {
             string formattedDate = ev.Date.ToLocalTime().ToString("dd/MM/yyyy  HH:mm");
 
             Frame card = new()
             {
-                CornerRadius = 12,
-                BorderColor = Color.FromArgb("#FF8C00"),
-                BackgroundColor = Colors.White,
-                Padding = new Thickness(12, 10),
-                Margin = new Thickness(20, 4),
+                CornerRadius       = 12,
+                BorderColor        = Color.FromArgb("#FF8C00"),
+                BackgroundColor    = Colors.White,
+                Padding            = new Thickness(12, 10),
+                Margin             = new Thickness(20, 4),
                 HasShadow = false,
-                HorizontalOptions = LayoutOptions.Fill
+                HorizontalOptions  = LayoutOptions.Fill
             };
 
             HorizontalStackLayout header = new() { Spacing = 8 };
             header.Children.Add(new Image
             {
-                Source = "calendar_icon.png",
-                WidthRequest = 18,
-                HeightRequest = 18,
+                Source          = "calendar_icon.png",
+                WidthRequest    = 18,
+                HeightRequest   = 18,
                 VerticalOptions = LayoutOptions.Center
             });
+
             header.Children.Add(new Label
             {
-                Text = "Propuesta",
-                FontSize = 13,
-                FontAttributes = FontAttributes.Bold,
-                TextColor = Color.FromArgb("#FF6A00"),
+                Text            = "Propuesta",
+                FontSize        = 13,
+                FontAttributes  = FontAttributes.Bold,
+                TextColor       = Color.FromArgb("#FF6A00"),
                 VerticalOptions = LayoutOptions.Center
             });
 
             Label titleLabel = new()
             {
-                Text = ev.Title,
-                FontSize = 14,
+                Text           = ev.Title,
+                FontSize       = 14,
                 FontAttributes = FontAttributes.Bold,
-                TextColor = Color.FromArgb("#222")
+                TextColor      = Color.FromArgb("#222")
             };
 
             HorizontalStackLayout detailsRow = new(){ Spacing = 10 };
             detailsRow.Children.Add(new Label
             {
-                Text = "📅 " + formattedDate,
-                FontSize = 12,
+                Text      = "📅 " + formattedDate,
+                FontSize  = 12,
                 TextColor = Colors.Gray
             });
 
@@ -209,8 +211,8 @@ public partial class GroupsChat : ContentPage
             {
                 detailsRow.Children.Add(new Label
                 {
-                    Text = "📍 " + ev.Location,
-                    FontSize = 12,
+                    Text      = "📍 " + ev.Location,
+                    FontSize  = 12,
                     TextColor = Colors.Gray
                 });
             }
@@ -218,15 +220,15 @@ public partial class GroupsChat : ContentPage
             Button votarBtn = new()
             {
                 Text = ev.IsDraft ? "Votar" : "Evento confirmado",
-                BackgroundColor = ev.IsDraft
+                BackgroundColor   = ev.IsDraft
                 ? Color.FromArgb("#FF6A00")
                 : Color.FromArgb("#1A3A6B"),
-                TextColor = Colors.White,
-                CornerRadius = 20,
-                HeightRequest = 38,
+                TextColor         = Colors.White,
+                CornerRadius      = 20,
+                HeightRequest     = 38,
                 HorizontalOptions = LayoutOptions.Fill,
-                FontSize = 13,
-                IsEnabled = ev.IsDraft
+                FontSize          = 13,
+                IsEnabled         = ev.IsDraft
             };
 
             if (ev.IsDraft)
@@ -249,9 +251,10 @@ public partial class GroupsChat : ContentPage
         });
     }
 
+    //Scroll to the bottom of the chat, doesnt work well in fast use because it freezes each tab for 2-3s instead of deleteing it
     private async void ScrollToBottom()
     {
-        await Task.Delay(100);
+        await Task.Delay(100);//<--Useless try to solve things
         await ChatScrollView.ScrollToAsync(MessagesContainer, ScrollToPosition.End, false);
         MainThread.BeginInvokeOnMainThread(async () =>
         {
@@ -267,8 +270,8 @@ public partial class GroupsChat : ContentPage
         //Get messages and events into a list
         List<ChatItem> chatItems = new List<ChatItem>();
         chatItems.AddRange(messages.Select(m => new ChatItem { CreateDate = m.CreateDate, Message = m }));//Put in messages
-        chatItems.AddRange(events.Select(e => new ChatItem { CreateDate = e.CreateDate, Event = e }));//Put in events
-        List<ChatItem> sortedChatItems = chatItems.OrderBy(c => c.CreateDate).ToList();//Sort list
+        chatItems.AddRange(events  .Select(e => new ChatItem { CreateDate = e.CreateDate, Event   = e }));//Put in events
+        List<ChatItem> sortedChatItems = chatItems.OrderBy(c => c.CreateDate).ToList();                   //Sort list
 
         //Print each item and update lastMessageId, because Android doesn't know better
         int maxId = 0;
@@ -316,7 +319,7 @@ public partial class GroupsChat : ContentPage
         }
 
         //Get initial messages
-        //await LoadInitialChat();// DISABLED FOR GOOD AND NO TIME. NO MORE RACE CONDITION BUGS, NO MORE DIFF ORIGINS BUGS
+        //await LoadInitialChat();// DISABLED FOR GOOD AND NO TIME. NO MORE RACE CONDITION BUGS, NO MORE DIFF ORIGINS BUGS, ONE THREAD ONE SOCKET
         //await Task.Delay(1000);
 
         _isInitialLoadComplete = true;

@@ -132,19 +132,24 @@
                        FontSize="14"/>
             </Frame>
 
+            <!-- Send button -->
             <Frame Grid.Column="1"
-                   WidthRequest="40"
-                   HeightRequest="40"
-                   CornerRadius="20"
-                   BackgroundColor="#F07030">
-                <Label Text="➤"
-                       TextColor="White"
-                       HorizontalOptions="Center"
-                       VerticalOptions="Center">
-                    <Label.GestureRecognizers>
+               WidthRequest="40"
+               HeightRequest="40"
+               CornerRadius="20"
+               BackgroundColor="#F07030"
+               Padding="0">
+
+                <Image Source="send_Icon.png"
+                   WidthRequest="20"
+                   HeightRequest="20"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center">
+                    <Image.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnSendTapped"/>
-                    </Label.GestureRecognizers>
-                </Label>
+                    </Image.GestureRecognizers>
+                </Image>
+
             </Frame>
 
         </Grid>

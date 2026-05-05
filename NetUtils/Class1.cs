@@ -9,6 +9,9 @@ namespace NetUtils
 {
     public static class NetUtils
     {
+
+        #region Sockets
+
         public static Socket CreateServerSocket(string addressText, int port)
         {
             IPAddress address = IPAddress.Parse(addressText);
@@ -28,49 +31,70 @@ namespace NetUtils
             return socket;
         }
 
-        // Shared JSON options to avoid ORM cycles and improve speed
-        private static readonly JsonSerializerOptions JsonOptions = new()
+        public static Socket CreateClientSocket(string addressText, int port)
         {
-            ReferenceHandler = ReferenceHandler.IgnoreCycles,
-            WriteIndented = false
-        };
+            IPAddress address = IPAddress.Parse(addressText);
+            IPEndPoint endpoint = new IPEndPoint(address, port);
 
-        // --- SEND JSON WITH (ACK) ---
+            Socket clientSocket = new Socket(address.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            clientSocket.Connect(endpoint);
+
+            return clientSocket;
+        }
+
+        public static void CloseSocket(Socket s)
+        {
+            if (s.Connected) s.Shutdown(SocketShutdown.Both);
+
+            s.Close();
+        }
+
+        #endregion
+
+        #region Json
+
+        // --- JSON SEND WITH ACK ---
         public static void SendJson(Socket socket, object data)
         {
             if (socket == null) return;
             socket.SendTimeout = 10000;
 
+            JsonSerializerOptions JsonOptions = new() //Ignore pretty printing (spaces and intros) and dodge possible Orm infinites
+            {
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+                WriteIndented = false
+            };
+
             string json = JsonSerializer.Serialize(data, JsonOptions);
             byte[] jsonBytes = Encoding.UTF8.GetBytes(json);
             byte[] lengthBytes = BitConverter.GetBytes(jsonBytes.Length);
 
-            // 1. Send Lengt
+            //Send length
             socket.Send(lengthBytes);
 
-            // 2. WAIT FOR ACK (Receiver Confirmation)
-            //This ensures the receiver has read the length and is ready for the body
+            //Wait for ACK
+            //This is just a useless patch for a bigger problem
             byte[] ack = new byte[1];
             int ackReceived = socket.Receive(ack);
-            if (ackReceived <= 0) throw new Exception("Conexión perdida esperando ACK");
+            if (ackReceived <= 0) throw new Exception("Connection lost, waiting ACK");
 
-            // 3. Enviar JSON por partes
+            //Send JSON in parts
             int sent = 0;
             while (sent < jsonBytes.Length)
             {
                 int r = socket.Send(jsonBytes, sent, jsonBytes.Length - sent, SocketFlags.None);
-                if (r == 0) throw new Exception("Error al enviar el cuerpo de los datos");
+                if (r == 0) throw new Exception("Error when sending data (Sent 0 bytes)");
                 sent += r;
             }
         }
 
-        // --- RECIBIR JSON CON SYNC (ACK) ---
+        // --- JSON RECEIVE WITH ACK ---
         public static T? ReceiveJson<T>(Socket socket)
         {
             if (socket == null) return default;
             socket.ReceiveTimeout = 10000;
 
-            // 1. Recibir longitud (4 bytes)
+            //Get length, should be in int 
             byte[] lengthBuffer = new byte[4];
             int receivedLength = 0;
             while (receivedLength < 4)
@@ -81,10 +105,10 @@ namespace NetUtils
             }
             int length = BitConverter.ToInt32(lengthBuffer, 0);
 
-            // 2.Send  ACK 
+            //Send  ACK 
             socket.Send(new byte[] { 1 });
 
-            // 3. Recibir el cuerpo del JSON
+            //Get JSON in parts
             byte[] buffer = new byte[length];
             int receivedBody = 0;
             while (receivedBody < length)
@@ -99,6 +123,10 @@ namespace NetUtils
             string json = Encoding.UTF8.GetString(buffer);
             return JsonSerializer.Deserialize<T>(json);
         }
+
+        #endregion
+
+        #region Binary_not_implemented
 
         //-- Binary for images and large files --
         public static void SendBinary(Socket socket, byte[] data)//<-- C# manages pointers by default
@@ -132,23 +160,7 @@ namespace NetUtils
             }
         }
 
-        public static Socket CreateClientSocket(string addressText, int port)
-        {
-            IPAddress address = IPAddress.Parse(addressText);
-            IPEndPoint endpoint = new IPEndPoint(address, port);
+        #endregion
 
-            Socket clientSocket = new Socket(address.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            clientSocket.Connect(endpoint);
-
-            return clientSocket;
-        }
-
-        public static void CloseSocket(Socket s)
-        {
-            if (s.Connected)
-                s.Shutdown(SocketShutdown.Both);
-
-            s.Close();
-        }
     }
 }
