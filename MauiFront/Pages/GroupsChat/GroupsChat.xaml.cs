@@ -222,7 +222,7 @@ public partial class GroupsChat : ContentPage
                 Text = ev.IsDraft ? "Votar" : "Evento confirmado",
                 BackgroundColor   = ev.IsDraft
                 ? Color.FromArgb("#FF6A00")
-                : Color.FromArgb("#1A3A6B"),
+                : Color.FromArgb("#10295c"),
                 TextColor         = Colors.White,
                 CornerRadius      = 20,
                 HeightRequest     = 38,
